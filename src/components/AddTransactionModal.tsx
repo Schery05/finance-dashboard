@@ -7,6 +7,7 @@ import { useFinanceStore } from "@/store/financeStore";
 import type { Transaction } from "@/lib/types";
 import type { TransactionInput } from "@/lib/validators";
 
+
 function toISODate(value: string) {
   const s = String(value ?? "").trim();
   if (!s) return "";
@@ -30,9 +31,21 @@ function toISODate(value: string) {
   return "";
 }
 
-export function AddTransactionModal({ open, onClose,editing, }: { open: boolean; onClose: () => void; editing: Transaction | null; }) {
+export function AddTransactionModal({ 
+  open, 
+  onClose,
+  editing, 
+  cloning,
+}: {
+   open: boolean; 
+   onClose: () => void; 
+   editing: Transaction | null; 
+   cloning: Transaction | null;
+  }) {
   const { addTransaction, updateTransaction, loading } = useFinanceStore();
-
+  const update = (k: keyof Transaction, v: any) => setForm((p) => ({ ...p, [k]: v }));
+  const isEdit = !!editing;
+  const isClone = !!cloning && !editing;
   // const [form, setForm] = useState<Transaction>({
   //   Fecha: new Date().toISOString().slice(0, 10),
   //   Tipo: "Gasto",
@@ -41,9 +54,7 @@ export function AddTransactionModal({ open, onClose,editing, }: { open: boolean;
   //   EstadoPago: "Pendiente",
   //   DescripcionAdicional: "",
   // });
-  const update = (k: keyof Transaction, v: any) => setForm((p) => ({ ...p, [k]: v }));
 
-  const isEdit = !!editing;
 
   const [form, setForm] = useState<TransactionInput>({
   Fecha: new Date().toISOString().slice(0, 10),
@@ -65,7 +76,20 @@ useEffect(() => {
       EstadoPago: editing.EstadoPago,
       DescripcionAdicional: editing.DescripcionAdicional ?? "",
     });
-  } else {
+    return;
+  }
+    if(cloning){
+      //MODO CLONAR: PRELLENA LOS DATO, PERO CREANDO UNA NUEVA
+      setForm({
+      Fecha: new Date().toISOString().slice(0, 10), // HOY (recomendado)
+      Tipo: cloning.Tipo,
+      Categoría: cloning.Categoría,
+      Importe: cloning.Importe,
+      EstadoPago: "Pendiente", // recomendado para gastos fijos
+      DescripcionAdicional: cloning.DescripcionAdicional ?? "",
+    });
+    return;
+    } else {
     // modo crear: reset
     setForm({
       Fecha: new Date().toISOString().slice(0, 10),
@@ -76,7 +100,7 @@ useEffect(() => {
       DescripcionAdicional: "",
     });
   }
-}, [editing, open]);
+}, [editing, open, cloning]);
 
 
   const submit = async () => {
@@ -126,7 +150,7 @@ useEffect(() => {
                 <X className="h-5 w-5" />
               </button>
 
-             <h3>{isEdit ? "Editar transacción" : "Agregar transacción"}</h3>
+             <h3>{isEdit ? "Editar transacción" : isClone ? "Clonar transacción" : "Nueva transacción"}</h3>
               <p className="text-sm text-white/60 mb-4">Se guardará en Google Sheets.</p>
 
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -207,7 +231,7 @@ useEffect(() => {
                   className="rounded-xl bg-gradient-to-r from-cyan-500/80 to-fuchsia-500/80 px-4 py-2 text-sm font-medium
                              ring-1 ring-white/15 hover:opacity-95 disabled:opacity-60"
                 >
-                  Guardar
+                  {isEdit ? "Actualizar" : isClone ? "Crear copia" : "Guardar"}
                 </button>
               </div>
             </div>

@@ -9,12 +9,14 @@ import { FloatingAddButton } from "@/components/FloatingAddButton";
 import { AddTransactionModal } from "@/components/AddTransactionModal";
 import { useFinanceStore } from "@/store/financeStore";
 import type { Transaction } from "@/lib/types";
+import { set } from "zod";
 
 export default function Page() {
   const { transactions, fetchTransactions, loading, error } = useFinanceStore();
  // const txs = transactions; // o como lo tengas
   const [open, setOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
+  const [cloningTx, setCloningTx] = useState<Transaction | null>(null);
 
 
 
@@ -22,11 +24,11 @@ export default function Page() {
     fetchTransactions();
      if (!txs?.length) return;
 
-  console.log("SAMPLE TX:", txs[0]);
-  console.log("TIPOS únicos:", [...new Set(txs.map(t => String((t as any).Tipo)))].slice(0, 30));
-  console.log("ESTADOS únicos:", [...new Set(txs.map(t => String((t as any).EstadoPago)))].slice(0, 30));
+     //console.log("SAMPLE TX:", txs[0]);
+    //console.log("TIPOS únicos:", [...new Set(txs.map(t => String((t as any).Tipo)))].slice(0, 30));
+    //console.log("ESTADOS únicos:", [...new Set(txs.map(t => String((t as any).EstadoPago)))].slice(0, 30));
   
-    console.log("Polling started");
+    //console.log("Polling started");
     const id = setInterval(fetchTransactions, 5000);
     return () => clearInterval(id);
   }, [fetchTransactions]);
@@ -36,10 +38,10 @@ export default function Page() {
     return [...transactions].sort((a, b) => String(b.Fecha).localeCompare(String(a.Fecha)));
   }, [transactions]);
 
-  console.log("SAMPLE TX:", txs?.[0]);
-console.log("TIPOS únicos:", Array.from(new Set(txs.map(t => t.Tipo))).slice(0, 20));
-console.log("ESTADOS únicos:", Array.from(new Set(txs.map(t => t.EstadoPago))).slice(0, 20));
-console.log("CATEGORÍAS sample:", Array.from(new Set(txs.map(t => t.Categoría))).slice(0, 10));
+//   console.log("SAMPLE TX:", txs?.[0]);
+// console.log("TIPOS únicos:", Array.from(new Set(txs.map(t => t.Tipo))).slice(0, 20));
+// console.log("ESTADOS únicos:", Array.from(new Set(txs.map(t => t.EstadoPago))).slice(0, 20));
+// console.log("CATEGORÍAS sample:", Array.from(new Set(txs.map(t => t.Categoría))).slice(0, 10));
   return (
     <DashboardShell>
       <div className="space-y-4">
@@ -59,31 +61,45 @@ console.log("CATEGORÍAS sample:", Array.from(new Set(txs.map(t => t.Categoría)
         </div>
 
         <TransactionsTable
-          txs={txs}
-          onEdit={(t) => {
-          setEditingTx(t);
-          setOpen(true);
-        }}
-/>
-
-
+          // txs={txs}
+          // onEdit={(t) => {
+          // setEditingTx(t);
+          // setCloningTx(null);
+          // setOpen(true);
+            //}}
+            txs={txs}
+            onEdit={(t) => { 
+              setCloningTx(null); 
+              setEditingTx(t); 
+              setOpen(true);
+             }}
+            onClone={(t) => { 
+              setEditingTx(null); 
+              setCloningTx(t); 
+              setOpen(true);
+             }}
+          />
       </div>
 
-     <FloatingAddButton
-         onClick={() => {
+      <FloatingAddButton
+        onClick={() => {
+          setEditingTx(null);
+          setOpen(true);
+          setCloningTx(null)
+        }}
+      />
+   
+    <AddTransactionModal
+      open={open}
+      onClose={() => {
+        setOpen(false);
         setEditingTx(null);
-        setOpen(true);
+        setCloningTx(null);
+      }}
+      editing={editingTx}
+      cloning={cloningTx}
 
-        
-  }}
-/>
-   
-   
-<AddTransactionModal
-  open={open}
-  onClose={() => setOpen(false)}
-  editing={editingTx}
-/>
+    />
     </DashboardShell>
   );
 
