@@ -22,6 +22,7 @@ const GASTO_CATEGORIES = [
   "Compras internet",
   "Contribucion Congregacion",
   "Cuidado personal (Ej. Belleza)",
+  "Dexter Necesidades",
   "Dinero mami",
   "Dinero prestado",
   "Educación (Universidad/ Colegio)",
