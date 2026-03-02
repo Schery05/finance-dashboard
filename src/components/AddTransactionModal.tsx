@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useFinanceStore } from "@/store/financeStore";
 import type { Transaction } from "@/lib/types";
 import type { TransactionInput } from "@/lib/validators";
-
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 function toISODate(value: string) {
   const s = String(value ?? "").trim();
@@ -43,8 +43,7 @@ export function AddTransactionModal({
    cloning: Transaction | null;
   }) {
   const { addTransaction, updateTransaction, loading } = useFinanceStore();
-  const update = (k: keyof Transaction, v: any) => setForm((p) => ({ ...p, [k]: v }));
-  const isEdit = !!editing;
+  const update = (k: keyof TransactionInput, v: any) => setForm((p) => ({ ...p, [k]: v }));  const isEdit = !!editing;
   const isClone = !!cloning && !editing;
   // const [form, setForm] = useState<Transaction>({
   //   Fecha: new Date().toISOString().slice(0, 10),
@@ -85,7 +84,7 @@ useEffect(() => {
       Tipo: cloning.Tipo,
       Categoría: cloning.Categoría,
       Importe: cloning.Importe,
-      EstadoPago: "Pendiente", // recomendado para gastos fijos
+      EstadoPago: cloning.EstadoPago, // recomendado para gastos fijos
       DescripcionAdicional: cloning.DescripcionAdicional ?? "",
     });
     return;
@@ -166,14 +165,15 @@ useEffect(() => {
 
                 <label className="text-sm text-white/70">
                   Tipo
-                  <select
+                  <CustomSelect
                     value={form.Tipo}
-                    onChange={(e) => update("Tipo", e.target.value as any)}
-                    className="mt-1 w-full rounded-xl bg-white/5 px-3 py-2 text-sm outline-none ring-1 ring-white/10"
-                  >
-                    <option value="Ingreso">Ingreso</option>
-                    <option value="Gasto">Gasto</option>
-                  </select>
+                    onChange={(v) => update("Tipo", v)}
+                    placeholder="Selecciona tipo"
+                    options={[
+                    { value: "Ingreso", label: "Ingreso" },
+                    { value: "Gasto", label: "Gasto" },
+  ]}
+                  />
                 </label>
 
                 <label className="text-sm text-white/70">
@@ -197,14 +197,14 @@ useEffect(() => {
 
                 <label className="text-sm text-white/70 md:col-span-2">
                   Estado de pago
-                  <select
-                    value={form.EstadoPago}
-                    onChange={(e) => update("EstadoPago", e.target.value as any)}
-                    className="mt-1 w-full rounded-xl bg-white/5 px-3 py-2 text-sm outline-none ring-1 ring-white/10"
-                  >
-                    <option value="Pagado">Pagado</option>
-                    <option value="Pendiente">Pendiente</option>
-                  </select>
+                <CustomSelect
+                  value={form.EstadoPago}
+                  onChange={(v) => update("EstadoPago", v)}
+                  options={[
+                    { value: "Pagado", label: "Pagado" },
+                    { value: "Pendiente", label: "Pendiente" },
+                  ]}
+                />
                 </label>
 
                 <label className="text-sm text-white/70 md:col-span-2">
