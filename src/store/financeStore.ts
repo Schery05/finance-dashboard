@@ -4,6 +4,7 @@ import type { TransactionInput } from "@/lib/validators";
 
 type MonthFilter = "Todos" | string; // "2026-02"
 type TypeFilter = "Todos" | "Ingreso" | "Gasto";
+type StatusFilter = "Todos" | "Pagado" | "Pendiente";
 
 interface FinanceState {
   loading: boolean;
@@ -13,10 +14,12 @@ interface FinanceState {
   search: string;
   month: MonthFilter;
   type: TypeFilter;
+  status: StatusFilter;
 
   setSearch: (v: string) => void;
   setMonth: (v: MonthFilter) => void;
   setType: (v: TypeFilter) => void;
+  setStatus: (v: StatusFilter) => void;
 
   fetchTransactions: () => Promise<void>;
   addTransaction: (tx: TransactionInput) => Promise<void>;
@@ -29,10 +32,12 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
   search: "",
   month: "Todos",
   type: "Todos",
+  status: "Todos",
 
   setSearch: (v) => set({ search: v }),
   setMonth: (v) => set({ month: v }),
   setType: (v) => set({ type: v }),
+  setStatus: (v) => set({ status: v }),
 
   fetchTransactions: async () => {
     set({ loading: true, error: undefined });

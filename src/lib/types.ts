@@ -9,3 +9,13 @@ export interface Transaction {
   EstadoPago: "Pagado" | "Pendiente";
   DescripcionAdicional: string;
 }
+
+export interface SavingsGoal {
+  ID: string;
+  Nombre: string;
+  MontoObjetivo: number;
+  FechaLimite: string;
+  TransaccionesAsociadas: string[];
+  CreadoEn: string;
+  SaldoInicial: number;
+}

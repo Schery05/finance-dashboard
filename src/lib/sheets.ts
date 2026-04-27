@@ -1,9 +1,13 @@
 import { google } from "googleapis";
-import type { Transaction } from "./types";
+import type { Budget } from "./budgets";
+import type { SavingsGoal, Transaction } from "./types";
 import { TransactionInput } from "./validators";
 
 const SHEET_ID = process.env.GOOGLE_SHEETS_ID!;
 const RANGE = process.env.GOOGLE_SHEETS_RANGE || "Transacciones!A:G";
+const SAVINGS_GOALS_RANGE =
+  process.env.GOOGLE_SAVINGS_GOALS_RANGE || "MetasAhorro!A2:G";
+const BUDGETS_RANGE = process.env.GOOGLE_BUDGETS_RANGE || "Presupuesto!A2:E";
 
 function getAuth() {
   const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL!;
@@ -67,6 +71,27 @@ function parseAmount(v: unknown): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+function getSheetName(range: string) {
+  return range.split("!")[0].replace(/"/g, "");
+}
+
+function parseAssociatedTransactions(v: unknown) {
+  const raw = String(v ?? "").trim();
+  if (!raw) return [];
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed.map(String).filter(Boolean);
+  } catch {
+    // Support older comma-separated values too.
+  }
+
+  return raw
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+}
+
 export async function readTransactions(): Promise<TransactionInput[]> {
   const auth = getAuth();
   const sheets = google.sheets({ version: "v4", auth });
@@ -122,7 +147,7 @@ export async function updateTransactionById(id: string, tx: Omit<Transaction, "I
   const auth = getAuth();
   const sheets = google.sheets({ version: "v4", auth });
 
-  const sheetName = RANGE.split("!")[0].replace(/"/g, ""); // "Hoja 1"
+  const sheetName = getSheetName(RANGE); // "Hoja 1"
   // Leemos todas las filas para encontrar el ID (simple y efectivo)
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
@@ -154,6 +179,257 @@ export async function updateTransactionById(id: string, tx: Omit<Transaction, "I
         tx.EstadoPago,
         tx.DescripcionAdicional ?? "",
       ]],
+    },
+  });
+}
+
+export async function readSavingsGoals(): Promise<SavingsGoal[]> {
+  const auth = getAuth();
+  const sheets = google.sheets({ version: "v4", auth });
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: SAVINGS_GOALS_RANGE,
+  });
+
+  const rows = res.data.values ?? [];
+
+  return rows
+    .filter((r) => r.length >= 3)
+    .map((r) => ({
+      ID: String(r[0] ?? "").trim(),
+      Nombre: String(r[1] ?? "").trim(),
+      MontoObjetivo: parseAmount(r[2]),
+      FechaLimite: String(r[3] ?? "").trim(),
+      TransaccionesAsociadas: parseAssociatedTransactions(r[4]),
+      CreadoEn: String(r[5] ?? "").trim(),
+      SaldoInicial: parseAmount(r[6]),
+    }))
+    .filter((goal) => goal.ID && goal.Nombre);
+}
+
+export async function appendSavingsGoal(goal: SavingsGoal): Promise<void> {
+  const auth = getAuth();
+  const sheets = google.sheets({ version: "v4", auth });
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: SHEET_ID,
+    range: SAVINGS_GOALS_RANGE,
+    valueInputOption: "USER_ENTERED",
+    requestBody: {
+      values: [[
+        goal.ID,
+        goal.Nombre,
+        goal.MontoObjetivo,
+        goal.FechaLimite,
+        JSON.stringify(goal.TransaccionesAsociadas),
+        goal.CreadoEn,
+        goal.SaldoInicial,
+      ]],
+    },
+  });
+}
+
+export async function updateSavingsGoalById(
+  id: string,
+  goal: Omit<SavingsGoal, "ID">
+) {
+  const auth = getAuth();
+  const sheets = google.sheets({ version: "v4", auth });
+  const sheetName = getSheetName(SAVINGS_GOALS_RANGE);
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: `${sheetName}!A:A`,
+  });
+
+  const colA = res.data.values ?? [];
+  const rowIndex = colA.findIndex((r) => String(r?.[0] ?? "").trim() === id);
+  if (rowIndex === -1) throw new Error(`No se encontro la meta con ID=${id}`);
+
+  const rowNumber = rowIndex + 1;
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: SHEET_ID,
+    range: `${sheetName}!A${rowNumber}:G${rowNumber}`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: {
+      values: [[
+        id,
+        goal.Nombre,
+        goal.MontoObjetivo,
+        goal.FechaLimite,
+        JSON.stringify(goal.TransaccionesAsociadas),
+        goal.CreadoEn,
+        goal.SaldoInicial,
+      ]],
+    },
+  });
+}
+
+export async function deleteSavingsGoalById(id: string) {
+  const auth = getAuth();
+  const sheets = google.sheets({ version: "v4", auth });
+  const sheetName = getSheetName(SAVINGS_GOALS_RANGE);
+
+  const spreadsheet = await sheets.spreadsheets.get({
+    spreadsheetId: SHEET_ID,
+  });
+  const sheet = spreadsheet.data.sheets?.find(
+    (item) => item.properties?.title === sheetName
+  );
+  const sheetId = sheet?.properties?.sheetId;
+  if (sheetId === undefined || sheetId === null) {
+    throw new Error(`No se encontro la hoja ${sheetName}`);
+  }
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: `${sheetName}!A:A`,
+  });
+
+  const colA = res.data.values ?? [];
+  const rowIndex = colA.findIndex((r) => String(r?.[0] ?? "").trim() === id);
+  if (rowIndex === -1) throw new Error(`No se encontro la meta con ID=${id}`);
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: SHEET_ID,
+    requestBody: {
+      requests: [
+        {
+          deleteDimension: {
+            range: {
+              sheetId,
+              dimension: "ROWS",
+              startIndex: rowIndex,
+              endIndex: rowIndex + 1,
+            },
+          },
+        },
+      ],
+    },
+  });
+}
+
+export async function readBudgets(): Promise<Budget[]> {
+  const auth = getAuth();
+  const sheets = google.sheets({ version: "v4", auth });
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: BUDGETS_RANGE,
+  });
+
+  const rows = res.data.values ?? [];
+
+  return rows
+    .filter((r) => r.length >= 4)
+    .map((r) => ({
+      id: String(r[0] ?? "").trim(),
+      category: String(r[1] ?? "").trim(),
+      monthlyLimit: parseAmount(r[2]),
+      period: String(r[3] ?? "").trim(),
+      createdAt: String(r[4] ?? "").trim(),
+    }))
+    .filter((budget) => budget.id && budget.category && budget.period);
+}
+
+export async function appendBudget(budget: Budget): Promise<void> {
+  const auth = getAuth();
+  const sheets = google.sheets({ version: "v4", auth });
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: SHEET_ID,
+    range: BUDGETS_RANGE,
+    valueInputOption: "USER_ENTERED",
+    requestBody: {
+      values: [[
+        budget.id,
+        budget.category,
+        budget.monthlyLimit,
+        budget.period,
+        budget.createdAt,
+      ]],
+    },
+  });
+}
+
+export async function updateBudgetById(id: string, budget: Omit<Budget, "id">) {
+  const auth = getAuth();
+  const sheets = google.sheets({ version: "v4", auth });
+  const sheetName = getSheetName(BUDGETS_RANGE);
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: `${sheetName}!A:A`,
+  });
+
+  const colA = res.data.values ?? [];
+  const rowIndex = colA.findIndex((r) => String(r?.[0] ?? "").trim() === id);
+  if (rowIndex === -1) {
+    throw new Error(`No se encontro el presupuesto con ID=${id}`);
+  }
+
+  const rowNumber = rowIndex + 1;
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: SHEET_ID,
+    range: `${sheetName}!A${rowNumber}:E${rowNumber}`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: {
+      values: [[
+        id,
+        budget.category,
+        budget.monthlyLimit,
+        budget.period,
+        budget.createdAt,
+      ]],
+    },
+  });
+}
+
+export async function deleteBudgetById(id: string) {
+  const auth = getAuth();
+  const sheets = google.sheets({ version: "v4", auth });
+  const sheetName = getSheetName(BUDGETS_RANGE);
+
+  const spreadsheet = await sheets.spreadsheets.get({
+    spreadsheetId: SHEET_ID,
+  });
+  const sheet = spreadsheet.data.sheets?.find(
+    (item) => item.properties?.title === sheetName
+  );
+  const sheetId = sheet?.properties?.sheetId;
+  if (sheetId === undefined || sheetId === null) {
+    throw new Error(`No se encontro la hoja ${sheetName}`);
+  }
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: `${sheetName}!A:A`,
+  });
+
+  const colA = res.data.values ?? [];
+  const rowIndex = colA.findIndex((r) => String(r?.[0] ?? "").trim() === id);
+  if (rowIndex === -1) {
+    throw new Error(`No se encontro el presupuesto con ID=${id}`);
+  }
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: SHEET_ID,
+    requestBody: {
+      requests: [
+        {
+          deleteDimension: {
+            range: {
+              sheetId,
+              dimension: "ROWS",
+              startIndex: rowIndex,
+              endIndex: rowIndex + 1,
+            },
+          },
+        },
+      ],
     },
   });
 }

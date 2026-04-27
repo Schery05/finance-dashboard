@@ -1,79 +1,25 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useFinanceStore } from "@/store/financeStore";
+import { CustomSelect } from "@/components/ui/CustomSelect";
+import {
+  CATEGORIES_UPDATED_EVENT,
+  loadManagedCategories,
+  type ManagedCategories,
+} from "@/lib/categories";
 import type { Transaction } from "@/lib/types";
 import type { TransactionInput } from "@/lib/validators";
-import { CustomSelect } from "@/components/ui/CustomSelect";
+import { useFinanceStore } from "@/store/financeStore";
 
-const GASTO_CATEGORIES = [
-  "Ahorro Boda Jally",
-  "Ahorro cooperativa (Personal)",
-  "Ahorro Personal",
-  "Ashley Universidad",
-  "Combustible",
-  "Compra Articulos Hogar",
-  "Compra Colmado",
-  "Compras Boda Jally",
-  "Compras Colombia",
-  "Compras GYM",
-  "Compras internet",
-  "Contribucion Congregacion",
-  "Cuidado personal (Ej. Belleza)",
-  "Dexter Necesidades",
-  "Dinero mami",
-  "Dinero prestado",
-  "Educación (Universidad/ Colegio)",
-  "Electricidad",
-  "Electricidad San Pedro",
-  "Entretenimiento",
-  "Gas San Pedro",
-  "Gas Santo Domingo",
-  "Gastos médicos",
-  "Gimnasio/Deporte",
-  "Imprevistos",
-  "Internet San Pedro",
-  "Internet Santo Domingo",
-  "Mant. de vehículo",
-  "Paquetes envío",
-  "Parqueos",
-  "Peajes",
-  "Prime",
-  "Retiro efectivo",
-  "Servicio telecomunicación móvil",
-  "Supermercado San Pedro",
-  "Supermercado Sto",
-  "Suscripciones",
-  "Uber",
-  "Uber Eats/Pedidos Ya",
-  "Viaje colombia",
-  "Viaje personal",
-  "Vivienda (alquiler San Pedro)",
-  "Vivienda (alquiler Santo Domingo)",
-];
-const INGRESO_CATEGORIES = [
-  "Sueldo",
-  "Horas / Trabajos extras",
-  "Remesas",
-  "Bonos",
-  "Doble sueldo Navidad",
-  "Alquileres",
-  "Inversiones",
-  "Aportes",
-  "Comisiones",
-  "Pago prestamos",
-  "Regalo recibido",
-];
-
-// ✅ Sets para validar sin líos de TS
-const GASTO_SET = new Set<string>(GASTO_CATEGORIES);
-const INGRESO_SET = new Set<string>(INGRESO_CATEGORIES);
-
-function categoryExists(tipo: "Ingreso" | "Gasto", categoria: string) {
+function categoryExists(
+  categories: ManagedCategories,
+  tipo: "Ingreso" | "Gasto",
+  categoria: string
+) {
   const c = (categoria ?? "").trim();
-  return tipo === "Ingreso" ? INGRESO_SET.has(c) : GASTO_SET.has(c);
+  return categories[tipo].includes(c);
 }
 
 function normalizeTipo(tipo?: string): "Ingreso" | "Gasto" {
@@ -87,7 +33,7 @@ function toISODate(value: string) {
 
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
 
-  const m = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  const m = s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
   if (m) {
     const dd = m[1].padStart(2, "0");
     const mm = m[2].padStart(2, "0");
@@ -113,6 +59,9 @@ export function AddTransactionModal({
   cloning: Transaction | null;
 }) {
   const { addTransaction, updateTransaction, loading } = useFinanceStore();
+  const [categories, setCategories] = useState<ManagedCategories>(() =>
+    loadManagedCategories()
+  );
 
   const [form, setForm] = useState<TransactionInput>({
     Fecha: new Date().toISOString().slice(0, 10),
@@ -123,32 +72,40 @@ export function AddTransactionModal({
     DescripcionAdicional: "",
   });
 
-  const update = (k: keyof TransactionInput, v: any) =>
-    setForm((p) => ({ ...p, [k]: v }));
+  const update = <K extends keyof TransactionInput>(
+    key: K,
+    value: TransactionInput[K]
+  ) => setForm((prev) => ({ ...prev, [key]: value }));
 
   const isEdit = !!editing;
   const isClone = !!cloning && !editing;
 
-  // ✅ Opciones según tipo
-  const categoryOptions = useMemo(() => {
-    const list = form.Tipo === "Ingreso" ? INGRESO_CATEGORIES : GASTO_CATEGORIES;
-    return list.map((c) => ({ value: c, label: c }));
-  }, [form.Tipo]);
+  useEffect(() => {
+    const refreshCategories = () => setCategories(loadManagedCategories());
+    refreshCategories();
+    window.addEventListener(CATEGORIES_UPDATED_EVENT, refreshCategories);
+    return () =>
+      window.removeEventListener(CATEGORIES_UPDATED_EVENT, refreshCategories);
+  }, []);
 
-  /**
-   * ✅ Prefill EDIT / CLONE / NEW
-   */
+  const categoryOptions = useMemo(() => {
+    return categories[form.Tipo].map((category) => ({
+      value: category,
+      label: category,
+    }));
+  }, [categories, form.Tipo]);
+
   useEffect(() => {
     if (!open) return;
 
     if (editing) {
       const tipo = normalizeTipo(editing.Tipo);
-      const cat = (editing.Categoría ?? "").trim();
+      const category = (editing.Categoría ?? "").trim();
 
       setForm({
         Fecha: toISODate(editing.Fecha),
         Tipo: tipo,
-        Categoría: categoryExists(tipo, cat) ? cat : "",
+        Categoría: categoryExists(categories, tipo, category) ? category : "",
         Importe: Number(editing.Importe) || 0,
         EstadoPago: editing.EstadoPago,
         DescripcionAdicional: editing.DescripcionAdicional ?? "",
@@ -158,15 +115,12 @@ export function AddTransactionModal({
 
     if (cloning) {
       const tipo = normalizeTipo(cloning.Tipo);
-      const cat = (cloning.Categoría ?? "").trim();
+      const category = (cloning.Categoría ?? "").trim();
 
       setForm({
-        // ✅ si quieres la misma fecha del registro clonado:
         Fecha: toISODate(cloning.Fecha),
-        // ✅ mismo tipo:
         Tipo: tipo,
-        // ✅ misma categoría (si existe en el catálogo):
-        Categoría: categoryExists(tipo, cat) ? cat : "",
+        Categoría: categoryExists(categories, tipo, category) ? category : "",
         Importe: Number(cloning.Importe) || 0,
         EstadoPago: cloning.EstadoPago,
         DescripcionAdicional: cloning.DescripcionAdicional ?? "",
@@ -174,7 +128,6 @@ export function AddTransactionModal({
       return;
     }
 
-    // NEW
     setForm({
       Fecha: new Date().toISOString().slice(0, 10),
       Tipo: "Gasto",
@@ -183,20 +136,15 @@ export function AddTransactionModal({
       EstadoPago: "Pendiente",
       DescripcionAdicional: "",
     });
-  }, [open, editing, cloning]);
+  }, [open, editing, cloning, categories]);
 
-  /**
-   * ✅ IMPORTANTE:
-   * Antes borrabas Categoría SIEMPRE al cambiar Tipo.
-   * Ahora solo se borra si la categoría no pertenece al nuevo tipo.
-   */
   useEffect(() => {
     if (!form.Categoría) return;
-    if (!categoryExists(form.Tipo, form.Categoría)) {
+    if (!categoryExists(categories, form.Tipo, form.Categoría)) {
       update("Categoría", "");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.Tipo]);
+  }, [categories, form.Tipo]);
 
   const submit = async () => {
     const payload: TransactionInput = {
@@ -236,7 +184,7 @@ export function AddTransactionModal({
             exit={{ opacity: 0, y: 18 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
           >
-            <div className="glass w-full max-w-xl p-5 relative">
+            <div className="glass relative w-full max-w-xl p-5">
               <button
                 onClick={onClose}
                 className="absolute right-4 top-4 rounded-xl bg-white/5 p-2 ring-1 ring-white/10 hover:bg-white/10"
@@ -247,13 +195,13 @@ export function AddTransactionModal({
 
               <h3 className="text-base font-semibold">
                 {isEdit
-                  ? "Editar transacción"
+                  ? "Editar transaccion"
                   : isClone
-                  ? "Clonar transacción"
-                  : "Nueva transacción"}
+                    ? "Clonar transaccion"
+                    : "Nueva transaccion"}
               </h3>
-              <p className="text-sm text-white/60 mb-4">
-                Se guardará en Google Sheets.
+              <p className="mb-4 text-sm text-white/60">
+                Se guardara en Google Sheets.
               </p>
 
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -271,7 +219,7 @@ export function AddTransactionModal({
                   Tipo
                   <CustomSelect
                     value={form.Tipo}
-                    onChange={(v) => update("Tipo", normalizeTipo(v))}
+                    onChange={(value) => update("Tipo", normalizeTipo(value))}
                     placeholder="Selecciona tipo"
                     options={[
                       { value: "Ingreso", label: "Ingreso" },
@@ -281,11 +229,11 @@ export function AddTransactionModal({
                 </label>
 
                 <label className="text-sm text-white/70 md:col-span-2">
-                  Categoría
+                  Categoria
                   <CustomSelect
                     value={form.Categoría}
-                    onChange={(v) => update("Categoría", v)}
-                    placeholder="Selecciona categoría"
+                    onChange={(value) => update("Categoría", value)}
+                    placeholder="Selecciona categoria"
                     options={categoryOptions}
                   />
                 </label>
@@ -304,7 +252,9 @@ export function AddTransactionModal({
                   Estado de pago
                   <CustomSelect
                     value={form.EstadoPago}
-                    onChange={(v) => update("EstadoPago", v)}
+                    onChange={(value) =>
+                      update("EstadoPago", value as "Pagado" | "Pendiente")
+                    }
                     placeholder="Selecciona estado"
                     options={[
                       { value: "Pagado", label: "Pagado" },
@@ -314,7 +264,7 @@ export function AddTransactionModal({
                 </label>
 
                 <label className="text-sm text-white/70 md:col-span-2">
-                  Descripción adicional
+                  Descripcion adicional
                   <textarea
                     value={form.DescripcionAdicional}
                     onChange={(e) =>
@@ -337,8 +287,7 @@ export function AddTransactionModal({
                 <button
                   disabled={loading || !form.Categoría}
                   onClick={submit}
-                  className="rounded-xl bg-gradient-to-r from-cyan-500/80 to-fuchsia-500/80 px-4 py-2 text-sm font-medium
-                             ring-1 ring-white/15 hover:opacity-95 disabled:opacity-60"
+                  className="rounded-xl bg-gradient-to-r from-cyan-500/80 to-fuchsia-500/80 px-4 py-2 text-sm font-medium ring-1 ring-white/15 hover:opacity-95 disabled:opacity-60"
                 >
                   {isEdit ? "Actualizar" : isClone ? "Crear copia" : "Guardar"}
                 </button>

@@ -58,7 +58,16 @@ export function TransactionsTable({
   onClone: (t: Transaction) => void;
   onEdit: (t: Transaction) => void;
 }) {
-  const { search, month, type, setSearch, setMonth, setType } = useFinanceStore();
+  const {
+    search,
+    month,
+    type,
+    status,
+    setSearch,
+    setMonth,
+    setType,
+    setStatus,
+  } = useFinanceStore();
 
   const months = Array.from(new Set(txs.map((t) => monthKey(t.Fecha))))
     .filter((m) => m && m !== "N/A")
@@ -71,20 +80,22 @@ export function TransactionsTable({
     const categoria = String(t.Categoría ?? "").toLowerCase();
     const desc = String(t.DescripcionAdicional ?? "").toLowerCase();
     const tipo = String(t.Tipo ?? "").toLowerCase();
+    const estado = String(t.EstadoPago ?? "").trim().toLowerCase();
 
     const matchesSearch = !s || categoria.includes(s) || desc.includes(s) || tipo.includes(s);
     const matchesMonth = month === "Todos" ? true : m === month;
     const matchesType = type === "Todos" ? true : t.Tipo === type;
+    const matchesStatus = status === "Todos" ? true : estado === status.toLowerCase();
 
-    return matchesSearch && matchesMonth && matchesType;
+    return matchesSearch && matchesMonth && matchesType && matchesStatus;
   });
 
   const controlBase =
     "rounded-xl px-3 py-2 text-sm outline-none backdrop-blur-xl transition " +
     "bg-white/10 text-white ring-1 ring-white/20 hover:bg-white/15 focus:ring-2 focus:ring-cyan-400/60";
 
-  const selectWrap = "relative w-full md:w-auto";
-  const selectClass = controlBase + " pr-9 appearance-none";
+  const selectWrap = "relative w-full min-w-0";
+  const selectClass = controlBase + " w-full min-w-0 appearance-none pr-9";
   const optionClass = "bg-[#0B1020] text-white";
 
   return (
@@ -95,19 +106,19 @@ export function TransactionsTable({
       className="glass p-5"
     >
       {/* ✅ HEADER (este es el bloque exacto que controla la distancia/posicionamiento) */}
-      <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
+      <div className="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+        <div className="shrink-0">
           <h3 className="text-base font-semibold">Transacciones</h3>
           <p className="text-sm text-white/60">{filtered.length} registro(s) mostrados</p>
         </div>
 
         {/* ✅ FILTROS (alineados y compactos) */}
-        <div className="grid w-full grid-cols-1 gap-3 md:w-auto md:grid-cols-[320px_170px_140px] md:items-center">
+        <div className="grid w-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(240px,1.6fr)_minmax(150px,1fr)_minmax(120px,0.8fr)_minmax(150px,1fr)] xl:max-w-[900px] xl:items-center">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar (categoría, tipo, descripción)..."
-            className={controlBase + " placeholder-white/50 w-full"}
+            className={controlBase + " w-full min-w-0 placeholder-white/50 sm:col-span-2 lg:col-span-1"}
           />
 
           <div className={selectWrap}>
@@ -127,7 +138,13 @@ export function TransactionsTable({
           </div>
 
           <div className={selectWrap}>
-            <select value={type} onChange={(e) => setType(e.target.value as any)} className={selectClass}>
+            <select
+              value={type}
+              onChange={(e) =>
+                setType(e.target.value as "Todos" | "Ingreso" | "Gasto")
+              }
+              className={selectClass}
+            >
               <option className={optionClass} value="Todos">
                 Todos
               </option>
@@ -136,6 +153,29 @@ export function TransactionsTable({
               </option>
               <option className={optionClass} value="Gasto">
                 Gasto
+              </option>
+            </select>
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-white/70">
+              ▾
+            </span>
+          </div>
+
+          <div className={selectWrap}>
+            <select
+              value={status}
+              onChange={(e) =>
+                setStatus(e.target.value as "Todos" | "Pagado" | "Pendiente")
+              }
+              className={selectClass}
+            >
+              <option className={optionClass} value="Todos">
+                Todos estados
+              </option>
+              <option className={optionClass} value="Pagado">
+                PAGADO
+              </option>
+              <option className={optionClass} value="Pendiente">
+                PENDIENTE
               </option>
             </select>
             <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-white/70">
