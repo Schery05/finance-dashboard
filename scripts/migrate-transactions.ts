@@ -4,12 +4,7 @@ import csv from "csv-parser";
 import { google } from "googleapis";
 import { config } from "dotenv";
 import { PrismaPg } from "@prisma/adapter-pg";
-import {
-  PaymentStatus,
-  PrismaClient,
-  SavingsMovementType,
-  TransactionType,
-} from "../generated/prisma/client";
+import { PrismaClient } from "../generated/prisma/client";
 
 config({ path: ".env" });
 config({ path: ".env.local", override: true });
@@ -54,23 +49,27 @@ type MigrationStats = {
   missingGoalTransactions: number;
 };
 
+type TransactionType = "INGRESO" | "GASTO";
+type PaymentStatus = "PAGADO" | "PENDIENTE";
+type SavingsMovementType = "APORTE" | "RETIRO" | "AJUSTE";
+
 function normalizeTransactionType(value?: string): TransactionType {
   return String(value ?? "").trim().toUpperCase() === "INGRESO"
-    ? TransactionType.INGRESO
-    : TransactionType.GASTO;
+    ? "INGRESO"
+    : "GASTO";
 }
 
 function normalizePaymentStatus(value?: string): PaymentStatus {
   return String(value ?? "").trim().toUpperCase() === "PAGADO"
-    ? PaymentStatus.PAGADO
-    : PaymentStatus.PENDIENTE;
+    ? "PAGADO"
+    : "PENDIENTE";
 }
 
 function normalizeSavingsMovementType(value?: string): SavingsMovementType {
   const clean = String(value ?? "").trim().toUpperCase();
-  if (clean === "RETIRO") return SavingsMovementType.RETIRO;
-  if (clean === "AJUSTE") return SavingsMovementType.AJUSTE;
-  return SavingsMovementType.APORTE;
+  if (clean === "RETIRO") return "RETIRO";
+  if (clean === "AJUSTE") return "AJUSTE";
+  return "APORTE";
 }
 
 function parseAmount(value: unknown): number {
@@ -299,7 +298,7 @@ async function migrateBudgetsFromSheets(userId: string, stats: MigrationStats) {
     const category = await upsertCategory(
       userId,
       categoryName,
-      TransactionType.GASTO
+      "GASTO"
     );
 
     const existing = await prisma.budget.findUnique({
@@ -381,7 +380,7 @@ async function syncGoalTransactions(
         goalId,
         date: transaction.date,
         amount: transaction.amount,
-        type: SavingsMovementType.APORTE,
+        type: "APORTE",
         note: transaction.additionalDescription,
       },
       create: {
@@ -390,7 +389,7 @@ async function syncGoalTransactions(
         transactionId,
         date: transaction.date,
         amount: transaction.amount,
-        type: SavingsMovementType.APORTE,
+        type: "APORTE",
         note: transaction.additionalDescription,
       },
     });
