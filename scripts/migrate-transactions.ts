@@ -19,6 +19,31 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString }),
 });
 
+
+const TransactionType = {
+  INGRESO: "INGRESO",
+  GASTO: "GASTO",
+} as const;
+
+type TransactionType = (typeof TransactionType)[keyof typeof TransactionType];
+
+const PaymentStatus = {
+  PAGADO: "PAGADO",
+  PENDIENTE: "PENDIENTE",
+} as const;
+
+type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
+
+const SavingsMovementType = {
+  APORTE: "APORTE",
+  RETIRO: "RETIRO",
+  AJUSTE: "AJUSTE",
+} as const;
+
+type SavingsMovementType =
+  (typeof SavingsMovementType)[keyof typeof SavingsMovementType];
+
+
 const USER_EMAIL =
   process.env.MIGRATION_USER_EMAIL ?? "yamilet.schery05@gmail.com";
 const USER_NAME = process.env.MIGRATION_USER_NAME ?? "Yamilet";
@@ -49,27 +74,25 @@ type MigrationStats = {
   missingGoalTransactions: number;
 };
 
-type TransactionType = "INGRESO" | "GASTO";
-type PaymentStatus = "PAGADO" | "PENDIENTE";
-type SavingsMovementType = "APORTE" | "RETIRO" | "AJUSTE";
+
 
 function normalizeTransactionType(value?: string): TransactionType {
   return String(value ?? "").trim().toUpperCase() === "INGRESO"
-    ? "INGRESO"
-    : "GASTO";
+    ? TransactionType.INGRESO
+    : TransactionType.GASTO;
 }
 
 function normalizePaymentStatus(value?: string): PaymentStatus {
   return String(value ?? "").trim().toUpperCase() === "PAGADO"
-    ? "PAGADO"
-    : "PENDIENTE";
+    ? PaymentStatus.PAGADO
+    : PaymentStatus.PENDIENTE;
 }
 
 function normalizeSavingsMovementType(value?: string): SavingsMovementType {
   const clean = String(value ?? "").trim().toUpperCase();
-  if (clean === "RETIRO") return "RETIRO";
-  if (clean === "AJUSTE") return "AJUSTE";
-  return "APORTE";
+  if (clean === "RETIRO") return SavingsMovementType.RETIRO;
+  if (clean === "AJUSTE") return SavingsMovementType.AJUSTE;
+  return SavingsMovementType.APORTE;
 }
 
 function parseAmount(value: unknown): number {
@@ -298,7 +321,7 @@ async function migrateBudgetsFromSheets(userId: string, stats: MigrationStats) {
     const category = await upsertCategory(
       userId,
       categoryName,
-      "GASTO"
+      TransactionType.GASTO
     );
 
     const existing = await prisma.budget.findUnique({
@@ -380,7 +403,7 @@ async function syncGoalTransactions(
         goalId,
         date: transaction.date,
         amount: transaction.amount,
-        type: "APORTE",
+        type: SavingsMovementType.APORTE,
         note: transaction.additionalDescription,
       },
       create: {
@@ -389,7 +412,7 @@ async function syncGoalTransactions(
         transactionId,
         date: transaction.date,
         amount: transaction.amount,
-        type: "APORTE",
+        type: SavingsMovementType.APORTE,
         note: transaction.additionalDescription,
       },
     });

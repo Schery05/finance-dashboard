@@ -1,4 +1,5 @@
-﻿import { prisma } from "@/lib/prisma";
+import { randomUUID } from "node:crypto";
+import { prisma } from "@/lib/prisma";
 
 type DecimalLike = {
   toNumber?: () => number;
@@ -15,6 +16,20 @@ type SourceTransaction = {
   category: {
     name: string;
   };
+};
+
+type RawSourceTransaction = {
+  id: string;
+  date: Date;
+  type: string;
+  amount: DecimalLike | number | string;
+  additionalDescription: string | null;
+  categoryId: string;
+  categoryName: string;
+};
+
+type IdRow = {
+  id: string;
 };
 
 const MIN_RECURRING_OCCURRENCES = 2;
@@ -123,19 +138,34 @@ function isRecurringMonthlyPattern(transactions: SourceTransaction[]) {
 }
 
 export async function ensureRecurringTransactionSuggestions(userId: string) {
-  const sourceTransactions = await prisma.transaction.findMany({
-    where: {
-      userId,
-      type: "GASTO",
-      isRecurringSuggestion: false,
+  const rawTransactions = await prisma.$queryRaw<RawSourceTransaction[]>`
+    SELECT
+      t."id",
+      t."date",
+      t."type",
+      t."amount",
+      t."additionalDescription",
+      t."categoryId",
+      c."name" AS "categoryName"
+    FROM "Transaction" t
+    INNER JOIN "Category" c ON c."id" = t."categoryId"
+    WHERE t."userId" = ${userId}
+      AND t."type" = 'GASTO'::"TransactionType"
+      AND COALESCE(t."isRecurringSuggestion", false) = false
+    ORDER BY t."date" ASC
+  `;
+
+  const sourceTransactions: SourceTransaction[] = rawTransactions.map((tx) => ({
+    id: tx.id,
+    date: tx.date,
+    type: tx.type,
+    amount: tx.amount,
+    additionalDescription: tx.additionalDescription,
+    categoryId: tx.categoryId,
+    category: {
+      name: tx.categoryName,
     },
-    include: {
-      category: true,
-    },
-    orderBy: {
-      date: "asc",
-    },
-  });
+  }));
 
   const grouped = new Map<string, SourceTransaction[]>();
 
@@ -164,65 +194,79 @@ export async function ensureRecurringTransactionSuggestions(userId: string) {
     const date = nextSuggestedDate(latest.date, preferredDay, today);
     const amount = decimalToNumber(latest.amount);
 
-    const pendingSuggestion = await prisma.transaction.findFirst({
-      where: {
-        userId,
-        recurrenceKey,
-        isRecurringSuggestion: true,
-        paymentStatus: "PENDIENTE",
-      },
-      select: {
-        id: true,
-      },
-    });
+    const pendingSuggestion = await prisma.$queryRaw<IdRow[]>`
+      SELECT "id"
+      FROM "Transaction"
+      WHERE "userId" = ${userId}
+        AND "recurrenceKey" = ${recurrenceKey}
+        AND COALESCE("isRecurringSuggestion", false) = true
+        AND "paymentStatus" = 'PENDIENTE'::"PaymentStatus"
+      LIMIT 1
+    `;
 
-    if (pendingSuggestion) continue;
+    if (pendingSuggestion.length > 0) continue;
 
-    const existingSuggestion = await prisma.transaction.findFirst({
-      where: {
-        userId,
-        recurrenceKey,
-        date,
-      },
-      select: {
-        id: true,
-      },
-    });
+    const existingSuggestion = await prisma.$queryRaw<IdRow[]>`
+      SELECT "id"
+      FROM "Transaction"
+      WHERE "userId" = ${userId}
+        AND "recurrenceKey" = ${recurrenceKey}
+        AND "date" = ${date}
+      LIMIT 1
+    `;
 
-    if (existingSuggestion) continue;
+    if (existingSuggestion.length > 0) continue;
 
-    const existingManualTransaction = await prisma.transaction.findFirst({
-      where: {
-        userId,
-        isRecurringSuggestion: false,
-        date,
-        type: "GASTO",
-        categoryId: latest.categoryId,
-        amount,
-      },
-      select: {
-        id: true,
-      },
-    });
+    const existingManualTransaction = await prisma.$queryRaw<IdRow[]>`
+      SELECT "id"
+      FROM "Transaction"
+      WHERE "userId" = ${userId}
+        AND COALESCE("isRecurringSuggestion", false) = false
+        AND "date" = ${date}
+        AND "type" = 'GASTO'::"TransactionType"
+        AND "categoryId" = ${latest.categoryId}
+        AND "amount" = ${amount}
+      LIMIT 1
+    `;
 
-    if (existingManualTransaction) continue;
+    if (existingManualTransaction.length > 0) continue;
 
-    await prisma.transaction.create({
-      data: {
-        userId,
-        categoryId: latest.categoryId,
-        date,
-        type: "GASTO",
-        amount,
-        paymentStatus: "PENDIENTE",
-        additionalDescription:
-          latest.additionalDescription?.trim() || "Gasto recurrente sugerido",
-        recurrenceKey,
-        isRecurringSuggestion: true,
-      },
-    });
+    const description =
+      latest.additionalDescription?.trim() || "Gasto recurrente sugerido";
 
-    created += 1;
+    const inserted = await prisma.$executeRaw`
+      INSERT INTO "Transaction" (
+        "id",
+        "userId",
+        "categoryId",
+        "date",
+        "type",
+        "amount",
+        "paymentStatus",
+        "additionalDescription",
+        "recurrenceKey",
+        "isRecurringSuggestion",
+        "createdAt",
+        "updatedAt"
+      )
+      VALUES (
+        ${randomUUID()},
+        ${userId},
+        ${latest.categoryId},
+        ${date},
+        'GASTO'::"TransactionType",
+        ${amount},
+        'PENDIENTE'::"PaymentStatus",
+        ${description},
+        ${recurrenceKey},
+        true,
+        NOW(),
+        NOW()
+      )
+      ON CONFLICT ("userId", "recurrenceKey", "date") DO NOTHING
+    `;
+
+    if (inserted > 0) created += 1;
   }
 
   return {
