@@ -1,22 +1,65 @@
 "use client";
 
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { useState } from "react";
 import { BudgetsMaintenancePanel } from "@/components/BudgetsMaintenancePanel";
 import { CategoriesMaintenancePanel } from "@/components/CategoriesMaintenancePanel";
+import { DebtControlPanel } from "@/components/DebtControlPanel";
+import { ExpenseCalendarPanel } from "@/components/ExpenseCalendarPanel";
+import { FinancialAssistantPanel } from "@/components/FinancialAssistantPanel";
+import { FinancialScorePanel } from "@/components/FinancialScorePanel";
 import { SavingsGoalsPanel } from "@/components/SavingsGoalsPanel";
 import { Sidebar } from "@/components/Sidebar";
+import { NotificationBell } from "@/components/NotificationBell";
+import { getDebtNotifications, getPaymentNotifications } from "@/lib/notifications";
+import type { Debt } from "@/lib/types";
+import { useFinanceStore } from "@/store/financeStore";
+import { UserMenu } from "@/components/UserMenu";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [activeModule, setActiveModule] = useState<
-    "finanzas" | "ahorros" | "presupuesto" | "mantenimiento"
+    | "finanzas"
+    | "calendar"
+    | "score"
+    | "asistente"
+    | "deudas"
+    | "ahorros"
+    | "presupuesto"
+    | "mantenimiento"
   >("finanzas");
   const [activeMaintenanceSection, setActiveMaintenanceSection] = useState<
     "categorias"
   >("categorias");
   const isSavingsModule = activeModule === "ahorros";
+  const isCalendarModule = activeModule === "calendar";
+  const isScoreModule = activeModule === "score";
+  const isAssistantModule = activeModule === "asistente";
+  const isDebtsModule = activeModule === "deudas";
   const isBudgetsModule = activeModule === "presupuesto";
   const isMaintenanceModule = activeModule === "mantenimiento";
+  const { transactions } = useFinanceStore();
+  const [debtsForNotifications, setDebtsForNotifications] = useState<Debt[]>([]);
+  const notifications = [
+    ...getPaymentNotifications(transactions),
+    ...getDebtNotifications({
+      debts: debtsForNotifications,
+      transactions,
+    }),
+  ];
+
+  React.useEffect(() => {
+    let mounted = true;
+    fetch("/api/debts", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((json) => {
+        if (mounted && json.ok) setDebtsForNotifications(json.data as Debt[]);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <div className="relative flex min-h-screen overflow-hidden">
@@ -34,35 +77,79 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         setActiveMaintenanceSection={setActiveMaintenanceSection}
       />
 
-      <main className="relative mx-auto w-full max-w-7xl px-4 py-8 md:px-8">
-        <motion.header
+
+          <main className="relative mx-auto w-full max-w-7xl px-4 py-8 md:px-8">
+           
+          <motion.header
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: "easeOut" }}
-          className="mb-6 flex flex-col gap-2"
+          className="mb-6 flex items-start justify-between gap-4"
         >
-          <h1 className="text-2xl md:text-3xl font-semibold text-glow">
-            {isSavingsModule
-              ? "Metas de ahorro"
-              : isBudgetsModule
+          <div>
+            <h1 className="text-2xl md:text-3xl font-semibold text-glow">
+              {isSavingsModule
+                ? "Metas de ahorro"
+                : isCalendarModule
+                ? "Calendar Trxn"
+                : isScoreModule
+                ? "Score financiero"
+                : isAssistantModule
+                ? "Asistente Financiero"
+                : isDebtsModule
+                ? "Control de deudas"
+                : isBudgetsModule
                 ? "Presupuesto"
-              : isMaintenanceModule
+                : isMaintenanceModule
                 ? "Mantenimiento"
-                : "Finance Dashboard"}
-          </h1>
-          <p className="text-sm md:text-base text-white/60">
-            {isSavingsModule
-              ? "Asocia tus transacciones de ahorro y mide el avance de cada meta."
-              : isBudgetsModule
+                : "Centro de Control Financiero"}
+            </h1>
+
+            <p className="max-w-2xl text-sm md:text-base leading-7 text-slate-300">
+              {isSavingsModule
+                ? "Asocia tus transacciones de ahorro y mide el avance de cada meta."
+                : isCalendarModule
+                ? "Vista mensual para identificar tus dias de mayor gasto."
+                : isScoreModule
+                ? "Mide tu salud financiera mensual con ahorro, presupuesto y pagos."
+                : isAssistantModule
+                ? "Consulta tus finanzas en lenguaje natural con recomendaciones accionables."
+                : isDebtsModule
+                ? "Gestiona balances, intereses y estrategia de pago de deudas."
+                : isBudgetsModule
                 ? "Controla tu limite mensual por categoria."
-              : isMaintenanceModule
+                : isMaintenanceModule
                 ? "Gestiona catalogos y configuraciones del sistema."
-                : "Datos en tiempo real desde Google Sheets (refresh cada 5s)"}
-          </p>
+                : (
+                    <>
+                      <span className="block text-white">Control total de tus finanzas,</span>
+                      <span className="block font-semibold text-emerald-300">
+                        en tiempo real y siempre actualizado.
+                      </span>
+                    </>
+                  )}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <NotificationBell notifications={notifications} />
+
+            <div className="h-8 w-px bg-white/10" />
+
+            <UserMenu />
+          </div>
         </motion.header>
 
         {isSavingsModule ? (
           <SavingsGoalsPanel />
+        ) : isCalendarModule ? (
+          <ExpenseCalendarPanel txs={transactions} />
+        ) : isScoreModule ? (
+          <FinancialScorePanel />
+        ) : isAssistantModule ? (
+          <FinancialAssistantPanel />
+        ) : isDebtsModule ? (
+          <DebtControlPanel />
         ) : isBudgetsModule ? (
           <BudgetsMaintenancePanel />
         ) : isMaintenanceModule ? (

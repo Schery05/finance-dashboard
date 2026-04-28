@@ -1,0 +1,186 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+// prisma/schema.prisma
+datasource db {
+  provider  = "postgresql"
+}
+
+enum TransactionType {
+  INGRESO
+  GASTO
+}
+
+enum PaymentStatus {
+  PAGADO
+  PENDIENTE
+}
+
+enum SavingsMovementType {
+  APORTE
+  RETIRO
+  AJUSTE
+}
+
+enum DebtType {
+  TARJETA
+  PRESTAMO_PERSONAL
+  VEHICULO
+  HIPOTECA
+  OTRO
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  passwordHash String?
+  name      String?
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions        Transaction[]
+  categories          Category[]
+  budgets             Budget[]
+  savingsGoals        SavingsGoal[]
+  savingsMovements    SavingsMovement[]
+  debts               Debt[]
+  readNotifications   ReadNotification[]
+}
+
+model Category {
+  id        String          @id @default(cuid())
+  name      String
+  type      TransactionType
+  isActive  Boolean         @default(true)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  transactions Transaction[]
+  budgets      Budget[]
+
+  @@unique([userId, name, type])
+}
+
+model Transaction {
+  id                    String            @id @default(cuid())
+  date                  DateTime
+  type                  TransactionType
+  amount                Decimal           @db.Decimal(12, 2)
+  paymentStatus         PaymentStatus     @default(PENDIENTE)
+  additionalDescription String?
+  recurrenceKey         String?
+  isRecurringSuggestion Boolean           @default(false)
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  savingsMovement SavingsMovement?
+
+  @@index([userId, date])
+  @@index([userId, paymentStatus])
+  @@index([userId, type])
+  @@index([userId, recurrenceKey])
+  @@unique([userId, recurrenceKey, date])
+}
+
+model Budget {
+  id        String   @id @default(cuid())
+  month     Int
+  year      Int
+  limit     Decimal  @db.Decimal(12, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([userId, categoryId, month, year])
+}
+
+model SavingsGoal {
+  id          String   @id @default(cuid())
+  name        String
+  target      Decimal  @db.Decimal(12, 2)
+  initialBalance Decimal @default(0) @db.Decimal(12, 2)
+  deadline    DateTime?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  movements SavingsMovement[]
+
+  @@index([userId, isActive])
+}
+
+model SavingsMovement {
+  id        String              @id @default(cuid())
+  date      DateTime
+  type      SavingsMovementType
+  amount    Decimal             @db.Decimal(12, 2)
+  note      String?
+  createdAt DateTime            @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  goalId String
+  goal   SavingsGoal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  transactionId String?      @unique
+  transaction   Transaction? @relation(fields: [transactionId], references: [id])
+
+  @@index([userId, date])
+  @@index([goalId])
+}
+
+model ReadNotification {
+  id             String   @id @default(cuid())
+  notificationId String
+  readAt         DateTime @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, notificationId])
+}
+
+model Debt {
+  id             String   @id @default(cuid())
+  name           String
+  initialAmount  Decimal  @db.Decimal(12, 2)
+  currentBalance Decimal  @db.Decimal(12, 2)
+  interestRate   Decimal  @db.Decimal(5, 2)
+  monthlyPayment Decimal  @db.Decimal(12, 2)
+  paymentDay     Int
+  type           DebtType
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@index([userId, paymentDay])
+}

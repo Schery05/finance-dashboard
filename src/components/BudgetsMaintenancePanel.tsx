@@ -14,6 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import {
   CATEGORIES_UPDATED_EVENT,
+  fetchManagedCategories,
   loadManagedCategories,
   type ManagedCategories,
 } from "@/lib/categories";
@@ -144,7 +145,16 @@ export function BudgetsMaintenancePanel() {
 
   useEffect(() => {
     const refresh = () => setCategories(loadManagedCategories());
+    const fetchCategories = async () => {
+      try {
+        setCategories(await fetchManagedCategories());
+      } catch {
+        refresh();
+      }
+    };
+
     refresh();
+    fetchCategories();
     window.addEventListener(CATEGORIES_UPDATED_EVENT, refresh);
     return () => window.removeEventListener(CATEGORIES_UPDATED_EVENT, refresh);
   }, []);
@@ -158,6 +168,10 @@ export function BudgetsMaintenancePanel() {
       .filter(Boolean)
       .sort((a, b) => b.localeCompare(a));
   }, [budgets, period]);
+  const availablePeriodOptions = availablePeriods.map((item) => ({
+    value: item,
+    label: item,
+  }));
 
   const currentBudgets = useMemo(() => {
     return budgets
@@ -513,21 +527,13 @@ export function BudgetsMaintenancePanel() {
             <div className="grid grid-cols-1 gap-3 md:grid-cols-[180px_1fr] md:items-end">
               <label className="text-sm text-white/70">
                 Periodo
-                <select
+                <div className="mt-1">
+                <CustomSelect
                   value={periodFilter}
-                  onChange={(event) => setPeriodFilter(event.target.value)}
-                  className="mt-1 w-full rounded-xl bg-white/10 px-3 py-2 text-sm text-white outline-none ring-1 ring-white/15 focus:ring-2 focus:ring-emerald-300/60"
-                >
-                  {availablePeriods.map((item) => (
-                    <option
-                      key={item}
-                      value={item}
-                      className="bg-[#0B1020] text-white"
-                    >
-                      {item}
-                    </option>
-                  ))}
-                </select>
+                  onChange={setPeriodFilter}
+                  options={availablePeriodOptions}
+                />
+                </div>
               </label>
 
               <label className="text-sm text-white/70">

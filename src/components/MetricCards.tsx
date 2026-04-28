@@ -15,8 +15,10 @@ function money(n: number) {
 export function MetricCards({ txs }: { txs: Transaction[] }) {
   const ingresos = sum(txs, (t) => t.Tipo === "Ingreso");
   const gastos = sum(txs, (t) => t.Tipo === "Gasto");
+  const ingresosPagados = sum(txs, (t) => t.Tipo === "Ingreso" && t.EstadoPago === "Pagado");
+  const gastosPagados = sum(txs, (t) => t.Tipo === "Gasto" && t.EstadoPago === "Pagado");
   const pendientes = sum(txs, (t) => t.EstadoPago === "Pendiente");
-  const balance = ingresos - gastos;
+  const balance = ingresosPagados - gastosPagados;
 
   const cards = [
     { title: "Balance", value: money(balance), Icon: Wallet, ring: "from-cyan-400/30 to-blue-500/20", accent: "text-cyan-300" },
@@ -32,8 +34,9 @@ export function MetricCards({ txs }: { txs: Transaction[] }) {
           key={c.title}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
+          whileHover={{ y: -6 }}
           transition={{ delay: idx * 0.05, duration: 0.45, ease: "easeOut" }}
-          className="glass relative overflow-hidden p-5"
+          className="glass relative overflow-hidden p-5 transition-transform duration-300 hover:-translate-y-1"
         >
           <div className={`absolute inset-0 bg-gradient-to-br ${c.ring}`} />
           <div className="relative flex items-center justify-between">

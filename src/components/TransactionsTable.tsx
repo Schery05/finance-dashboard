@@ -1,8 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 import type { Transaction } from "@/lib/types";
 import { useFinanceStore } from "@/store/financeStore";
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
 function parseDateSafe(dateStr: string): Date | null {
   const s = (dateStr ?? "").trim();
@@ -68,12 +73,32 @@ export function TransactionsTable({
     setType,
     setStatus,
   } = useFinanceStore();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const months = Array.from(new Set(txs.map((t) => monthKey(t.Fecha))))
     .filter((m) => m && m !== "N/A")
     .sort((a, b) => b.localeCompare(a));
+  const monthOptions = [
+    { value: "Todos", label: "Todos los meses" },
+    ...months.map((item) => ({ value: item, label: item })),
+  ];
+  const typeOptions = [
+    { value: "Todos", label: "Todos" },
+    { value: "Ingreso", label: "Ingreso" },
+    { value: "Gasto", label: "Gasto" },
+  ];
+  const statusOptions = [
+    { value: "Todos", label: "Todos estados" },
+    { value: "Pagado", label: "PAGADO" },
+    { value: "Pendiente", label: "PENDIENTE" },
+  ];
+  const pageSizeOptions = PAGE_SIZE_OPTIONS.map((option) => ({
+    value: String(option),
+    label: String(option),
+  }));
 
-  const filtered = txs.filter((t) => {
+  const filtered = useMemo(() => txs.filter((t) => {
     const m = monthKey(t.Fecha);
     const s = search.trim().toLowerCase();
 
@@ -88,7 +113,24 @@ export function TransactionsTable({
     const matchesStatus = status === "Todos" ? true : estado === status.toLowerCase();
 
     return matchesSearch && matchesMonth && matchesType && matchesStatus;
-  });
+  }), [txs, search, month, type, status]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, month, type, status, pageSize, txs.length]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const pageStart = filtered.length === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const pageEnd = Math.min(currentPage * pageSize, filtered.length);
+  const paginated = filtered.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages);
+  }, [page, totalPages]);
 
   const controlBase =
     "rounded-xl px-3 py-2 text-sm outline-none backdrop-blur-xl transition " +
@@ -109,7 +151,9 @@ export function TransactionsTable({
       <div className="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
         <div className="shrink-0">
           <h3 className="text-base font-semibold">Transacciones</h3>
-          <p className="text-sm text-white/60">{filtered.length} registro(s) mostrados</p>
+          <p className="text-sm text-white/60">
+            {filtered.length} registro(s) encontrados
+          </p>
         </div>
 
         {/* ✅ FILTROS (alineados y compactos) */}
@@ -200,11 +244,11 @@ export function TransactionsTable({
           </thead>
 
           <tbody>
-            {filtered.map((t, i) => {
+            {paginated.map((t) => {
               const isIngreso = String(t.Tipo ?? "").trim().toLowerCase() === "ingreso";
 
               return (
-                <tr key={i} className="border-t border-white/10 hover:bg-white/[0.03]">
+                <tr key={t.ID} className="border-t border-white/10 hover:bg-white/[0.03]">
                   <td className="px-4 py-3 whitespace-nowrap text-white/80">{t.Fecha}</td>
 
                   <td className="px-4 py-3">
@@ -235,7 +279,18 @@ export function TransactionsTable({
                     </span>
                   </td>
 
-                  <td className="px-4 py-3 text-white/70 max-w-[420px] truncate">{t.DescripcionAdicional}</td>
+                  <td className="px-4 py-3 text-white/70">
+                    <div className="flex max-w-[420px] flex-col gap-1">
+                      {t.EsSugerenciaRecurrente && (
+                        <span className="w-fit rounded-full bg-amber-400/10 px-2 py-0.5 text-[11px] font-semibold text-amber-200 ring-1 ring-amber-300/25">
+                          Recurrente sugerido
+                        </span>
+                      )}
+                      <span className="truncate">
+                        {t.DescripcionAdicional || "Sin descripcion"}
+                      </span>
+                    </div>
+                  </td>
 
                   <td className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">
@@ -270,6 +325,60 @@ export function TransactionsTable({
             )}
           </tbody>
         </table>
+      </div>
+
+      <div className="mt-4 flex flex-col gap-3 rounded-2xl bg-white/[0.03] px-4 py-3 ring-1 ring-white/10 md:flex-row md:items-center md:justify-between">
+        <div className="text-sm text-white/60">
+          Mostrando{" "}
+          <span className="font-semibold text-white/85">
+            {pageStart}-{pageEnd}
+          </span>{" "}
+          de{" "}
+          <span className="font-semibold text-white/85">{filtered.length}</span>
+        </div>
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+          <label className="flex items-center gap-2 text-sm text-white/60">
+            Filas
+            <select
+              value={pageSize}
+              onChange={(event) => setPageSize(Number(event.target.value))}
+              className="rounded-xl bg-white/10 px-3 py-2 text-sm text-white outline-none ring-1 ring-white/15 focus:ring-2 focus:ring-cyan-400/60"
+            >
+              {PAGE_SIZE_OPTIONS.map((option) => (
+                <option key={option} value={option} className={optionClass}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="flex items-center justify-between gap-2 sm:justify-end">
+            <button
+              onClick={() => setPage((value) => Math.max(1, value - 1))}
+              disabled={currentPage <= 1}
+              className="inline-flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-sm text-white/75 ring-1 ring-white/10 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Anterior
+            </button>
+
+            <span className="min-w-[92px] text-center text-sm font-semibold text-white/85">
+              {currentPage} / {totalPages}
+            </span>
+
+            <button
+              onClick={() =>
+                setPage((value) => Math.min(totalPages, value + 1))
+              }
+              disabled={currentPage >= totalPages}
+              className="inline-flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-sm text-white/75 ring-1 ring-white/10 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Siguiente
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
       </div>
     </motion.div>
   );

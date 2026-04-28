@@ -1,0 +1,405 @@
+﻿ID;Fecha;Tipo;Categoria;Importe;EstadoPago;DescripcionAdicional
+21560f1a-1fdb-4935-9592-8cc0e3b49c9d;28/2/2026;Gasto;Entretenimiento;$1,410.00 ;Pagado;CompraMcDonaldsSPM
+fc11b358-a471-430b-8c05-740ecdbffd26;3/1/2026;Gasto;Compra Internet;$1,850.00 ;Pagado;CompraporAmazon
+d848fe69-e2ea-493d-aaca-6fba3169daae;3/1/2026;Gasto;Suscripciones;$350.00 ;Pagado;Patreon
+bb93ad28-6cb6-4ce5-bd88-9671a5ca2867;28/2/2026;Gasto;Mant.de vehículo;$14,000.00 ;Pagado;VidrioFrontalJeep
+675ef865-2597-4479-bac1-d4554a857fa4;24/2/2026;Gasto;Compras Internet;$11,799.60 ;Pagado;Comprademonitor
+6c95441f-64b7-49f6-9c2d-59b6dc6f3286;23/2/2026;Gasto;Entretenimiento;$660.00 ;Pagado;FoodShop
+696a1f0a-0518-41e8-b3d5-9ce333a794a4;23/2/2026;Gasto;Combustible;$2,000.00 ;Pagado;
+caa5c2dd-12d6-4368-8cf8-98389fa6b2a2;23/2/2026;Gasto;Imprevistos;$1,525.00 ;Pagado;MaterialesFerreteriaMejiaparaLlaveSPM
+e865110c-506a-4735-a57c-5a432925a2fa;23/2/2026;Gasto;Supermercado San Pedro;$1,629.62 ;Pagado;ComprasSupermercadoSPM
+f578908e-027a-4ee8-93cb-0abd000e6b68;23/2/2026;Gasto;Imprevistos;$805.00 ;Pagado;MaterialesFerreteriaMejiaparaLlaveSPM
+24e81811-4804-49be-a8a1-784f9a404c64;26/2/2026;Ingreso;Sueldo;$67,500.00 ;Pagado;ST
+add02516-e180-4443-b640-9b62e09bc53e;22/2/2026;Gasto;Supermercado Sto;$851.00 ;Pagado;Compralasirena
+594a7428-cb87-42bd-bb6f-bbd841f331fb;22/2/2026;Gasto;Ashley Universidad;$550.00 ;Pagado;SalonAshley
+79852c1a-eb15-45c7-af48-6b8ab825af3d;22/2/2026;Gasto;Supermercado Sto;$844.40 ;Pagado;Compralasirena
+64c8f95a-9ca2-4ab9-8820-26060593378b;22/2/2026;Gasto;CompraInternet;$2,000.00 ;Pagado;Samba
+945dac87-f6a6-43c5-8f61-469ac51d0bb4;21/1/2026;Gasto;Imprevistos;$625.00 ;Pagado;PicaPolloSanPedro
+eb438e3a-fc99-40dc-867b-c3303027aef6;25/2/2026;Gasto;Vivienda (alquiler San Pedro);$3,000.00 ;Pagado;
+35167538-8a00-403a-b9bd-7a32aa11f757;25/2/2026;Ingreso;Sueldo;$23,798.10 ;Pagado;SeNaSa
+023fb9a8-9f3f-4354-b16a-1d60c9b53972;30/1/2026;Ingreso;Sueldo;$67,500.00 ;Pagado;ST
+00ea821a-9a8a-46b8-aaae-f833b5661c82;2/3/2026;Gasto;Internet San Pedro;$1,707.00 ;Pagado;InternetSPM
+dcb793a1-81b9-41e3-a19c-6abccb4f7563;20/2/2026;Gasto;Entretenimiento;$1,890.00 ;Pagado;CasadeCañaStoli
+7851e8f3-c0f1-4c6a-991a-380fb91cef13;20/2/2026;Gasto;Electricidad San Pedro;$4,540.91 ;Pagado;
+42b1d68e-6480-46c5-a355-baf1f4bb8abc;28/2/2026;Ingreso;Aportes;$3,000.00 ;Pagado;PagoluzSPMpapi
+dc6be140-19e8-4788-94d7-e52c4f91f287;19/2/2026;Gasto;UberEats/PedidosYa;$1,376.60 ;Pagado;PedidosYaCompralasirena
+80323f00-c7f0-4c6c-be04-7c848584e395;2/3/2026;Gasto;Vivienda (alquiler Santo Domingo);$20,000.00 ;Pagado;
+b041d53f-cf8c-4211-8993-e59852df3c04;14/2/2026;Gasto;Mant.de vehículo;$2,315.00 ;Pagado;SeguroVehiculo
+36d2c1bd-0f3a-4d65-a322-a73ab02804e2;23/3/2026;Gasto;Vivienda (alquiler San Pedro);$3,000.00 ;Pagado;
+fa27059e-7e92-43f5-87fc-a02823a6e9bc;30/3/2026;Gasto;Vivienda (alquiler Santo Domingo);$20,000.00 ;Pagado;
+b1d2a5c0-ed90-4890-a23e-2f057ddc2376;14/2/2026;Gasto;Mant.de vehículo;$7,490.00 ;Pagado;CambioAceiteJeep
+e857c466-dd91-4e8d-be88-3d0fd164fe16;13/2/2026;Gasto;Imprevistos;$8,150.00 ;Pagado;ChoqueJeep
+e3fec8fa-3572-41f6-8102-00d58bdfb521;13/2/2026;Gasto;Compras Internet;$390.59 ;Pagado;Compramaceterocactus
+0d8a42e0-5562-42e4-8d83-6f5029352b39;13/2/2026;Gasto;Entretenimiento;$1,890.00 ;Pagado;CasadeCañaStoli
+959c0798-e4bd-49be-b16e-9870b4bbfc2b;12/12/2025;Gasto;GasSantoDomingo;$1,073.78 ;Pagado;
+924c8b5f-6fba-4e6c-9cfb-973b20d14cea;12/2/2026;Gasto;Ashley Universidad;$70.00 ;Pagado;RecargaAshley
+137eea39-7717-4ac0-a7c1-2759870e0824;12/2/2026;Ingreso;Sueldo;$23,798.10 ;Pagado;SeNaSa
+7ef074ca-6e56-4a8d-aab0-0cb2292a340c;11/2/2026;Gasto;Entretenimiento;$295.00 ;Pagado;PedidosYa(MunchiesCafSANTODOMINGODO
+e5acb18d-3379-4353-9ea2-f3dfb66478ca;10/2/2026;Gasto;GasSantoDomingo;$1,159.23 ;Pagado;
+284f59fc-c441-4d00-917c-d093897ee0c3;9/2/2026;Gasto;Uber;$89.12 ;Pagado;UBERRIDES-W*UBERRIDES-WSANTODOMINGODO
+327e3f94-85ba-4315-b78f-ff511e5ef932;9/2/2026;Gasto;Ashley Universidad;$228.25 ;Pagado;SirenaMella
+081ac836-b8b3-49cf-85c2-168f59f4a413;9/2/2026;Gasto;Ashley Universidad;$727.20 ;Pagado;LASIRENACDEGAULLESANTODOMINGODO
+299ba0fd-5410-4355-af0b-e217a297f1ee;9/2/2026;Gasto;Cuidado personal (Ej. Belleza);$1,100.00 ;Pagado;CorteMatt
+c12a4fc2-a2ff-41d2-ad42-8b4780f8c572;6/2/2026;Gasto;Supermercado Sto;$919.10 ;Pagado;Compralasirena
+cbb1bc2d-25e6-43df-9c71-4156241b630c;7/2/2026;Gasto;UberEats/PedidosYa;$919.00 ;Pagado;PedidosYáSirena
+590be765-0651-4d6f-9f01-a27aac7b3bc9;6/2/2026;Gasto;UberEats/PedidosYa;$53.12 ;Pagado;PedidosYaExtra
+35c52923-7596-4b77-9d4c-59849fc977d3;6/2/2026;Gasto;Mant.de vehículo;$1,200.00 ;Pagado;LimpiaVidrioChevy
+dda6c75f-4b8f-46a9-a414-1257f8327c49;6/2/2026;Gasto;Peajes;$100.00 ;Pagado;
+f0bc4f27-ca08-438d-87c9-b53d0b35d27d;7/2/2026;Gasto;Entretenimiento;$4,235.01 ;Pagado;SalidaMatt
+142e79ec-c1d1-4d45-8f23-4bac37e2e8cd;7/2/2026;Gasto;Parqueos;$50.00 ;Pagado;SAMBIL
+dd892610-0c26-4c75-b8c7-7a911bf80b98;7/2/2026;Gasto;Viaje personal;$450.02 ;Pagado;DOÑAPULA
+8aa47276-1ad9-4b20-a25c-3b6a03f40d94;7/2/2026;Gasto;Entretenimiento;$245.00 ;Pagado;SIGMASMARTSHOPKM25
+5746adfb-bbdb-4e2b-9686-1caf7a2abaef;7/2/2026;Gasto;Entretenimiento;$650.00 ;Pagado;TEXACOAUTDUARTE
+c535b84c-384a-4fef-9ebf-7006891108dc;7/2/2026;Gasto;Combustible;$565.00 ;Pagado;BONJOURTOTALJACOBOM
+aea25bfe-f8d2-46f1-82e7-5b0858bf8074;7/2/2026;Gasto;Combustible;$1,950.00 ;Pagado;
+c4aab17a-b827-42f9-8980-5cdab602f5a8;7/2/2026;Gasto;Viaje personal;$357.50 ;Pagado;DOÑAPULA
+4ae45b32-5cec-4ead-8613-24e8a9478c3b;8/2/2026;Gasto;Supermercado Sto;$12,137.50 ;Pagado;PRICESMARTSANISIDRO
+bea08b35-884f-4fb7-984c-2205908deaa1;8/2/2026;Gasto;Entretenimiento;$1,199.00 ;Pagado;RegaloMattporPrimerCortedePelo(SoccerBall)
+22f4c8cd-165a-437e-b851-263928566567;8/2/2026;Gasto;Entretenimiento;$1,080.00 ;Pagado;CompraMcDonaldsSarasota(Matt)
+bd86a88e-f2fc-4600-ac14-44326bc67a5c;8/2/2026;Gasto;Supermercado Sto;$995.20 ;Pagado;Compralasirena
+bc07e9c6-51c1-4e8c-baba-4d8807888508;5/2/2026;Gasto;DexterNecesidades;$1,998.00 ;Pagado;Groomie
+b180c88d-85a4-4d2d-ae0a-1354b0b1f487;5/2/2026;Gasto;DexterNecesidades;$319.00 ;Pagado;Compratreat
+520938ac-62cc-4bf1-b0a8-fb155382fb68;4/2/2026;Gasto;Entretenimiento;$1,225.00 ;Pagado;Compramatas
+f490631e-fc90-4bae-ab46-9ec69fcb962b;30/1/2026;Gasto;Vivienda (alquiler Santo Domingo);$20,000.00 ;Pagado;
+f145eff6-4664-413a-93bb-ebe5a182e84f;4/2/2026;Ingreso;Bonos;$231.97 ;Pagado;VisaBravoSantaCruz
+9d268856-a3cc-4f34-9264-59d12117f9d8;3/2/2026;Gasto;Ashley Universidad;$370.00 ;Pagado;LASIRENAVILLAMELLASANTODOMINGODO
+17e8f04b-49d2-4fc7-9b83-c5e8a6b0b4fc;31/1/2026;Gasto;Entretenimiento;$17,930.00 ;Pagado;ConciertoBeret
+9a7fea7a-d974-49d1-a95b-75ac3b0b53f0;1/2/2026;Gasto;Electricidad San Pedro;$4,910.93 ;Pagado;
+3a162d42-a3b1-4762-887d-ded34801fff0;22/2/2026;Gasto;Ashley Universidad;$133.00 ;Pagado;CLARORECAR8494540499SANTODOMINGODO
+b5908c03-a6d0-4414-923d-800cf886687c;1/2/2026;Gasto;Cuidado personal (Ej. Belleza);$800.00 ;Pagado;Salion
+53e4bb85-a712-4c2f-9a86-bf5809c76986;1/2/2026;Gasto;Mant.de vehículo;$1,300.00 ;Pagado;LimpiaVidrioChevy
+1bff4f7f-a018-4d0a-99b6-dd0add2cf5be;31/1/2026;Gasto;UberEats/PedidosYa;$790.00 ;Pagado;PedidosYaZaglul
+0cb2c46c-1e37-43b1-b28b-75e0b2f2d06d;31/1/2026;Gasto;UberEats/PedidosYa;$395.00 ;Pagado;PedidosYaHeladosBon
+cf6895ae-f921-4449-bb9e-1e923a5da83b;31/1/2026;Gasto;UberEats/PedidosYa;$365.00 ;Pagado;PedidosYaHeladosBon
+37627699-9fd4-412e-9398-a2371b2a86c0;30/1/2026;Gasto;Combustible;$750.00 ;Pagado;TOTALENERGIESPETROLONEP
+9bcb9658-51da-41df-ac17-ba5c0f73d916;30/1/2026;Gasto;Combustible;$750.00 ;Pagado;TOTALENERGIESPETROLONEP
+4dd9952a-039c-4804-b6cf-cc10e723c117;30/1/2026;Gasto;UberEats/PedidosYa;$375.00 ;Pagado;PedidosYaMasaReyes
+fb0e736c-9948-41e7-aea0-3e233f416572;30/1/2026;Gasto;Suscripciones;$2,351.30 ;Pagado;IPSY
+d9321073-e4c3-4086-a680-830eba01186c;30/1/2026;Gasto;Combustible;$1,000.00 ;Pagado;TOTALBUENAVISTA
+8693bc75-3aee-4c2e-9b0f-40eb85312c47;30/1/2026;Gasto;Combustible;$280.00 ;Pagado;TOTALHIGUAMOFOODMARKET
+42f3b04d-5cb1-4f5c-94ea-e31ed229a8f0;29/1/2026;Gasto;Entretenimiento;$660.00 ;Pagado;BONJOURSPM
+1e67e206-dc98-4a06-9085-6f2f279b29b2;29/1/2026;Gasto;Supermercado San Pedro;$951.74 ;Pagado;Baratillo
+18efb182-05fa-4f9d-83a0-95b44ce8d181;29/1/2026;Gasto;Gas San Pedro;$823.20 ;Pagado;MACORIXGASPTAGARZASANPEDRODEDO
+5768838f-a33e-4f06-bb60-5fee4e19643e;29/1/2026;Gasto;Internet San Pedro;$1,707.00 ;Pagado;InternetSPM
+a44642e3-4c8a-45bf-9020-ead3e3c7e969;4/3/2026;Gasto;Ahorro Personal;$20,000.00 ;Pagado;BHDCUENTADEAHORRO
+253edf49-a46d-4989-b855-16bc049db351;4/3/2026;Gasto;Supermercado San Pedro;$650.00 ;Pagado;Baratillo
+fb311c09-8442-4a30-ad39-6b6befeb741e;8/3/2026;Gasto;Supermercado San Pedro;$3,393.55 ;Pagado;ComprasmiasSPM
+b524c14c-c5d9-47af-8eb2-3e6b7c375b46;9/3/2026;Gasto;Suscripciones;$148.99 ;Pagado;PedidosYaSuscripcion
+7390a3af-4c7b-4798-89d3-5f2a33d5f4eb;8/3/2026;Gasto;Supermercado San Pedro;$647.49 ;Pagado;ComprasSupermercadoSPM
+556874fc-b862-40d5-8158-a74ba26568c8;8/3/2026;Gasto;Combustible;$1,000.00 ;Pagado;
+20f1f0ae-7e0f-4eb1-8822-00a850e36a66;6/3/2026;Gasto;Combustible;$1,000.00 ;Pagado;
+7faaa76a-480f-416e-b6c5-21ffc5114582;9/3/2026;Gasto;Compras Internet;$4,290.05 ;Pagado;"
+Prensadetortilladehierro
+LaptopCooling"
+0f6f8040-5797-4a3d-a14c-f49e14314d97;7/3/2026;Gasto;Suscripciones;$395.00 ;Pagado;Uber
+7111ec50-dd6e-407f-88cd-2f4d00b5a583;7/3/2026;Gasto;Mant.de vehículo;$2,284.38 ;Pagado;BujiaVehiculos
+0823bd82-e240-408d-9735-2e687f6df9d8;6/3/2026;Gasto;Entretenimiento;$1,890.00 ;Pagado;CasadeCañaStoli
+e5b65ece-5280-4b5c-8340-72166bbcd0f1;5/3/2026;Gasto;Supermercado San Pedro;$425.85 ;Pagado;Baratillo
+1c92d34a-4d76-4011-9d72-2a71311de7cc;4/3/2026;Ingreso;Bonos;$42.92 ;Pagado;TCSantaCruz
+d8745c0a-c314-4879-a0d1-399c1442bbc2;4/3/2026;Gasto;Paquetes envío;$603.77 ;Pagado;EPS
+a0adbb06-5098-44cb-8aee-b4f730f42fde;3/3/2026;Gasto;UberEats/PedidosYa;$255.00 ;Pagado;UberEats-LicorStore
+a4e9a2b1-6299-451c-830e-3160ab02797f;27/2/2026;Gasto;Entretenimiento;$215.00 ;Pagado;FoodShop
+0d22970b-552c-4ef0-9f00-866b3a8bcc4b;15/2/2026;Ingreso;Sueldo;$67,500.00 ;Pagado;ST
+bebd6af3-299c-4051-9790-be0cb898b898;30/1/2026;Ingreso;Sueldo;$23,798.10 ;Pagado;SeNaSa
+3168ca9a-814f-4e49-90b2-9a6ce969bbb2;15/1/2026;Ingreso;Sueldo;$67,500.00 ;Pagado;ST
+9bf2b61a-9041-4914-9d19-126212c9131f;15/1/2026;Ingreso;Sueldo;$23,798.10 ;Pagado;SeNaSa
+710ea1ed-cd47-404c-8c72-a6b21f8a7bdc;10/3/2026;Gasto;Cuidado personal (Ej. Belleza);$6,351.05 ;Pagado;
+8ddfbe0d-6cc7-4df1-95b4-bf1815fae699;13/3/2026;Gasto;Supermercado Sto;$19,980.25 ;Pagado;PRICESMARTSANISIDRO
+f07381f3-076e-417c-90e9-6076b677067f;15/3/2026;Gasto;Cuidado personal (Ej. Belleza);$6,407.25 ;Pagado;Mesdelabellezaenlasirena
+9ed10f97-8469-4977-9849-1ef7a89253ab;15/3/2026;Gasto;Supermercado Sto;$5,482.44 ;Pagado;ComprasNacional
+562c8c8e-fd1f-448f-9282-64781bc7d718;15/3/2026;Gasto;Supermercado Sto;$2,768.73 ;Pagado;ComprasNacional
+0a23af49-761b-44ee-a6e7-3f7131428e5d;16/3/2026;Gasto;GasSantoDomingo;$1,017.64 ;Pagado;
+323dfdf9-7f6f-4496-b26b-729b0ca5dc39;16/3/2026;Gasto;Supermercado Sto;$100.00 ;Pagado;ColmadoAgua
+5f62fb29-1e51-46fc-be41-9af7783151d3;13/3/2026;Ingreso;Sueldo;$67,500.00 ;Pagado;ST
+6cde59a4-00c7-46ea-b565-62fe8e1961b1;9/3/2026;Gasto;Supermercado Sto;$135.00 ;Pagado;ColmadoAgua
+606d2a3d-1ba3-4faf-b159-da826a25fd66;2/1/2026;Ingreso;Pago prestamos;$50,000.00 ;Pagado;MASSIEL
+386fbf75-646d-48ce-88af-c642040c1247;9/1/2026;Ingreso;Pago prestamos;$15,000.00 ;Pagado;MASSIEL
+6ec056fa-49cf-4b0a-8832-f8a48c20d782;12/1/2026;Ingreso;Bonos;$10,000.00 ;Pagado;
+8d75f7b0-71b1-4d5e-8910-aa795e6aed9b;15/1/2026;Gasto;Paquetes envío;$1,665.24 ;Pagado;EcoPaq
+60b6da17-e29a-4f56-a838-b2a62c6c82c6;27/1/2026;Gasto;Imprevistos;$1,400.00 ;Pagado;
+510239db-ece7-469d-be24-b7df94210833;27/1/2026;Ingreso;Pago prestamos;$1,000.00 ;Pagado;MASSIEL
+0f66b1fd-ab81-4ca6-aa1c-7e8e93a904be;27/1/2026;Gasto;Paquetes envío;$490.31 ;Pagado;EcoPaq
+44405fa0-c4bc-4fc9-b1f8-870da4a47d6f;31/1/2026;Gasto;UberEats/PedidosYa;$375.00 ;Pagado;PedidosYáEmpanadas
+17fc931a-b289-4907-a50b-2e1de75c86c2;1/2/2026;Gasto;Suscripciones;$322.50 ;Pagado;Patreon
+e626c3a2-982e-44cc-a461-d09573835592;1/2/2026;Gasto;Compras Internet;$672.15 ;Pagado;CompraporAmazon
+ccf9f967-4f63-46b6-94cc-a89b8bf71727;1/2/2026;Gasto;Compras Internet;$1,224.73 ;Pagado;CompraporAmazon
+961a257c-2067-4a4f-9c87-dc7b0796cd2a;1/2/2026;Gasto;Peajes;$150.00 ;Pagado;
+ccdf995d-d0ed-483e-9347-ed19c21c6fef;1/2/2026;Gasto;Entretenimiento;$1,845.00 ;Pagado;PizzaHut
+8210d38e-ddec-4405-be84-4ef8d7735a07;1/2/2026;Gasto;Supermercado San Pedro;$790.00 ;Pagado;ComprasZaglul
+5534fced-3e05-46b3-8df0-5bf0b137b1cb;1/2/2026;Gasto;Entretenimiento;395;Pagado;HeladosBon
+63886f37-92aa-49d6-8bfc-eb0100ba63e7;1/2/2026;Gasto;Entretenimiento;365;Pagado;HeladosBon
+7ec714f9-d174-47b6-ab2d-82925a4a3c02;30/1/2026;Ingreso;Bonos;161;Pagado;TCGnial
+6ef588fd-6f8e-4873-a2ac-6a9197de76d8;1/1/2026;Ingreso;Bonos;275;Pagado;TCGnial
+e8c11d3a-a4ba-4a21-9c8d-cefc1aff783e;1/1/2026;Ingreso;Bonos;300;Pagado;TCGnial
+31e2ff33-8bf7-4bd8-b14b-e0498d5ae595;1/1/2026;Gasto;Suscripciones;323.28;Pagado;Patreon
+861cbc6a-65fe-4401-a8c9-68e2bd99695e;2/2/2026;Ingreso;Bonos;300;Pagado;TCGnial
+290c4132-6b91-482d-b4c2-41a7c2447696;2/2/2026;Ingreso;Bonos;275;Pagado;TCGnial
+32812472-a9c2-4904-970c-c145ad695b85;26/1/2026;Gasto;UberEats/PedidosYa;1400;Pagado;PedidosYaSirena
+6796781f-505a-4e6d-a172-c560ddca765a;25/1/2026;Gasto;UberEats/PedidosYa;87;Pagado;PedidosYáExtrapedido
+e63c18bd-e926-409e-8a3a-01c8133b34cb;22/1/2026;Gasto;Supermercado Sto;1308.97;Pagado;SupermercadoAsfer
+5b6c82fd-8c2a-4768-9bdf-86c162c74fdd;20/1/2026;Gasto;Viaje personal;6333.06;Pagado;Airbnb
+28aca45f-ad6b-4165-8e0a-a126033f54f9;19/1/2026;Gasto;Viaje personal;390;Pagado;Mcdonalds
+741ab611-816e-476e-be2f-bc0e102f18b2;19/1/2026;Gasto;Viaje personal;244.7;Pagado;Supermercado
+787f4a76-a7ea-4ed8-9ccc-554569d00890;19/1/2026;Gasto;Viaje personal;800;Pagado;Bar
+2eaf7d93-4674-4421-8730-5510eb7809fd;19/1/2026;Gasto;Viaje personal;590;Pagado;Bar
+dcf2122a-6129-477d-971f-bc9b353e1b61;19/1/2026;Gasto;Viaje personal;6407.48;Pagado;Airbnb
+fdc7c6c4-7561-495c-b2f9-6a4e89154dd1;13/1/2026;Gasto;UberEats/PedidosYa;484;Pagado;PedidosYaMarket
+74817853-81cb-420c-a493-67a0cb29191c;13/1/2026;Gasto;UberEats/PedidosYa;484;Pagado;PedidosYaMarket
+9cabaa71-2e96-4e42-8bb2-380463509dbf;13/1/2026;Gasto;Supermercado Sto;1740;Pagado;Compralasirena
+62e3dc4b-73eb-4d53-931e-bade3064988e;10/1/2026;Gasto;Compra Articulos Hogar;2455;Pagado;Aliss
+1e22e612-017d-46a2-8920-6436509be059;10/1/2026;Gasto;Supermercado Sto;6577;Pagado;PRICESMARTSANISIDRO
+d8e20dec-e9f7-4fd3-bc1e-3af492d228bb;10/1/2026;Gasto;Supermercado Sto;1223;Pagado;PRICESMARTSANISIDRO
+c577f890-8fce-4742-a667-de0c97f21124;10/1/2026;Gasto;Entretenimiento;800;Pagado;BarMetroSanIsidro
+a64acfaf-31f0-4e63-86b0-5a22776fd143;10/1/2026;Gasto;Entretenimiento;1188;Pagado;GroundMetroSanIsidro
+d39383c3-cee1-4f57-a439-3d3a5c1a98aa;11/1/2026;Gasto;Suscripciones;986.05;Pagado;AMAZONPrime
+ec708b8c-1cb4-4743-ac07-c49025f68883;11/1/2026;Gasto;Suscripciones;148.99;Pagado;PedidosYaPlus
+9cd741c2-1eab-4d96-8ad2-49b0393e6d35;7/1/2026;Gasto;Viaje personal;605;Pagado;ElMau
+014bea1e-2d2c-428b-95ce-9f3fe91641d5;9/1/2026;Ingreso;Bonos;300;Pagado;TCGnial
+c82ca245-a6af-400c-aa40-4944486654b7;7/1/2026;Gasto;Entretenimiento;195;Pagado;FoodShop
+e47055fa-3fdb-437c-ac9d-b818abe399e4;7/1/2026;Gasto;Educación (Universidad/Colegio);9046.5;Pagado;Pagouniversidad
+b1ff5b89-8fd7-4662-8e9f-f491712b49ea;7/1/2026;Gasto;Entretenimiento;1703.9;Pagado;TexasGrill
+752faa59-64a2-499a-9491-36bb517870d8;3/1/2026;Gasto;Supermercado San Pedro;720;Pagado;Baratillo
+95b47af0-5ca1-44fb-9dc0-f1c884b5ff10;3/1/2026;Gasto;Entretenimiento;3393.74;Pagado;BELLAMARFOODPARK
+fba7fa82-a24a-44e0-82bf-ec968ec4cb4a;3/1/2026;Gasto;Peajes;200;Pagado;
+bb0f31cc-1a1a-45fa-b462-576ffa4a58e7;3/1/2026;Gasto;Entretenimiento;1125;Pagado;PACOBURGUERSANPEDRO
+c5617516-98f0-40f9-beb6-53e37a325d5c;1/3/2026;Gasto;Suscripciones;305.82;Pagado;Patreon
+d75d0ea8-74c0-499f-8880-5c3596d97771;2/3/2026;Gasto;Compras Internet;1837.99;Pagado;
+ef7556db-ed3f-477a-8b39-86315b31804a;2/3/2026;Ingreso;Bonos;300;Pagado;TCGnial
+c7f01336-afa8-408e-9495-9a1d3edf59f1;2/3/2026;Ingreso;Bonos;186;Pagado;TCGnial
+eb2a0fcf-fca6-4191-8e05-3a1145357e36;28/2/2026;Gasto;UberEats/PedidosYa;697;Pagado;PedidosYaMarket
+fed28e5e-1a8e-4cd2-ae5b-89b63db9c6f5;28/2/2026;Gasto;Entretenimiento;940;Pagado;spm
+df0cfef0-9c94-477d-aebe-1c8e36e9ff1f;27/2/2026;Gasto;Suscripciones;2247.3;Pagado;IPSY
+af08e729-14c5-416a-9347-34e9022b08d4;27/2/2026;Gasto;Compras Internet;2470.16;Pagado;CompraporAmazon
+2694ec69-6639-4671-8a27-782b5810d300;23/2/2026;Gasto;UberEats/PedidosYa;844.4;Pagado;PedidosYaMarket
+87c9c89e-6549-45bd-b07c-1cad8ef97c5a;23/2/2026;Gasto;UberEats/PedidosYa;851;Pagado;PedidosYaSirena
+b0788dc5-b103-4f2d-8c2c-4a3a024c7c65;24/2/2026;Ingreso;Bonos;636.93;Pagado;TCGnial
+a9adc6b7-c6ac-41e7-a84b-b4c1f9083a8c;21/2/2026;Gasto;Entretenimiento;285;Pagado;FoodShop
+81bd53ad-8fd8-4f91-a6ee-2e3f3787fff0;21/2/2026;Gasto;Supermercado Sto;1682;Pagado;Compralasirena
+01543544-f4f4-43e5-a784-b34dc374406e;22/2/2026;Gasto;Compras Internet;2989.07;Pagado;SAMBAEBAY
+162a0587-a069-4b8f-b128-3b326a55cdb0;21/2/2026;Gasto;Entretenimiento;760;Pagado;CompraMcDonaldsSPM
+c23ee838-6b69-431d-a6f4-b734ca3a9743;22/2/2026;Gasto;Gastos médicos;906;Pagado;FARMACIA
+f771af09-cd86-40f9-bf7c-6f8b2742d941;20/2/2026;Gasto;UberEats/PedidosYa;1348.64;Pagado;PedidosYaSirena
+c2781811-2552-435e-b2e7-4233c0ede943;19/2/2026;Gasto;UberEats/PedidosYa;743;Pagado;PedidosYámARKET
+32146606-d9a5-4862-84b3-cf03a51f1c04;15/2/2026;Gasto;UberEats/PedidosYa;660;Pagado;KFC
+bc182d5e-8633-4977-bd65-e73a8084b268;11/2/2026;Gasto;Suscripciones;974.37;Pagado;AMAZONPrime
+1eb92591-08ef-42c4-9edc-1471bb1bf371;9/2/2026;Gasto;Entretenimiento;630;Pagado;WENDY
+d017b39b-f82e-4990-9d3e-de4615f9bd74;9/2/2026;Gasto;Suscripciones;148.99;Pagado;PedidosYaSuscripcion
+9aa8ad8f-04c0-4bd5-b875-a07d85961c00;7/2/2026;Gasto;Entretenimiento;565;Pagado;FoodShop
+d512c76d-ad87-4cb9-8fc4-e8e7486d7acf;7/2/2026;Gasto;Combustible;650;Pagado;
+ef31d5a8-f84b-46cf-8aee-6ef75330966a;7/2/2026;Gasto;Entretenimiento;590;Pagado;SANTOMERCADO
+56f8a430-3956-4c9b-9f29-b58828e90f30;7/2/2026;Gasto;Entretenimiento;285;Pagado;SANTOMERCADO
+0b814442-403c-4157-941c-9c69adc42903;19/2/2026;Gasto;UberEats/PedidosYa;770;Pagado;PedidosYáMARKET
+0c6afc59-89b8-4608-9cdd-d59b98bd9829;16/3/2026;Gasto;Imprevistos;13500;Pagado;InternamientoMatt
+91df061e-29de-41bb-b5f5-6b047b7c5f42;16/3/2026;Gasto;Imprevistos;648.3;Pagado;InternamientoMatt
+8e77c2d0-be16-48d5-a11c-7cdec97adad7;13/3/2026;Gasto;Compras Internet;7708.91;Pagado;SHEIN
+ef31838c-1d39-409e-adfc-b4ee5983a9ff;11/3/2026;Gasto;Suscripciones;950.77;Pagado;AMAZONPrime
+e7df6ee6-54dc-43b7-a885-569a4f7e82dc;11/3/2026;Gasto;Compras Internet;4497.25;Pagado;CompraporAmazon
+f58225ee-4373-4f4c-bed5-e48a0af3d30a;9/3/2026;Gasto;Suscripciones;148.99;Pagado;PedidosYaPlus
+df7b1a11-dd5d-4093-97ca-fb0bb201db85;7/3/2026;Gasto;UberEats/PedidosYa;534;Pagado;PedidosYaMarket
+4faf3992-b445-4707-900a-f6c27681cc56;4/3/2026;Gasto;Entretenimiento;610;Pagado;YaroaSPM
+af26974f-c9b4-425f-99d5-b1f818e3f04b;3/3/2026;Gasto;Compras Internet;1716.03;Pagado;CompraporAmazon
+f912bca4-f235-4841-a989-8cdbb380699d;3/3/2026;Gasto;UberEats/PedidosYa;665;Pagado;PedidosYaHeladosBon
+f70efae9-8cda-40cd-88e2-13626aa14886;3/3/2026;Gasto;UberEats/PedidosYa;255;Pagado;PedidosYaLiquorStore
+0001122e-a5dc-4ab3-94e9-fb98eb863c67;18/3/2026;Gasto;Imprevistos;480;Pagado;CompraMcDonaldsSPM
+a8212d79-f553-4536-a890-0727342f5d61;18/3/2026;Gasto;Uber;422.76;Pagado;MattInternamiento
+eccc8840-71f7-479e-b82f-7afb5d4bf9ef;18/3/2026;Gasto;Uber;427.51;Pagado;MattInternamiento
+76828837-2627-4d27-9029-0d0f73dee496;17/3/2026;Gasto;Compra Colmado;580;Pagado;MattInternamiento-Colmado
+1090581a-acf6-45b6-a63f-fd3fbcdf608e;15/3/2026;Gasto;Imprevistos;920.36;Pagado;InternamientoMatt-Medicamentos
+dec85519-65c4-4c49-a32a-ef7ec2ffa3a9;15/3/2026;Gasto;Imprevistos;614.04;Pagado;InternamientoMatt-MedicamentosFarmacia
+ce4e68a2-65bb-416f-947b-608bf221112b;15/3/2026;Gasto;Imprevistos;821.7;Pagado;InternamientoMatt-MedicamentosFarmacia
+a0abd12b-b86d-4e4d-a0df-66d361d7ba19;15/3/2026;Gasto;Imprevistos;1000;Pagado;InternamientoMatt-Combustible
+df8ec4f5-0074-47a2-a4f8-5de89a794d72;15/3/2026;Gasto;Compra Colmado;155;Pagado;InternamientoMatt-Cafeteria
+1ae7b3ad-7fad-4613-9488-76861542274a;15/3/2026;Gasto;Imprevistos;370;Pagado;InternamientoMatt-Mcdonalds
+dbfc866d-ad1a-4530-a0d7-3e5fd3d7e56f;15/3/2026;Gasto;Combustible;1500;Pagado;
+3181459b-0fe6-4438-b30c-58d85696e7a2;15/3/2026;Gasto;Imprevistos;50;Pagado;Agua
+f883eb09-ce18-4713-8828-6ae322f67c3f;18/3/2026;Gasto;Compra Colmado;275;Pagado;MattInternamiento-ComidaColmado
+62988993-83e1-4df2-b070-35de242963bf;1/4/2026;Gasto;Suscripciones;308.29;Pagado;Patreon
+f1d6dfc8-d5a8-4533-b113-76074b0cd180;5/4/2026;Gasto;UberEats/PedidosYa;540;Pagado;PedidosYaHeladosBon
+c8e7b7b7-f207-4048-813a-8688f9080ef2;15/3/2026;Ingreso;Horas/Trabajos extras;5000;Pagado;VentaCelular
+ccd8e304-2403-4edf-b40e-cc6a05de6e54;5/4/2026;Gasto;Compras Internet;4604.91;Pagado;"CompraporAmazon
+-Extratordejugosto
+-SkinCare
+-TornillosGomasJeep"
+ba6ddb3b-4eb3-4bea-b053-afc74674aa09;1/4/2026;Ingreso;Bonos;300;Pagado;TCGnial
+f3572032-cee6-4040-a9f1-74aca7825271;31/3/2026;Gasto;Suscripciones;2237.94;Pagado;IPSY
+da3c9625-26d6-437f-9d1c-69ad68e75c60;30/3/2026;Gasto;Supermercado Sto;902.76;Pagado;Compralasirena
+a7a28989-afb2-4b14-8bd5-d0e1e15f4ebe;30/3/2026;Gasto;Supermercado San Pedro;1275;Pagado;ComprasZaglul
+931110eb-257b-4a15-904c-f2c52279d56b;29/3/2026;Gasto;Peajes;150;Pagado;
+1b82ef2b-d79a-4f27-8e27-8360d93c2087;28/3/2026;Gasto;Gastos médicos;515.15;Pagado;FARMACIAPEDIDOSYA
+d385b85c-f162-477e-be44-b9de75f4f9c1;27/3/2026;Gasto;Supermercado Sto;154.52;Pagado;Compralasirena
+1f0b0fe2-de8e-415d-8e06-146f60e26b55;27/3/2026;Gasto;Combustible;1000;Pagado;TOTALENERGIESPETROLONEP
+a8107e12-24fa-4b92-86c8-eaf122ea61a6;26/3/2026;Gasto;UberEats/PedidosYa;765;Pagado;PedidosYaHeladosBon
+1f571667-9198-4f40-b3fc-656e79d96f69;23/3/2026;Gasto;Compras Internet;915.77;Pagado;"CompraporAmazon
+-Cosasparahogar"
+bc0068d3-f77e-4eaf-8934-29cec1474440;23/3/2026;Gasto;Gastos médicos;3591.2;Pagado;FARMACIAGBC
+c9aefa88-e10a-4666-a64b-187812c5c8c9;23/3/2026;Gasto;UberEats/PedidosYa;700;Pagado;PedidosYaHeladosBon
+3c2a21ce-f4c7-4a48-99e1-831448ca7fe7;23/3/2026;Gasto;UberEats/PedidosYa;575;Pagado;PedidosYaHeladosBon
+6cc331e5-0f52-4968-9dc5-7395a12f77b2;21/3/2026;Gasto;Uber;366.54;Pagado;MattInternamiento
+1439e0cd-7a5b-41da-a97d-950b2ffd7aaf;21/3/2026;Gasto;Uber;333.19;Pagado;MattInternamiento
+d84b7417-5af3-4f5a-b456-7ae0fd4eded0;19/3/2026;Gasto;Peajes;100;Pagado;
+9b03b90c-cd3d-457b-a7eb-77e99b52d95c;29/3/2026;Gasto;Combustible;1800;Pagado;PETRONAN
+1627e56e-01f7-4330-8ab9-ee8499a6d572;28/3/2026;Gasto;Supermercado Sto;705.73;Pagado;Compralasirena
+9037b2be-c37e-4c99-b89a-4c1e0a67b382;28/3/2026;Gasto;Compra Articulos Hogar;3222;Pagado;IKEA
+9a92ad5b-05af-4ca3-a9aa-fee2edcffd5a;28/3/2026;Gasto;Entretenimiento;1890;Pagado;CasadeCañaStoli
+948ebbcf-78ad-43c3-bffa-67f13dc3a12b;21/3/2026;Gasto;Supermercado Sto;711.4;Pagado;MattInternamiento-GARRIDO
+b8724a5e-b7ea-4723-ae3b-4ab6cc5ec7df;21/3/2026;Gasto;Gastos médicos;108;Pagado;FARMACIAFARMTRIXRENACIMIII
+75422462-c458-4ee1-be82-a320c54badd0;19/3/2026;Gasto;Compra Colmado;240;Pagado;MattInternamiento-ComidaColmado
+7f64b1de-27fc-4f32-9898-255f8ce5f0ee;19/3/2026;Gasto;Combustible;1200;Pagado;TOTALENERGIESPETROLONEP
+4dac3b89-8a85-47ee-9d8e-feb2deff5b03;16/3/2026;Gasto;Compra Colmado;430;Pagado;InternamientoMatt-Cafeteria
+9eb792fb-f4b2-445a-aa5d-3d3cfe08b059;16/3/2026;Gasto;Imprevistos;183.57;Pagado;InternamientoMatt-CENTROMEDICOREAL
+47e07120-b320-4bd6-b25d-b7d4813b2850;15/3/2026;Gasto;Suscripciones;1010.47;Pagado;YOTUBE
+c373895c-e27b-4c41-8cf0-1e37472db216;15/3/2026;Gasto;Compras Internet;2271.83;Pagado;CompraporAmazon
+3d50ded5-ec27-4c29-82b4-97871a578dd2;2/4/2026;Ingreso;Aportes;3000;Pagado;PagoluzSPMpapi
+31f5cbd4-244f-4a17-93db-3cbeea7d4565;6/4/2026;Gasto;Electricidad San Pedro;4566.99;Pagado;LUZSPM
+274e689a-9ca9-414a-a15c-20df99c66910;4/4/2026;Gasto;Suscripciones;1260.51;Pagado;CHATGPT
+0b776695-8642-4a70-b2cd-95224833ee3a;2/4/2026;Gasto;Suscripciones;468.42;Pagado;Uber
+6537f586-4068-4809-9b78-8f7059448f0e;30/3/2026;Gasto;Internet San Pedro;1802.67;Pagado;InternetSPM
+6c74abcc-2de5-41b8-9226-ac7485e2aa9f;24/3/2026;Gasto;Imprevistos;11109.82;Pagado;InternamientoMatt-PAGOCLINICA
+dfa202c1-bfac-4603-9495-b8153d655e82;24/3/2026;Gasto;Gastos médicos;1084.16;Pagado;PASTILLAMAMI
+c24b04c7-4932-4059-9d3c-107f6812a4b9;23/3/2026;Gasto;Supermercado San Pedro;3429.92;Pagado;ComprasSupermercadoSPM-JUMBO
+66008f7a-a607-49cd-865f-1360f174c942;20/3/2026;Gasto;UberEats/PedidosYa;464.44;Pagado;UberEats
+2bba412d-82c2-44cb-ae14-46b33a3d28cf;20/3/2026;Gasto;Imprevistos;1600;Pagado;CARGORENOVACIONTCBANRESERVAS
+6e2f19b2-0a4e-48e9-944b-05f7e6f217ac;20/3/2026;Gasto;Imprevistos;600;Pagado;CARGORENOVACIONTCBANRESERVAS-SEGURO
+91111670-3b5d-49f4-9cb2-18d0d4f18175;20/3/2026;Gasto;UberEats/PedidosYa;214.98;Pagado;UberEats
+cb1da5de-c4e4-4fc2-9adf-b5bd28c93dd3;17/3/2026;Gasto;Paquetes envío;749.12;Pagado;EPS
+64203873-9962-447e-b356-15fc9016637a;4/3/2026;Gasto;Suscripciones;1236.43;Pagado;CHATGPT
+12a2c987-201b-4eb3-8941-38694a29e429;1/3/2026;Gasto;Entretenimiento;4012.8;Pagado;CATRINA
+a2f64881-b5b0-423e-b318-e717bddd5d7b;1/3/2026;Gasto;UberEats/PedidosYa;430;Pagado;PedidosYaHeladosBon
+7887e5d3-452d-489e-bb96-85642d467be1;19/2/2026;Gasto;Paquetes envío;293.81;Pagado;EPS
+f37caac9-ca4d-437e-8749-ca61bea2c981;19/2/2026;Gasto;Uber;246.4;Pagado;ENVIOPAQUETEEPS
+478d5dac-57a0-4e68-a303-1dd26af40581;13/2/2026;Gasto;Ashley Universidad;70;Pagado;CLARORECAR8494540499SANTODOMINGODO
+70965455-5657-46e2-8493-3dfb79c275b2;1/4/2026;Gasto;Compra Colmado;100;Pagado;ColmadoAgua
+4e87b289-fdbb-4097-a310-a443c3642cb9;30/3/2026;Gasto;Ahorro Personal;1000;Pagado;BHDCUENTADEAHORRO
+5ec0be90-a06f-4f9b-b0a3-96e0028e626b;30/3/2026;Ingreso;Sueldo;72104.17;Pagado;ST
+d2c230fc-0572-48bc-8124-bec8253c3c7c;30/3/2026;Ingreso;Horas/Trabajos extras;4604.17;Pagado;HORASEXTRASBHD
+d60fc5d8-e849-40bd-9e91-27fe362f7699;27/3/2026;Ingreso;Inversiones;1064;Pagado;DEPOSITOAPLAZOBHD
+7f26685e-48f6-4b29-864d-3bb239b4cbd9;23/3/2026;Gasto;Dinero prestado;18036.3;Pagado;PAGOJEEP
+4ce5ed0a-e613-43b4-8418-5b2daa56edd3;21/4/2026;Gasto;Dinero prestado;18036.3;Pagado;PAGO JEEP
+dfc313e4-11f9-4560-a7ed-66f06368af47;19/3/2026;Gasto;Compra Colmado;135;Pagado;ColmadoAgua
+2049bace-80e4-43b7-a828-7654dd5879cc;18/3/2026;Gasto;Compra Colmado;275;Pagado;ColmadoCERVEZA
+d092c047-b4da-43d9-b4c5-e95f1f04fc71;16/3/2026;Gasto;Compra Colmado;100;Pagado;ColmadoAgua
+5b12eb54-9698-4867-bf47-1afa3527b3ec;31/3/2026;Ingreso;Inversiones;529.74;Pagado;CUENTADEAHORROINVERSION
+64978766-8249-4bd0-9c69-6cdc74cc1f1c;30/3/2026;Gasto;Ahorro Personal;20000;Pagado;BHDCUENTADEAHORRO
+6bb70002-c87f-4001-805d-48e74ecd59e7;16/3/2026;Gasto;Ahorro Personal;1000;Pagado;BHDCUENTADEAHORRO
+01438b5b-623c-4956-abbe-983d8b9624fb;26/2/2026;Ingreso;Inversiones;456.53;Pagado;CUENTADEAHORROINVERSION
+1634d62e-1138-4747-aa79-6042ccbf3a2d;16/2/2026;Gasto;Ahorro Personal;1000;Pagado;BHDCUENTADEAHORRO
+04219522-ee99-4eca-9ba0-ba80e89e9084;15/1/2026;Gasto;Ahorro Personal;1000;Pagado;BHDCUENTADEAHORRO
+dfde7f7e-6a6f-4c9d-945a-8b9303f134bb;30/1/2026;Ingreso;Inversiones;502.64;Pagado;CUENTADEAHORROINVERSION
+5ff0f5ff-4666-4c8f-9189-d40c3d4ff637;30/1/2026;Gasto;Ahorro Personal;1000;Pagado;BHDCUENTADEAHORRO
+51ff539c-8e2b-4bac-9ac9-80736a013b7a;31/3/2026;Gasto;Imprevistos;70;Pagado;CARGOMINIMOENCUENTABANRESERVAS
+cdf62f02-e40b-41a1-a471-96f03140491f;26/2/2026;Gasto;Imprevistos;60;Pagado;CARGOMINIMOENCUENTABANRESERVAS
+1fb0e301-0616-4fbc-b685-d742db56a8a9;23/2/2026;Gasto;Compra Articulos Hogar;10100;Pagado;ESCRITORIOSANPEDRO
+31cc8616-a1de-4f67-80cd-260595a2f19a;31/3/2026;Gasto;Ahorro Personal;15000;Pagado;BANRESERVASCUENTADEAHORRO
+90c466da-ac5b-4ba9-80ff-cfadd57e736f;1/4/2026;Ingreso;Pago prestamos;4000;Pagado;PAGOMASSIEL
+33e615ab-2896-43c2-a3e8-4ac9e9694b9b;31/3/2026;Ingreso;Pago prestamos;1000;Pagado;PAGOMASSIEL
+01fda145-d6f1-4e9c-a6ac-2e98b45e1788;27/3/2026;Gasto;Paquetes envío;222.03;Pagado;EcoPaq
+da434701-6195-4947-8102-545dba8bbae1;24/3/2026;Ingreso;Pago prestamos;19361;Pagado;PAGOMASSIEL
+fbf22712-79eb-464b-869d-e14356c1b7f9;18/3/2026;Gasto;Paquetes envío;786.33;Pagado;EcoPaq
+6ab0e0fa-d5d4-4c7c-bab2-25f55bcfcec6;16/3/2026;Gasto;Paquetes envío;370;Pagado;EcoPaq
+f096bc67-29f5-4506-a571-0bc966a2751b;9/3/2026;Gasto;Retiroefectivo;1200;Pagado;
+1945119e-ad15-4aab-b852-6d386106164b;9/3/2026;Gasto;Retiroefectivo;3200;Pagado;
+9aab5a88-931f-4748-b395-3b3989b229af;9/2/2026;Ingreso;Pago prestamos;35000;Pagado;PAGOMASSIEL
+1b71a783-f5e6-4c90-b428-c07adf45e006;26/3/2026;Gasto;Dineromami;2000;Pagado;DINEROMAMI
+ea9b85e6-aa03-4437-8dcf-b53b78c3fd01;13/2/2026;Gasto;Paquetes envío;2072.27;Pagado;EcoPaq
+ef3ec001-7491-4102-8843-7d09abb44480;20/2/2026;Gasto;Mant.de vehículo;1000;Pagado;CHEQUEOSILFA
+475694ee-5cd5-43e2-b496-5480a38be39e;9/3/2026;Ingreso;Pago prestamos;25500;Pagado;PAGOMASSIEL
+0ad72b68-d939-4c52-acbc-6c5d4bf1e582;6/3/2026;Gasto;Paquetes envío;7066.37;Pagado;EcoPaqMONITOR
+d9250ef1-6e0c-41b6-b794-a5d0b5659918;2/3/2026;Ingreso;Pago prestamos;5000;Pagado;PAGOMASSIEL
+48900d24-a31b-4e36-a12c-c8d1fec9eff6;2/3/2026;Ingreso;Pago prestamos;12800;Pagado;PAGOMASSIEL
+2852f5f1-bda1-4e21-8c58-5d51716489b0;6/3/2026;Gasto;DexterNecesidades;2600;Pagado;COMIDA
+a49ad575-2117-460e-aa98-1a4326063606;1/4/2026;Gasto;Imprevistos;615;Pagado;PicaPolloSanPedro
+d5aa2f07-db17-446b-b700-c18a76474ee6;30/3/2026;Gasto;VacacionesFamiliar;35347.9;Pagado;LOPESAN
+0034af7f-4b4f-40ec-b404-f098a8af37c7;27/3/2026;Ingreso;Sueldo;23798.1;Pagado;SeNaSa
+9629aa99-90c5-4256-ac29-68a84767a3d6;25/3/2026;Gasto;Ashley Universidad;244;Pagado;SirenaMella
+c82edcec-f1fd-4c16-ac67-ae0ff6c7ef9b;24/3/2026;Ingreso;Pago prestamos;1000;Pagado;PAGOMASSIEL
+3ccd344e-1623-4c97-b1e7-edb17ab4f21e;23/3/2026;Ingreso;Pago prestamos;5000;Pagado;PAGOMASSIEL
+49fe3957-4966-414c-87cb-b4564cf74d81;17/3/2026;Gasto;Imprevistos;205;Pagado;SEGURORESERVAS
+a901da32-9129-4ff3-baaf-c1456caa5da8;16/3/2026;Gasto;Supermercado San Pedro;779.78;Pagado;ComprasSupermercadoSPM-JUMBO
+7d0b6778-31a9-4349-82fe-e75293f730a2;16/3/2026;Gasto;Mant.de vehículo;1000;Pagado;CHEQUEO
+d67fbd48-6093-40c6-bc57-87169a8ac666;13/3/2026;Gasto;Imprevistos;65;Pagado;CARGOTDMENSUAL
+a89eab5c-160f-42c4-9bc2-81d53ce46a0c;13/3/2026;Gasto;Viaje personal;5000;Pagado;NICKELODEON
+993d714f-b1a3-40ed-b2f7-7cbb5eaf4c5a;11/3/2026;Gasto;Cuidado personal (Ej. Belleza);800;Pagado;SalonMULAN
+46a96cb4-a357-4f1c-996d-e3ca1c0701b1;25/4/2026;Gasto;UberEats/PedidosYa;713.5;Pagado;PedidosYaMarket
+e5e598a1-8982-48c2-ac90-0f97677db7d7;25/4/2026;Gasto;Peajes;200;Pagado;
+334d3925-5b6f-4ef1-a9ec-127c9d452b66;25/4/2026;Gasto;Dinero prestado;315;Pagado;TrabajoFinalMatt
+2b8a24b6-e4eb-4088-8364-d28092a7d7a7;25/4/2026;Gasto;Suscripciones;616.88;Pagado;IcloudApple
+034b7e9f-0313-4f37-b9dd-274fb9cdd59d;25/4/2026;Gasto;Suscripciones;1110.27;Pagado;Netflix
+cb5c9300-44cd-40d4-9fa2-43a7d6eae34f;24/4/2026;Gasto;Vivienda (alquiler San Pedro);3000;Pagado;
+c4dcebc6-b8ce-406f-aaf5-ab83119e8abf;26/4/2026;Gasto;Cuidado personal (Ej. Belleza);3152.33;Pagado;Suplementos
+80ed9d9d-7503-4d85-af03-65249069b11e;30/4/2026;Ingreso;Sueldo;23798.1;Pagado;SeNaSa
+3c603397-fd1f-4939-847c-1e6951fbd69a;24/4/2026;Gasto;Compra Colmado;125;Pagado;ColmadoAgua
+868e807c-1d39-41b9-89fc-193ff8aa2046;24/4/2026;Gasto;Supermercado Sto;2217;Pagado;Bravo
+0bde8b5e-f656-49fd-a0d9-10583d537354;27/4/2026;Gasto;Contribucion Cogregacion;2000;Pendiente;
+4bf4cc77-3541-4676-8b46-0ad7b4379205;30/4/2026;Gasto;Vivienda (alquiler Santo Domingo);20000;Pagado;
+02616fdb-4d9b-45cf-82d5-073073bfb309;24/4/2026;Gasto;Compra Articulos Hogar;14;Pagado;Ferreteria
+f202be2b-eb82-4a6a-bfb7-a72e04199c8e;23/4/2026;Gasto;Compra Articulos Hogar;2468.76;Pagado;Compradesocalos
+387f73cc-6faa-43ba-a679-881f735a278e;23/4/2026;Gasto;Imprevistos;771.88;Pagado;RegaloaudifonosMassiel
+170346cc-7336-42d3-afb8-060431fa2dc2;20/4/2026;Gasto;Cuidado personal (Ej. Belleza);2657.72;Pagado;Jeans-Ropa
+265285db-528a-485c-a9fe-b8bb7c91f77f;23/4/2026;Gasto;Paquetes envío;235.27;Pagado;Domex
+4d86d3d0-edf1-4b06-be0b-9515d3f19278;24/4/2026;Gasto;Imprevistos;359.38;Pagado;DonacionGofundme
+ca45772e-7eab-4db4-9e55-8990d52996c8;23/4/2026;Gasto;Paquetes envío;3487.69;Pagado;EPS
+ad62902e-bdfb-48ec-9dc0-b956b64e4203;23/4/2026;Gasto;Ahorro Personal;20000;Pagado;BHDCUENTADEAHORRO
+fce98d04-7566-40e4-8a5a-782bcb2c67e7;22/4/2026;Gasto;Compra Articulos Hogar;453.6;Pagado;FerreteriaInnovaCentro
+2179d33d-5397-4a3b-937a-22f99c485184;22/4/2026;Gasto;Supermercado Sto;13569.1;Pagado;PriceSmart
+10a0f88c-bf2c-43cf-baac-f4810b6c09f2;21/4/2026;Gasto;Dinero prestado;230;Pagado;TrabajoFinalMatt
+347e6c98-4194-4efc-b30e-deb99bbc4cf8;21/4/2026;Gasto;Dinero prestado;480;Pagado;TrabajoFinalMatt
+0524d229-b627-40fd-a8c1-e35c5f17cc2a;21/4/2026;Gasto;Paquetes envío;470.54;Pagado;Domex
+fc2e60ed-71ab-4927-ba89-f335735bf96c;21/4/2026;Gasto;Viaje personal;1360.72;Pagado;Vacaciones-Medicamentos-Nickelodeon
+861a98ad-0e3b-4ba9-917a-f17bd8c5d521;21/4/2026;Gasto;Combustible;1000;Pagado;NEXTNUEVOSOL
+c6ff7562-3d24-47e2-9640-8d612eac31e2;20/4/2026;Gasto;Dinero prestado;730;Pagado;TrabajoFinalMatt
+b0d4e3cc-1617-4e8b-8d83-c5fbd43d5cbb;20/4/2026;Gasto;Gimnasio/Deporte;6000;Pagado;TenisOnRunningyHoka
+1f00735a-63f4-461e-a10e-83bec857bf1d;19/4/2026;Gasto;Gastos médicos;264.87;Pagado;FARMACIA-AlergiasLuz-MamaMassiel
+305c0148-6f3e-4bd2-9fb4-b582f436e1c5;19/4/2026;Gasto;Compra Articulos Hogar;3795;Pagado;FerreteriaInnovaCentro-BidetyEspejodebaño
+724783e5-53ce-4087-933c-59f3e9c6f73e;19/4/2026;Gasto;Entretenimiento;1890;Pagado;CasadeCañaStoli
+97cbad3e-0b51-438b-bc8f-589e74673e1a;19/1/2026;Gasto;Combustible;1000;Pagado;PETRONANORIENTAL
+286104eb-d1ab-4012-80b5-3d5356713b49;19/3/2026;Gasto;Supermercado Sto;3531.8;Pagado;SuperMix
+58b8920a-5ace-41e8-acba-867e2ea5e57b;19/4/2026;Gasto;Gastos médicos;1084.16;Pagado;PASTILLAMAMI
+f4c3fd84-ebe4-434e-9e00-2e8caa3be604;19/4/2026;Gasto;Imprevistos;620;Pagado;PedidosYa(PicaPolloSSANTODOMINGODO
+e74b67b1-deda-4a94-8bfc-d117b5d197f0;17/4/2026;Gasto;Gas San Pedro;900;Pagado;MACORIXGASPTAGARZASANPEDRODEDO
+209a5e4c-5cf7-4124-831d-9e9dd52c6385;19/4/2026;Gasto;Combustible;1000;Pagado;TOTALHIGUAMO
+d5137c67-90b5-43f3-a349-d485fe6d96e3;17/4/2026;Gasto;Cuidado personal (Ej. Belleza);11772.02;Pagado;SHEIN-Ropa
+508eb329-d78f-4007-ae6a-61148a38c256;18/4/2026;Gasto;Compras Internet;7561.29;Pagado;"CompraporAmazon
+-Cargadomesitadenoche
+-Cajadeherramientas"
+c6a97128-1ce2-4d7e-a7a3-b88ecd6ac608;18/4/2026;Gasto;Supermercado Sto;2015.62;Pagado;Compralasirena
+9dfb8878-eee0-4d17-904a-ef61b5b76112;18/4/2026;Gasto;UberEats/PedidosYa;1263.44;Pagado;PedidosYaMarket
+64059f0b-da58-43d6-8b5f-a259dd974230;25/3/2026;Gasto;GasSantoDomingo;645.22;Pagado;
+3adbdc11-f5f6-45ad-a8a1-3e8d2217b827;17/4/2026;Gasto;Supermercado San Pedro;550.23;Pagado;Baratillo
+06690e2c-0190-42ea-a80a-9df26cee1b8c;17/4/2026;Gasto;Viaje personal;68800;Pagado;VacacionesNickelodeon
+bc71a9a7-cf83-4f7b-8227-115b70cfdde9;16/4/2026;Gasto;Cuidado personal (Ej. Belleza);11782.52;Pagado;SHEIN-Ropa
+d0b79830-b3b9-41f3-a903-375a0d8289c8;16/4/2026;Gasto;Suscripciones;65.45;Pagado;Uber
+36a8e4c2-ec67-44d5-933a-8d031edaa190;16/4/2026;Gasto;Paquetes envío;150;Pagado;EPS
+50854b5e-560e-45db-bac2-f923e8f237d9;15/4/2026;Gasto;Mant.de vehículo;990.95;Pagado;COMPRESORDEAIRE
+0f086a56-7585-4969-b32f-751e45e741ca;15/4/2026;Gasto;UberEats/PedidosYa;520;Pagado;PedidosYaHeladosBon
+f5045c1b-4b8f-444d-b4a7-8b2a86ebb45e;15/4/2026;Ingreso;Sueldo;67500;Pagado;ST
+3e7d24ac-7ed8-435c-a5f2-f1836a435942;14/4/2026;Gasto;Mant.de vehículo;2315;Pagado;SEGUROUNITVEHICULO
+7e8719da-0e71-4cb5-9fe6-73fd4b25cb87;14/3/2026;Gasto;Mant.de vehículo;2315;Pagado;SEGUROUNITVEHICULO
+4b35ea51-e24d-4080-afb8-10eea92adf56;14/2/2026;Gasto;Mant.de vehículo;2315;Pagado;SEGUROUNITVEHICULO
+68b014e1-6f7d-4d14-aab7-899b69a817ed;14/1/2026;Gasto;Mant.de vehículo;2315;Pagado;SEGUROUNITVEHICULO
+8b9cd972-834d-4d10-9bc0-cdd6a6eb4ae2;13/4/2026;Gasto;Mant.de vehículo;5285.18;Pagado;PIEZACARROCHEVY
+39e4769c-6f03-4dae-b624-a8e67068fb43;12/4/2026;Gasto;Entretenimiento;800;Pagado;ASAMBLEA-Mcdonalds
+9c7bfc9c-d0d5-401a-8adb-c1701d5a57c3;16/3/2026;Gasto;Supermercado San Pedro;631.85;Pagado;ComprasSupermercadoSPM-JUMBO-asamblea
+64df0d36-2b3c-4f1d-adc0-faa18da608d9;11/4/2026;Gasto;Supermercado Sto;612.73;Pagado;Compralasirena
+e6504fd3-be3c-46a8-9445-6fa3b79761b8;14/4/2026;Gasto;Suscripciones;936.13;Pagado;AMAZONPrime
+15f64ab9-be00-4364-a104-03b3536aff7f;10/4/2026;Gasto;Cuidado personal (Ej. Belleza);3960;Pagado;Suplementos-NATURALSLIM
+59432a21-a014-427a-bf4b-5ec4f074583c;10/4/2026;Gasto;Cuidado personal (Ej. Belleza);1914.25;Pagado;Suplementos-NATURALSLIMProgesterona
+3b128f69-07e3-403f-9d46-720c38af9bae;10/4/2026;Gasto;Suscripciones;185.17;Pagado;Uber
+6b67508a-6a61-4c71-9b78-17d6cf33c81b;10/4/2026;Gasto;Cuidado personal (Ej. Belleza);12331.47;Pagado;SHEIN-Ropa
+1c6dd3b9-7141-4d79-ad6e-3f7c47879b45;10/4/2026;Gasto;Suscripciones;185.66;Pagado;Uber
+3c1a7e61-25c0-4635-aead-ec5fe186438d;9/4/2026;Gasto;Ashley Universidad;495;Pagado;SalonAshley
+dc109a70-1b93-4480-95d1-29a2e974abb0;10/4/2026;Gasto;Dinero prestado;370;Pagado;COMPRAAPLICACIONJIMENA-ASHLEY
+ba44187a-921a-4764-b76e-4bb487a3e0bf;10/4/2026;Gasto;Paquetes envío;2775.31;Pagado;EPS
+f6eeb5d3-ecbb-4972-9741-af4d79e58a73;15/4/2026;Ingreso;Sueldo;23798.1;Pagado;SeNaSa
+7060270f-233f-4312-9e29-e5ecee4623f1;9/4/2026;Gasto;Suscripciones;148.99;Pagado;PedidosYaPLUS
+046bb8d9-4006-467c-a2c8-1b96a560b971;9/4/2026;Gasto;UberEats/PedidosYa;615;Pagado;PedidosYaHeladosBon-YOGEN
+9487748e-acb7-4f03-9daf-6debc9ecb154;8/4/2026;Gasto;Supermercado Sto;21285;Pagado;PriceSmart
+cae305b9-7a2d-4207-9bd8-7838dce4d5a6;8/4/2026;Gasto;Uber;129.2;Pagado;Uber
+acdd1835-d6c6-451c-8a3f-644fbdf39118;8/4/2026;Gasto;Suscripciones;136.37;Pagado;Uber
+bf92ca77-a4ce-4640-96a7-77606714108a;30/4/2026;Ingreso;Sueldo;67500;Pendiente;ST
+0213882f-47b8-4820-81d2-9b0249b31fe6;23/4/2026;Ingreso;Pago prestamos;16000;Pagado;DEVOLUCIONDINERODEMANUELARZENO
+413abf5a-31c4-4aaf-a257-7f979d284ede;14/5/2026;Gasto;Mant.de vehículo;2315;Pendiente;SEGUROUNITVEHICULO
+5411f6ff-3b24-480a-90a1-b3a432baeab0;30/5/2026;Gasto;Vivienda (alquiler Santo Domingo);20000;Pendiente;
+6da697c1-d6d2-4d87-b74d-f823523ce032;24/5/2026;Gasto;Vivienda (alquiler San Pedro);3000;Pendiente;
+bb7eb7be-50f0-4126-b648-307c63918afa;15/5/2026;Ingreso;Sueldo;23798.1;Pendiente;SeNaSa
+f055c12b-e98c-49bb-8dc1-c3daaa5f771f;21/5/2026;Gasto;Dinero prestado;18036.3;Pendiente;PAGO JEEP
+34658f95-16ad-40ba-b133-bdef3347a8a7;25/1/2026;Gasto;Vivienda (alquiler San Pedro);3000;Pagado;

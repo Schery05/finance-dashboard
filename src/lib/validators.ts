@@ -29,3 +29,15 @@ export const BudgetSchema = z.object({
 });
 
 export type BudgetInput = z.infer<typeof BudgetSchema>;
+
+export const DebtSchema = z.object({
+  name: z.string().min(1),
+  initialAmount: z.number().finite().positive(),
+  currentBalance: z.number().finite().nonnegative(),
+  interestRate: z.number().finite().min(0),
+  monthlyPayment: z.number().finite().nonnegative(),
+  paymentDay: z.number().int().min(1).max(31),
+  type: z.enum(["TARJETA", "PRESTAMO_PERSONAL", "VEHICULO", "HIPOTECA", "OTRO"]),
+});
+
+export type DebtInput = z.infer<typeof DebtSchema>;

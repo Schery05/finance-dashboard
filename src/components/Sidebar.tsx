@@ -1,17 +1,31 @@
 "use client";
 
+import { motion } from "framer-motion";
 import {
   BarChart3,
+  Bot,
+  CalendarDays,
   ChevronRight,
+  Gauge,
+  Landmark,
   PiggyBank,
   Tags,
   WalletCards,
   Wrench,
 } from "lucide-react";
 import Image from "next/image";
+import iconLogo from "../app/icon.png";
 import { useState } from "react";
 
-type ModuleKey = "finanzas" | "ahorros" | "presupuesto" | "mantenimiento";
+type ModuleKey =
+  | "finanzas"
+  | "calendar"
+  | "score"
+  | "asistente"
+  | "deudas"
+  | "ahorros"
+  | "presupuesto"
+  | "mantenimiento";
 type MaintenanceSection = "categorias";
 
 type SidebarProps = {
@@ -36,6 +50,26 @@ export function Sidebar({
       Icon: BarChart3,
     },
     {
+      key: "calendar" as const,
+      label: "Calendar Trxn",
+      Icon: CalendarDays,
+    },
+    {
+      key: "score" as const,
+      label: "Score financiero",
+      Icon: Gauge,
+    },
+    {
+      key: "asistente" as const,
+      label: "Asistente IA",
+      Icon: Bot,
+    },
+    {
+      key: "deudas" as const,
+      label: "Control de deudas",
+      Icon: Landmark,
+    },
+    {
       key: "ahorros" as const,
       label: "Ahorros",
       Icon: PiggyBank,
@@ -53,9 +87,12 @@ export function Sidebar({
   ];
 
   return (
-    <aside
+    <motion.aside
+      initial={{ opacity: 0, x: -16 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.45, ease: "easeOut" }}
       className={`
-        relative hidden min-h-screen border-r border-white/10 bg-slate-950/95 p-4 text-white transition-all duration-300 md:block
+        relative hidden min-h-screen border-r border-white/10 bg-slate-800/95 p-4 text-white transition-all duration-500 ease-out md:block
         ${collapsed ? "w-20" : "w-72"}
       `}
     >
@@ -76,28 +113,21 @@ export function Sidebar({
         </span>
       </button>
 
-      <div className="mb-8 flex items-center gap-3">
+      <div className="mb-8 flex items-center justify-center">
         <div
-          className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white p-1.5 ring-1 ring-amber-300/25 ${
-            collapsed ? "h-12 w-12" : "h-16 w-16"
+          className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-3xl bg-transparent ${
+            collapsed ? "h-16 w-16" : "h-32 w-32"
           }`}
         >
           <Image
-            src="/propia-mark-logo.png"
+            src={iconLogo}
             alt="Propia Finance"
             fill
-            sizes={collapsed ? "48px" : "64px"}
+            sizes={collapsed ? "64px" : "128px"}
             className="object-contain"
             priority
           />
         </div>
-
-        {!collapsed && (
-          <div>
-            <h1 className="text-lg font-semibold">PropiaFinance</h1>
-            <p className="text-xs text-white/50">Control financiero personal</p>
-          </div>
-        )}
       </div>
 
       <nav className="space-y-2">
@@ -115,7 +145,7 @@ export function Sidebar({
                   }
                 }}
                 className={`
-                  flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm transition
+                  flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm transition duration-300 ease-out
                   ${
                     active
                       ? "bg-white text-slate-950 shadow-lg shadow-cyan-500/10"
@@ -158,6 +188,6 @@ export function Sidebar({
           </p>
         </div>
       )}
-    </aside>
+    </motion.aside>
   );
 }

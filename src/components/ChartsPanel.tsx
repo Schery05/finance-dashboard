@@ -169,6 +169,9 @@ export function ChartsPanel({ txs }: { txs: Transaction[] }) {
                   stroke="#60a5fa"
                   strokeWidth={2}
                   dot={false}
+                  isAnimationActive={true}
+                  animationDuration={900}
+                  animationEasing="ease-out"
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -201,7 +204,9 @@ export function ChartsPanel({ txs }: { txs: Transaction[] }) {
                     paddingAngle={2}
                     cx="50%"
                     cy="50%"
-                    isAnimationActive={false}
+                    isAnimationActive={true}
+                    animationDuration={900}
+                    animationEasing="ease-out"
                   >
                     {pieData.map((_, i) => (
                       <Cell key={i} fill={COLORS[i % COLORS.length]} />
@@ -213,10 +218,14 @@ export function ChartsPanel({ txs }: { txs: Transaction[] }) {
                     formatter={(value) => [money(Number(value)), "Gasto"]}
                     wrapperStyle={{ outline: "none", zIndex: 50 }}
                     contentStyle={{
-                      background: "rgba(10,14,26,0.85)",
-                      border: "1px solid rgba(255,255,255,0.12)",
+                      background: "rgba(10,14,26,0.95)",
+                      border: "1px solid rgba(255,255,255,0.18)",
                       borderRadius: 12,
+                      color: "#ffffff",
+                      padding: "12px 14px",
                     }}
+                    labelStyle={{ color: "#cbd5e1", fontSize: 13 }}
+                    itemStyle={{ color: "#f8fafc", fontSize: 14, fontWeight: 600 }}
                   />
                 </PieChart>
               </ResponsiveContainer>

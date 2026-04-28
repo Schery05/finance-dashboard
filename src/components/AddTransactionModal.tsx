@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import {
   CATEGORIES_UPDATED_EVENT,
+  fetchManagedCategories,
   loadManagedCategories,
   type ManagedCategories,
 } from "@/lib/categories";
@@ -47,6 +48,20 @@ function toISODate(value: string) {
   return "";
 }
 
+const amountInputFormatter = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 2,
+});
+
+const parseAmountInput = (value: string) => {
+  const amount = Number(value.replace(/,/g, ""));
+  return Number.isFinite(amount) ? amount : 0;
+};
+
+const formatAmountInput = (value: number) => {
+  if (!Number.isFinite(value)) return "";
+  return amountInputFormatter.format(value);
+};
+
 export function AddTransactionModal({
   open,
   onClose,
@@ -82,7 +97,16 @@ export function AddTransactionModal({
 
   useEffect(() => {
     const refreshCategories = () => setCategories(loadManagedCategories());
+    const fetchCategories = async () => {
+      try {
+        setCategories(await fetchManagedCategories());
+      } catch {
+        refreshCategories();
+      }
+    };
+
     refreshCategories();
+    fetchCategories();
     window.addEventListener(CATEGORIES_UPDATED_EVENT, refreshCategories);
     return () =>
       window.removeEventListener(CATEGORIES_UPDATED_EVENT, refreshCategories);
@@ -241,9 +265,9 @@ export function AddTransactionModal({
                 <label className="text-sm text-white/70">
                   Importe
                   <input
-                    type="number"
-                    value={form.Importe}
-                    onChange={(e) => update("Importe", Number(e.target.value))}
+                    type="text"
+                    value={formatAmountInput(form.Importe)}
+                    onChange={(e) => update("Importe", parseAmountInput(e.target.value))}
                     className="mt-1 w-full rounded-xl bg-white/5 px-3 py-2 text-sm outline-none ring-1 ring-white/10"
                   />
                 </label>

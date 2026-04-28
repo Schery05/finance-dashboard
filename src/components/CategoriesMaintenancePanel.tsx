@@ -1,11 +1,13 @@
 "use client";
 
-import { Plus, Tags, Trash2 } from "lucide-react";
+import { Edit3, Plus, Tags, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
-  CATEGORIES_UPDATED_EVENT,
+  addManagedCategory,
+  deleteManagedCategory,
+  fetchManagedCategories,
   loadManagedCategories,
-  saveManagedCategories,
+  renameManagedCategory,
   type CategoryType,
   type ManagedCategories,
 } from "@/lib/categories";
@@ -22,24 +24,46 @@ export function CategoriesMaintenancePanel() {
     name: string;
     type: CategoryType;
   } | null>(null);
+  const [categoryToEdit, setCategoryToEdit] = useState<{
+    name: string;
+    type: CategoryType;
+  } | null>(null);
+  const [editName, setEditName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const refresh = () => setCategories(loadManagedCategories());
+    let mounted = true;
+
+    const refresh = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchManagedCategories();
+        if (mounted) setCategories(data);
+      } catch (err) {
+        if (mounted) {
+          setError(
+            err instanceof Error ? err.message : "Error cargando categorias"
+          );
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
     refresh();
-    window.addEventListener(CATEGORIES_UPDATED_EVENT, refresh);
-    return () => window.removeEventListener(CATEGORIES_UPDATED_EVENT, refresh);
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const visibleCategories = useMemo(() => categories[type], [categories, type]);
 
-  const persist = (next: ManagedCategories) => {
-    setCategories(next);
-    saveManagedCategories(next);
-  };
-
-  const addCategory = () => {
+  const addCategory = async () => {
     const value = name.trim();
-    if (!value) return;
+    if (!value || saving) return;
 
     const exists = categories[type].some(
       (category) => category.toLowerCase() === value.toLowerCase()
@@ -49,21 +73,71 @@ export function CategoriesMaintenancePanel() {
       return;
     }
 
-    persist({
-      ...categories,
-      [type]: [...categories[type], value].sort((a, b) => a.localeCompare(b)),
-    });
-    setName("");
+    setSaving(true);
+    setError(null);
+    try {
+      const next = await addManagedCategory(type, value);
+      setCategories(next);
+      setName("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error agregando categoria");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const removeCategory = (categoryToRemove: string, categoryType: CategoryType) => {
-    persist({
-      ...categories,
-      [categoryType]: categories[categoryType].filter(
-        (category) => category !== categoryToRemove
-      ),
-    });
-    setCategoryToDelete(null);
+  const removeCategory = async (
+    categoryToRemove: string,
+    categoryType: CategoryType
+  ) => {
+    if (saving) return;
+
+    setSaving(true);
+    setError(null);
+    try {
+      const next = await deleteManagedCategory(categoryType, categoryToRemove);
+      setCategories(next);
+      setCategoryToDelete(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error eliminando categoria");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const openEditCategory = (categoryName: string, categoryType: CategoryType) => {
+    setCategoryToEdit({ name: categoryName, type: categoryType });
+    setEditName(categoryName);
+    setError(null);
+  };
+
+  const renameCategory = async () => {
+    if (!categoryToEdit || saving) return;
+
+    const nextName = editName.trim();
+    if (!nextName) {
+      setError("El nuevo nombre de la categoria es obligatorio.");
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+    try {
+      const next = await renameManagedCategory(
+        categoryToEdit.type,
+        categoryToEdit.name,
+        nextName
+      );
+      setCategories(next);
+      setCategoryToEdit(null);
+      setEditName("");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Error renombrando categoria"
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -116,12 +190,19 @@ export function CategoriesMaintenancePanel() {
 
           <button
             onClick={addCategory}
+            disabled={saving}
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
           >
             <Plus className="h-4 w-4" />
-            Agregar
+            {saving ? "Guardando..." : "Agregar"}
           </button>
         </div>
+
+        {error && (
+          <div className="mt-4 rounded-2xl bg-rose-500/10 p-3 text-sm text-rose-200 ring-1 ring-rose-300/20">
+            {error}
+          </div>
+        )}
       </div>
 
       <div className="glass p-5">
@@ -135,7 +216,16 @@ export function CategoriesMaintenancePanel() {
         </div>
 
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
-          {visibleCategories.map((category) => (
+          {loading ? (
+            <div className="rounded-2xl bg-white/5 px-4 py-3 text-sm text-white/55 ring-1 ring-white/10 md:col-span-2 xl:col-span-3">
+              Cargando categorias...
+            </div>
+          ) : visibleCategories.length === 0 ? (
+            <div className="rounded-2xl bg-white/5 px-4 py-3 text-sm text-white/55 ring-1 ring-white/10 md:col-span-2 xl:col-span-3">
+              No hay categorias registradas para este tipo.
+            </div>
+          ) : (
+            visibleCategories.map((category) => (
             <div
               key={category}
               className="flex items-center justify-between gap-3 rounded-2xl bg-white/5 px-4 py-3 ring-1 ring-white/10"
@@ -143,17 +233,80 @@ export function CategoriesMaintenancePanel() {
               <p className="min-w-0 break-words text-sm text-white/85">
                 {category}
               </p>
-              <button
-                onClick={() => setCategoryToDelete({ name: category, type })}
-                className="rounded-xl bg-rose-500/10 p-2 text-rose-200 ring-1 ring-rose-300/20 transition hover:bg-rose-500/15"
-                aria-label={`Eliminar ${category}`}
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
+              <div className="flex flex-none items-center gap-2">
+                <button
+                  onClick={() => openEditCategory(category, type)}
+                  disabled={saving}
+                  className="rounded-xl bg-white/5 p-2 text-white/70 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white"
+                  aria-label={`Editar ${category}`}
+                >
+                  <Edit3 className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setCategoryToDelete({ name: category, type })}
+                  disabled={saving}
+                  className="rounded-xl bg-rose-500/10 p-2 text-rose-200 ring-1 ring-rose-300/20 transition hover:bg-rose-500/15"
+                  aria-label={`Eliminar ${category}`}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
             </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
+
+      {categoryToEdit && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-slate-950 p-5 text-white shadow-2xl shadow-black/50">
+            <div className="flex items-start gap-3">
+              <div className="rounded-2xl bg-cyan-400/10 p-3 text-cyan-200 ring-1 ring-cyan-300/20">
+                <Edit3 className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base font-semibold">Editar categoria</h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/65">
+                  El cambio se reflejara en transacciones y presupuesto que usan{" "}
+                  <span className="font-semibold text-white">
+                    {categoryToEdit.name}
+                  </span>
+                  .
+                </p>
+              </div>
+            </div>
+
+            <label className="mt-5 block text-sm text-white/70">
+              Nuevo nombre
+              <input
+                value={editName}
+                onChange={(event) => setEditName(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") renameCategory();
+                }}
+                className="mt-1 w-full rounded-xl bg-white/10 px-3 py-2 text-sm text-white outline-none ring-1 ring-white/15 placeholder:text-white/45 focus:ring-2 focus:ring-cyan-300/60"
+              />
+            </label>
+
+            <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button
+                onClick={() => setCategoryToEdit(null)}
+                disabled={saving}
+                className="rounded-xl bg-white/10 px-4 py-2 text-sm font-medium text-white ring-1 ring-white/15 transition hover:bg-white/15"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={renameCategory}
+                disabled={saving}
+                className="rounded-xl bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
+              >
+                {saving ? "Guardando..." : "Guardar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {categoryToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
@@ -177,6 +330,7 @@ export function CategoriesMaintenancePanel() {
             <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button
                 onClick={() => setCategoryToDelete(null)}
+                disabled={saving}
                 className="rounded-xl bg-white/10 px-4 py-2 text-sm font-medium text-white ring-1 ring-white/15 transition hover:bg-white/15"
               >
                 No
@@ -185,9 +339,10 @@ export function CategoriesMaintenancePanel() {
                 onClick={() =>
                   removeCategory(categoryToDelete.name, categoryToDelete.type)
                 }
+                disabled={saving}
                 className="rounded-xl bg-rose-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-rose-300"
               >
-                Si
+                {saving ? "Eliminando..." : "Si"}
               </button>
             </div>
           </div>

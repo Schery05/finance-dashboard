@@ -106,3 +106,71 @@ export function saveManagedCategories(categories: ManagedCategories) {
   );
   window.dispatchEvent(new Event(CATEGORIES_UPDATED_EVENT));
 }
+
+export async function fetchManagedCategories(): Promise<ManagedCategories> {
+  const res = await fetch("/api/categories", { cache: "no-store" });
+  const json = await res.json();
+
+  if (!json.ok) {
+    throw new Error(json.error ?? "No se pudieron cargar las categorias");
+  }
+
+  const categories = json.data as ManagedCategories;
+  saveManagedCategories(categories);
+  return categories;
+}
+
+export async function addManagedCategory(
+  type: CategoryType,
+  name: string
+): Promise<ManagedCategories> {
+  const res = await fetch("/api/categories", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type, name }),
+  });
+  const json = await res.json();
+
+  if (!json.ok) {
+    throw new Error(json.error ?? "No se pudo agregar la categoria");
+  }
+
+  return fetchManagedCategories();
+}
+
+export async function deleteManagedCategory(
+  type: CategoryType,
+  name: string
+): Promise<ManagedCategories> {
+  const res = await fetch("/api/categories", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type, name }),
+  });
+  const json = await res.json();
+
+  if (!json.ok) {
+    throw new Error(json.error ?? "No se pudo eliminar la categoria");
+  }
+
+  return fetchManagedCategories();
+}
+
+export async function renameManagedCategory(
+  type: CategoryType,
+  oldName: string,
+  newName: string
+): Promise<ManagedCategories> {
+  const res = await fetch("/api/categories", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type, oldName, newName }),
+  });
+  const json = await res.json();
+
+  if (!json.ok) {
+    throw new Error(json.error ?? "No se pudo renombrar la categoria");
+  }
+
+  return fetchManagedCategories();
+}

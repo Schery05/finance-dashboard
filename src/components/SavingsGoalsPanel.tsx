@@ -86,6 +86,7 @@ export function SavingsGoalsPanel() {
   const [initialBalance, setInitialBalance] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [activeGoalId, setActiveGoalId] = useState<string | null>(null);
+  const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
   const [goalToDelete, setGoalToDelete] = useState<SavingsGoal | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -108,6 +109,24 @@ export function SavingsGoalsPanel() {
     }
   };
 
+  const populateFormForGoal = (goal: SavingsGoal) => {
+    setEditingGoalId(goal.ID);
+    setName(goal.Nombre);
+    setTargetAmount(formatAmountInput(String(goal.MontoObjetivo)));
+    setInitialBalance(formatAmountInput(String(goal.SaldoInicial)));
+    setDueDate(goal.FechaLimite ?? "");
+    setActiveGoalId(goal.ID);
+    setError(null);
+  };
+
+  const cancelEdit = () => {
+    setEditingGoalId(null);
+    setName("");
+    setTargetAmount("");
+    setInitialBalance("");
+    setDueDate("");
+  };
+
   useEffect(() => {
     fetchGoals();
   }, []);
@@ -118,7 +137,13 @@ export function SavingsGoalsPanel() {
 
   const savingsTransactions = useMemo(() => {
     return transactions
-      .filter((tx) => tx.ID && Number(tx.Importe) > 0 && isSavingsTransaction(tx))
+      .filter(
+        (tx) =>
+          tx.ID &&
+          Number(tx.Importe) > 0 &&
+          isSavingsTransaction(tx) &&
+          tx.EstadoPago !== "Pendiente"
+      )
       .sort((a, b) => String(b.Fecha).localeCompare(String(a.Fecha)));
   }, [transactions]);
 
@@ -191,7 +216,54 @@ export function SavingsGoalsPanel() {
     }
   };
 
+  const saveGoal = async () => {
+    const amount = parseAmountInput(targetAmount);
+    const initial = parseAmountInput(initialBalance);
+    if (!name.trim() || amount <= 0 || saving) return;
+
+    setSaving(true);
+    setError(null);
+    try {
+      if (editingGoalId) {
+        const currentGoal = goals.find((goal) => goal.ID === editingGoalId);
+        if (!currentGoal) throw new Error("Meta no encontrada para editar");
+
+        const res = await fetch("/api/savings-goals", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: editingGoalId,
+            goal: {
+              Nombre: name.trim(),
+              MontoObjetivo: amount,
+              FechaLimite: dueDate,
+              TransaccionesAsociadas: currentGoal.TransaccionesAsociadas,
+              SaldoInicial: initial,
+            },
+          }),
+        });
+        const json = await res.json();
+        if (!json.ok) throw new Error(json.error ?? "No se pudo actualizar la meta");
+
+        setEditingGoalId(null);
+        setName("");
+        setTargetAmount("");
+        setInitialBalance("");
+        setDueDate("");
+        await fetchGoals();
+        setActiveGoalId(editingGoalId);
+      } else {
+        await createGoal();
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error guardando meta");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const applySuggestion = (suggestion: GoalSuggestion) => {
+    setEditingGoalId(null);
     setName(suggestion.name);
     setTargetAmount(formatAmountInput(String(suggestion.targetAmount)));
   };
@@ -312,14 +384,25 @@ export function SavingsGoalsPanel() {
                 className="w-full rounded-xl bg-white/10 px-3 py-2 text-sm text-white outline-none ring-1 ring-white/15 focus:ring-2 focus:ring-emerald-300/60 sm:col-span-2"
               />
             </div>
-            <button
-              onClick={createGoal}
-              disabled={saving}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-              Agregar meta
-            </button>
+<div className="flex flex-col gap-2 sm:flex-row">
+                <button
+                  onClick={saveGoal}
+                  disabled={saving}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                  {editingGoalId ? "Actualizar meta" : "Agregar meta"}
+                </button>
+                {editingGoalId && (
+                  <button
+                    onClick={cancelEdit}
+                    disabled={saving}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Cancelar edición
+                  </button>
+                )}
+              </div>
           </div>
 
           <div className="mt-5">
@@ -422,14 +505,24 @@ export function SavingsGoalsPanel() {
                 Marca las transacciones de ahorro que aportan a esta meta.
               </p>
             </div>
-            <button
-              onClick={() => setGoalToDelete(activeGoal)}
-              disabled={saving}
-              className="inline-flex items-center gap-2 rounded-xl bg-rose-500/10 px-3 py-2 text-sm text-rose-200 ring-1 ring-rose-300/20 transition hover:bg-rose-500/15 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <Trash2 className="h-4 w-4" />
-              Eliminar meta
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => activeGoal && populateFormForGoal(activeGoal)}
+                disabled={saving}
+                className="inline-flex items-center gap-2 rounded-xl bg-blue-500/10 px-3 py-2 text-sm text-blue-100 ring-1 ring-blue-300/20 transition hover:bg-blue-500/15 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <Plus className="h-4 w-4 rotate-45" />
+                Editar meta
+              </button>
+              <button
+                onClick={() => setGoalToDelete(activeGoal)}
+                disabled={saving}
+                className="inline-flex items-center gap-2 rounded-xl bg-rose-500/10 px-3 py-2 text-sm text-rose-200 ring-1 ring-rose-300/20 transition hover:bg-rose-500/15 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <Trash2 className="h-4 w-4" />
+                Eliminar meta
+              </button>
+            </div>
           </div>
 
           {savingsTransactions.length === 0 ? (

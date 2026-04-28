@@ -8,6 +8,7 @@ export interface Transaction {
   Importe: number;
   EstadoPago: "Pagado" | "Pendiente";
   DescripcionAdicional: string;
+  EsSugerenciaRecurrente?: boolean;
 }
 
 export interface SavingsGoal {
@@ -18,4 +19,23 @@ export interface SavingsGoal {
   TransaccionesAsociadas: string[];
   CreadoEn: string;
   SaldoInicial: number;
+}
+
+export type DebtType =
+  | "TARJETA"
+  | "PRESTAMO_PERSONAL"
+  | "VEHICULO"
+  | "HIPOTECA"
+  | "OTRO";
+
+export interface Debt {
+  id: string;
+  name: string;
+  initialAmount: number;
+  currentBalance: number;
+  interestRate: number;
+  monthlyPayment: number;
+  paymentDay: number;
+  type: DebtType;
+  createdAt: string;
 }
