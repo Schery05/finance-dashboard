@@ -4,7 +4,7 @@ import csv from "csv-parser";
 import { google } from "googleapis";
 import { config } from "dotenv";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../generated/prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 config({ path: ".env" });
 config({ path: ".env.local", override: true });
