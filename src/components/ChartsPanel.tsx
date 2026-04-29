@@ -140,16 +140,16 @@ export function ChartsPanel({ txs }: { txs: Transaction[] }) {
                 data={lineData}
                 margin={{ top: 14, right: 24, bottom: 14, left: 12 }}
               >
-                <CartesianGrid strokeOpacity={0.08} />
+                <CartesianGrid stroke="var(--chart-grid)" />
                 <XAxis
                   dataKey="month"
-                  stroke="rgba(255,255,255,0.55)"
-                  tick={{ fill: "rgba(255,255,255,0.62)", fontSize: 14 }}
+                  stroke="var(--chart-axis)"
+                  tick={{ fill: "var(--chart-axis)", fontSize: 14 }}
                   tickMargin={10}
                 />
                 <YAxis
-                  stroke="rgba(255,255,255,0.55)"
-                  tick={{ fill: "rgba(255,255,255,0.62)", fontSize: 14 }}
+                  stroke="var(--chart-axis)"
+                  tick={{ fill: "var(--chart-axis)", fontSize: 14 }}
                   tickFormatter={(value) => formatNumber(Number(value))}
                   tickMargin={8}
                   width={90}
@@ -158,9 +158,10 @@ export function ChartsPanel({ txs }: { txs: Transaction[] }) {
                   formatter={(value) => [money(Number(value)), "Neto"]}
                   labelFormatter={(label) => `Mes: ${label}`}
                   contentStyle={{
-                    background: "rgba(10,14,26,0.85)",
-                    border: "1px solid rgba(255,255,255,0.12)",
+                    background: "var(--chart-tooltip-bg)",
+                    border: "1px solid var(--chart-tooltip-border)",
                     borderRadius: 12,
+                    color: "var(--foreground)",
                   }}
                 />
                 <Line
@@ -244,16 +245,25 @@ export function ChartsPanel({ txs }: { txs: Transaction[] }) {
                     style={{ background: COLORS[i % COLORS.length] }}
                   />
                   <div className="min-w-0">
-                    <p className="break-words leading-snug text-white/90">
+                    <p
+                      className="break-words leading-snug"
+                      style={{ color: "var(--chart-legend-title)" }}
+                    >
                       {item.name}
                     </p>
-                    <p className="mt-0.5 text-white/45">
+                    <p
+                      className="mt-0.5"
+                      style={{ color: "var(--chart-legend-muted)" }}
+                    >
                       {totalGastos > 0
                         ? `${((item.value / totalGastos) * 100).toFixed(1)}%`
                         : "0.0%"}
                     </p>
                   </div>
-                  <p className="whitespace-nowrap text-right font-medium text-white/75">
+                  <p
+                    className="whitespace-nowrap text-right font-medium"
+                    style={{ color: "var(--chart-legend-value)" }}
+                  >
                     {money(item.value)}
                   </p>
                 </div>

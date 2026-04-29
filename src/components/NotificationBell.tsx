@@ -59,7 +59,7 @@ export function NotificationBell({ notifications }: NotificationBellProps) {
     <div className="relative">
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className={`relative flex h-11 w-11 items-center justify-center rounded-2xl text-white ring-1 transition ${
+        className={`notification-trigger relative flex h-11 w-11 items-center justify-center rounded-2xl text-white ring-1 transition ${
           open
             ? "bg-cyan-300/15 ring-cyan-300/30"
             : "bg-white/5 ring-white/10 hover:bg-white/10 hover:ring-white/20"
@@ -77,18 +77,18 @@ export function NotificationBell({ notifications }: NotificationBellProps) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-14 z-50 w-[min(92vw,420px)] overflow-hidden rounded-3xl border border-white/10 bg-slate-950/95 text-white shadow-2xl shadow-black/50 backdrop-blur-xl">
-          <div className="border-b border-white/10 bg-white/[0.03] p-4">
+        <div className="notification-panel absolute right-0 top-14 z-50 w-[min(92vw,420px)] overflow-hidden rounded-3xl border border-white/10 bg-slate-950/95 text-white shadow-2xl shadow-black/50 backdrop-blur-xl">
+          <div className="notification-panel-header border-b border-white/10 bg-white/[0.03] p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="text-base font-semibold">Notificaciones</h3>
-                <p className="mt-1 text-xs text-white/50">
+                <p className="notification-muted mt-1 text-xs text-white/50">
                   Alertas financieras y pagos pendientes
                 </p>
               </div>
               <button
                 onClick={() => setOpen(false)}
-                className="rounded-xl bg-white/5 p-2 text-white/60 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white"
+                className="notification-close rounded-xl bg-white/5 p-2 text-white/60 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white"
                 aria-label="Cerrar notificaciones"
               >
                 <X className="h-4 w-4" />
@@ -97,17 +97,17 @@ export function NotificationBell({ notifications }: NotificationBellProps) {
 
             {unreadCount > 0 && (
               <div className="mt-4 grid grid-cols-3 gap-2">
-                <div className="rounded-2xl bg-white/[0.04] p-3 ring-1 ring-white/10">
+                <div className="notification-summary-card rounded-2xl bg-white/[0.04] p-3 ring-1 ring-white/10">
                   <p className="text-lg font-semibold text-rose-100">{summary.overdue}</p>
-                  <p className="text-[11px] text-white/45">Vencidas</p>
+                  <p className="notification-muted text-[11px] text-white/45">Vencidas</p>
                 </div>
-                <div className="rounded-2xl bg-white/[0.04] p-3 ring-1 ring-white/10">
+                <div className="notification-summary-card rounded-2xl bg-white/[0.04] p-3 ring-1 ring-white/10">
                   <p className="text-lg font-semibold text-amber-100">{summary.upcoming}</p>
-                  <p className="text-[11px] text-white/45">Proximas</p>
+                  <p className="notification-muted text-[11px] text-white/45">Proximas</p>
                 </div>
-                <div className="rounded-2xl bg-white/[0.04] p-3 ring-1 ring-white/10">
+                <div className="notification-summary-card rounded-2xl bg-white/[0.04] p-3 ring-1 ring-white/10">
                   <p className="text-lg font-semibold text-cyan-100">{summary.debts}</p>
-                  <p className="text-[11px] text-white/45">Deudas</p>
+                  <p className="notification-muted text-[11px] text-white/45">Deudas</p>
                 </div>
               </div>
             )}
@@ -115,7 +115,7 @@ export function NotificationBell({ notifications }: NotificationBellProps) {
 
           {notifications.length === 0 ? (
             <div className="p-5">
-              <div className="rounded-2xl bg-emerald-400/10 p-4 text-sm text-emerald-100 ring-1 ring-emerald-300/20">
+              <div className="notification-empty rounded-2xl bg-emerald-400/10 p-4 text-sm text-emerald-100 ring-1 ring-emerald-300/20">
                 <div className="mb-2 flex items-center gap-2 font-semibold">
                   <CheckCircle2 className="h-4 w-4" />
                   Todo tranquilo
@@ -132,22 +132,44 @@ export function NotificationBell({ notifications }: NotificationBellProps) {
                 return (
                   <div
                     key={notification.id}
-                    className={`rounded-2xl border p-3 ${tone.card}`}
+                    className={`notification-card rounded-2xl border p-3 ${tone.card}`}
+                    style={{
+                      background: "var(--notification-card-bg)",
+                      borderColor: "var(--notification-card-border)",
+                    }}
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`rounded-xl p-2 ring-1 ${tone.icon}`}>
+                      <div
+                        className={`notification-card-icon rounded-xl p-2 ring-1 ${tone.icon}`}
+                        style={{
+                          background: "var(--notification-accent-bg)",
+                          color: "var(--notification-accent-color)",
+                        }}
+                      >
                         <Icon className="h-4 w-4" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-2">
-                          <p className="text-sm font-semibold text-white">
+                          <p
+                            className="notification-title text-sm font-semibold text-white"
+                            style={{ color: "var(--notification-title-color)" }}
+                          >
                             {notification.title}
                           </p>
-                          <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ${tone.badge}`}>
+                          <span
+                            className={`notification-badge rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ${tone.badge}`}
+                            style={{
+                              background: "var(--notification-accent-bg)",
+                              color: "var(--notification-accent-color)",
+                            }}
+                          >
                             {tone.label}
                           </span>
                         </div>
-                        <p className="mt-1 text-xs leading-5 text-white/68">
+                        <p
+                          className="notification-message mt-1 text-xs leading-5"
+                          style={{ color: "var(--notification-message-color)" }}
+                        >
                           {notification.message}
                         </p>
                       </div>

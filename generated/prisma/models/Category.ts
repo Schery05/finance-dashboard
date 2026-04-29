@@ -429,14 +429,6 @@ export type CategoryUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.CategoryScalarWhereInput | Prisma.CategoryScalarWhereInput[]
 }
 
-export type EnumTransactionTypeFieldUpdateOperationsInput = {
-  set?: $Enums.TransactionType
-}
-
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type CategoryCreateNestedOneWithoutTransactionsInput = {
   create?: Prisma.XOR<Prisma.CategoryCreateWithoutTransactionsInput, Prisma.CategoryUncheckedCreateWithoutTransactionsInput>
   connectOrCreate?: Prisma.CategoryCreateOrConnectWithoutTransactionsInput

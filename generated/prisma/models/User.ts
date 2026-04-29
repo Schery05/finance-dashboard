@@ -204,6 +204,8 @@ export type UserWhereInput = {
   savingsGoals?: Prisma.SavingsGoalListRelationFilter
   savingsMovements?: Prisma.SavingsMovementListRelationFilter
   debts?: Prisma.DebtListRelationFilter
+  banks?: Prisma.BankListRelationFilter
+  bankCategoryRules?: Prisma.BankCategoryRuleListRelationFilter
   readNotifications?: Prisma.ReadNotificationListRelationFilter
 }
 
@@ -221,6 +223,8 @@ export type UserOrderByWithRelationInput = {
   savingsGoals?: Prisma.SavingsGoalOrderByRelationAggregateInput
   savingsMovements?: Prisma.SavingsMovementOrderByRelationAggregateInput
   debts?: Prisma.DebtOrderByRelationAggregateInput
+  banks?: Prisma.BankOrderByRelationAggregateInput
+  bankCategoryRules?: Prisma.BankCategoryRuleOrderByRelationAggregateInput
   readNotifications?: Prisma.ReadNotificationOrderByRelationAggregateInput
 }
 
@@ -241,6 +245,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   savingsGoals?: Prisma.SavingsGoalListRelationFilter
   savingsMovements?: Prisma.SavingsMovementListRelationFilter
   debts?: Prisma.DebtListRelationFilter
+  banks?: Prisma.BankListRelationFilter
+  bankCategoryRules?: Prisma.BankCategoryRuleListRelationFilter
   readNotifications?: Prisma.ReadNotificationListRelationFilter
 }, "id" | "email">
 
@@ -284,6 +290,8 @@ export type UserCreateInput = {
   savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
   savingsMovements?: Prisma.SavingsMovementCreateNestedManyWithoutUserInput
   debts?: Prisma.DebtCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
 }
 
@@ -301,6 +309,8 @@ export type UserUncheckedCreateInput = {
   savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
   savingsMovements?: Prisma.SavingsMovementUncheckedCreateNestedManyWithoutUserInput
   debts?: Prisma.DebtUncheckedCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -318,6 +328,8 @@ export type UserUpdateInput = {
   savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
   savingsMovements?: Prisma.SavingsMovementUpdateManyWithoutUserNestedInput
   debts?: Prisma.DebtUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -335,6 +347,8 @@ export type UserUncheckedUpdateInput = {
   savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
   savingsMovements?: Prisma.SavingsMovementUncheckedUpdateManyWithoutUserNestedInput
   debts?: Prisma.DebtUncheckedUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -413,6 +427,34 @@ export type NullableStringFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type UserCreateNestedOneWithoutBankCategoryRulesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBankCategoryRulesInput, Prisma.UserUncheckedCreateWithoutBankCategoryRulesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBankCategoryRulesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutBankCategoryRulesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBankCategoryRulesInput, Prisma.UserUncheckedCreateWithoutBankCategoryRulesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBankCategoryRulesInput
+  upsert?: Prisma.UserUpsertWithoutBankCategoryRulesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBankCategoryRulesInput, Prisma.UserUpdateWithoutBankCategoryRulesInput>, Prisma.UserUncheckedUpdateWithoutBankCategoryRulesInput>
+}
+
+export type UserCreateNestedOneWithoutBanksInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBanksInput, Prisma.UserUncheckedCreateWithoutBanksInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBanksInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutBanksNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBanksInput, Prisma.UserUncheckedCreateWithoutBanksInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBanksInput
+  upsert?: Prisma.UserUpsertWithoutBanksInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBanksInput, Prisma.UserUpdateWithoutBanksInput>, Prisma.UserUncheckedUpdateWithoutBanksInput>
 }
 
 export type UserCreateNestedOneWithoutCategoriesInput = {
@@ -513,6 +555,182 @@ export type UserUpdateOneRequiredWithoutDebtsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDebtsInput, Prisma.UserUpdateWithoutDebtsInput>, Prisma.UserUncheckedUpdateWithoutDebtsInput>
 }
 
+export type UserCreateWithoutBankCategoryRulesInput = {
+  id?: string
+  email: string
+  passwordHash?: string | null
+  name?: string | null
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutUserInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  savingsMovements?: Prisma.SavingsMovementCreateNestedManyWithoutUserInput
+  debts?: Prisma.DebtCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutBankCategoryRulesInput = {
+  id?: string
+  email: string
+  passwordHash?: string | null
+  name?: string | null
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUserInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  savingsMovements?: Prisma.SavingsMovementUncheckedCreateNestedManyWithoutUserInput
+  debts?: Prisma.DebtUncheckedCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutBankCategoryRulesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutBankCategoryRulesInput, Prisma.UserUncheckedCreateWithoutBankCategoryRulesInput>
+}
+
+export type UserUpsertWithoutBankCategoryRulesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutBankCategoryRulesInput, Prisma.UserUncheckedUpdateWithoutBankCategoryRulesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutBankCategoryRulesInput, Prisma.UserUncheckedCreateWithoutBankCategoryRulesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutBankCategoryRulesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutBankCategoryRulesInput, Prisma.UserUncheckedUpdateWithoutBankCategoryRulesInput>
+}
+
+export type UserUpdateWithoutBankCategoryRulesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutUserNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  savingsMovements?: Prisma.SavingsMovementUpdateManyWithoutUserNestedInput
+  debts?: Prisma.DebtUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutBankCategoryRulesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutUserNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  savingsMovements?: Prisma.SavingsMovementUncheckedUpdateManyWithoutUserNestedInput
+  debts?: Prisma.DebtUncheckedUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutBanksInput = {
+  id?: string
+  email: string
+  passwordHash?: string | null
+  name?: string | null
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutUserInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  savingsMovements?: Prisma.SavingsMovementCreateNestedManyWithoutUserInput
+  debts?: Prisma.DebtCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
+  readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutBanksInput = {
+  id?: string
+  email: string
+  passwordHash?: string | null
+  name?: string | null
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUserInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  savingsMovements?: Prisma.SavingsMovementUncheckedCreateNestedManyWithoutUserInput
+  debts?: Prisma.DebtUncheckedCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
+  readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutBanksInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutBanksInput, Prisma.UserUncheckedCreateWithoutBanksInput>
+}
+
+export type UserUpsertWithoutBanksInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutBanksInput, Prisma.UserUncheckedUpdateWithoutBanksInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutBanksInput, Prisma.UserUncheckedCreateWithoutBanksInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutBanksInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutBanksInput, Prisma.UserUncheckedUpdateWithoutBanksInput>
+}
+
+export type UserUpdateWithoutBanksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutUserNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  savingsMovements?: Prisma.SavingsMovementUpdateManyWithoutUserNestedInput
+  debts?: Prisma.DebtUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
+  readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutBanksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutUserNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  savingsMovements?: Prisma.SavingsMovementUncheckedUpdateManyWithoutUserNestedInput
+  debts?: Prisma.DebtUncheckedUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
+  readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
 export type UserCreateWithoutCategoriesInput = {
   id?: string
   email: string
@@ -526,6 +744,8 @@ export type UserCreateWithoutCategoriesInput = {
   savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
   savingsMovements?: Prisma.SavingsMovementCreateNestedManyWithoutUserInput
   debts?: Prisma.DebtCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
 }
 
@@ -542,6 +762,8 @@ export type UserUncheckedCreateWithoutCategoriesInput = {
   savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
   savingsMovements?: Prisma.SavingsMovementUncheckedCreateNestedManyWithoutUserInput
   debts?: Prisma.DebtUncheckedCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -574,6 +796,8 @@ export type UserUpdateWithoutCategoriesInput = {
   savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
   savingsMovements?: Prisma.SavingsMovementUpdateManyWithoutUserNestedInput
   debts?: Prisma.DebtUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -590,6 +814,8 @@ export type UserUncheckedUpdateWithoutCategoriesInput = {
   savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
   savingsMovements?: Prisma.SavingsMovementUncheckedUpdateManyWithoutUserNestedInput
   debts?: Prisma.DebtUncheckedUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -606,6 +832,8 @@ export type UserCreateWithoutTransactionsInput = {
   savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
   savingsMovements?: Prisma.SavingsMovementCreateNestedManyWithoutUserInput
   debts?: Prisma.DebtCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
 }
 
@@ -622,6 +850,8 @@ export type UserUncheckedCreateWithoutTransactionsInput = {
   savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
   savingsMovements?: Prisma.SavingsMovementUncheckedCreateNestedManyWithoutUserInput
   debts?: Prisma.DebtUncheckedCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -654,6 +884,8 @@ export type UserUpdateWithoutTransactionsInput = {
   savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
   savingsMovements?: Prisma.SavingsMovementUpdateManyWithoutUserNestedInput
   debts?: Prisma.DebtUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -670,6 +902,8 @@ export type UserUncheckedUpdateWithoutTransactionsInput = {
   savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
   savingsMovements?: Prisma.SavingsMovementUncheckedUpdateManyWithoutUserNestedInput
   debts?: Prisma.DebtUncheckedUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -686,6 +920,8 @@ export type UserCreateWithoutBudgetsInput = {
   savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
   savingsMovements?: Prisma.SavingsMovementCreateNestedManyWithoutUserInput
   debts?: Prisma.DebtCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
 }
 
@@ -702,6 +938,8 @@ export type UserUncheckedCreateWithoutBudgetsInput = {
   savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
   savingsMovements?: Prisma.SavingsMovementUncheckedCreateNestedManyWithoutUserInput
   debts?: Prisma.DebtUncheckedCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -734,6 +972,8 @@ export type UserUpdateWithoutBudgetsInput = {
   savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
   savingsMovements?: Prisma.SavingsMovementUpdateManyWithoutUserNestedInput
   debts?: Prisma.DebtUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -750,6 +990,8 @@ export type UserUncheckedUpdateWithoutBudgetsInput = {
   savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
   savingsMovements?: Prisma.SavingsMovementUncheckedUpdateManyWithoutUserNestedInput
   debts?: Prisma.DebtUncheckedUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -766,6 +1008,8 @@ export type UserCreateWithoutSavingsGoalsInput = {
   budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
   savingsMovements?: Prisma.SavingsMovementCreateNestedManyWithoutUserInput
   debts?: Prisma.DebtCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
 }
 
@@ -782,6 +1026,8 @@ export type UserUncheckedCreateWithoutSavingsGoalsInput = {
   budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
   savingsMovements?: Prisma.SavingsMovementUncheckedCreateNestedManyWithoutUserInput
   debts?: Prisma.DebtUncheckedCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -814,6 +1060,8 @@ export type UserUpdateWithoutSavingsGoalsInput = {
   budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
   savingsMovements?: Prisma.SavingsMovementUpdateManyWithoutUserNestedInput
   debts?: Prisma.DebtUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -830,6 +1078,8 @@ export type UserUncheckedUpdateWithoutSavingsGoalsInput = {
   budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
   savingsMovements?: Prisma.SavingsMovementUncheckedUpdateManyWithoutUserNestedInput
   debts?: Prisma.DebtUncheckedUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -846,6 +1096,8 @@ export type UserCreateWithoutSavingsMovementsInput = {
   budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
   savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
   debts?: Prisma.DebtCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
 }
 
@@ -862,6 +1114,8 @@ export type UserUncheckedCreateWithoutSavingsMovementsInput = {
   budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
   savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
   debts?: Prisma.DebtUncheckedCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -894,6 +1148,8 @@ export type UserUpdateWithoutSavingsMovementsInput = {
   budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
   savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
   debts?: Prisma.DebtUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -910,6 +1166,8 @@ export type UserUncheckedUpdateWithoutSavingsMovementsInput = {
   budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
   savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
   debts?: Prisma.DebtUncheckedUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -927,6 +1185,8 @@ export type UserCreateWithoutReadNotificationsInput = {
   savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
   savingsMovements?: Prisma.SavingsMovementCreateNestedManyWithoutUserInput
   debts?: Prisma.DebtCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReadNotificationsInput = {
@@ -943,6 +1203,8 @@ export type UserUncheckedCreateWithoutReadNotificationsInput = {
   savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
   savingsMovements?: Prisma.SavingsMovementUncheckedCreateNestedManyWithoutUserInput
   debts?: Prisma.DebtUncheckedCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReadNotificationsInput = {
@@ -975,6 +1237,8 @@ export type UserUpdateWithoutReadNotificationsInput = {
   savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
   savingsMovements?: Prisma.SavingsMovementUpdateManyWithoutUserNestedInput
   debts?: Prisma.DebtUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReadNotificationsInput = {
@@ -991,6 +1255,8 @@ export type UserUncheckedUpdateWithoutReadNotificationsInput = {
   savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
   savingsMovements?: Prisma.SavingsMovementUncheckedUpdateManyWithoutUserNestedInput
   debts?: Prisma.DebtUncheckedUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutDebtsInput = {
@@ -1006,6 +1272,8 @@ export type UserCreateWithoutDebtsInput = {
   budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
   savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
   savingsMovements?: Prisma.SavingsMovementCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
 }
 
@@ -1022,6 +1290,8 @@ export type UserUncheckedCreateWithoutDebtsInput = {
   budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
   savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
   savingsMovements?: Prisma.SavingsMovementUncheckedCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1054,6 +1324,8 @@ export type UserUpdateWithoutDebtsInput = {
   budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
   savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
   savingsMovements?: Prisma.SavingsMovementUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -1070,6 +1342,8 @@ export type UserUncheckedUpdateWithoutDebtsInput = {
   budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
   savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
   savingsMovements?: Prisma.SavingsMovementUncheckedUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1085,6 +1359,8 @@ export type UserCountOutputType = {
   savingsGoals: number
   savingsMovements: number
   debts: number
+  banks: number
+  bankCategoryRules: number
   readNotifications: number
 }
 
@@ -1095,6 +1371,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   savingsGoals?: boolean | UserCountOutputTypeCountSavingsGoalsArgs
   savingsMovements?: boolean | UserCountOutputTypeCountSavingsMovementsArgs
   debts?: boolean | UserCountOutputTypeCountDebtsArgs
+  banks?: boolean | UserCountOutputTypeCountBanksArgs
+  bankCategoryRules?: boolean | UserCountOutputTypeCountBankCategoryRulesArgs
   readNotifications?: boolean | UserCountOutputTypeCountReadNotificationsArgs
 }
 
@@ -1153,6 +1431,20 @@ export type UserCountOutputTypeCountDebtsArgs<ExtArgs extends runtime.Types.Exte
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountBanksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BankWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountBankCategoryRulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BankCategoryRuleWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountReadNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ReadNotificationWhereInput
 }
@@ -1172,6 +1464,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   savingsGoals?: boolean | Prisma.User$savingsGoalsArgs<ExtArgs>
   savingsMovements?: boolean | Prisma.User$savingsMovementsArgs<ExtArgs>
   debts?: boolean | Prisma.User$debtsArgs<ExtArgs>
+  banks?: boolean | Prisma.User$banksArgs<ExtArgs>
+  bankCategoryRules?: boolean | Prisma.User$bankCategoryRulesArgs<ExtArgs>
   readNotifications?: boolean | Prisma.User$readNotificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -1214,6 +1508,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   savingsGoals?: boolean | Prisma.User$savingsGoalsArgs<ExtArgs>
   savingsMovements?: boolean | Prisma.User$savingsMovementsArgs<ExtArgs>
   debts?: boolean | Prisma.User$debtsArgs<ExtArgs>
+  banks?: boolean | Prisma.User$banksArgs<ExtArgs>
+  bankCategoryRules?: boolean | Prisma.User$bankCategoryRulesArgs<ExtArgs>
   readNotifications?: boolean | Prisma.User$readNotificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1229,6 +1525,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     savingsGoals: Prisma.$SavingsGoalPayload<ExtArgs>[]
     savingsMovements: Prisma.$SavingsMovementPayload<ExtArgs>[]
     debts: Prisma.$DebtPayload<ExtArgs>[]
+    banks: Prisma.$BankPayload<ExtArgs>[]
+    bankCategoryRules: Prisma.$BankCategoryRulePayload<ExtArgs>[]
     readNotifications: Prisma.$ReadNotificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1639,6 +1937,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   savingsGoals<T extends Prisma.User$savingsGoalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$savingsGoalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavingsGoalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   savingsMovements<T extends Prisma.User$savingsMovementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$savingsMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavingsMovementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   debts<T extends Prisma.User$debtsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$debtsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DebtPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  banks<T extends Prisma.User$banksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$banksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BankPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  bankCategoryRules<T extends Prisma.User$bankCategoryRulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$bankCategoryRulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BankCategoryRulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   readNotifications<T extends Prisma.User$readNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$readNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReadNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2210,6 +2510,54 @@ export type User$debtsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
   take?: number
   skip?: number
   distinct?: Prisma.DebtScalarFieldEnum | Prisma.DebtScalarFieldEnum[]
+}
+
+/**
+ * User.banks
+ */
+export type User$banksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Bank
+   */
+  select?: Prisma.BankSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Bank
+   */
+  omit?: Prisma.BankOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BankInclude<ExtArgs> | null
+  where?: Prisma.BankWhereInput
+  orderBy?: Prisma.BankOrderByWithRelationInput | Prisma.BankOrderByWithRelationInput[]
+  cursor?: Prisma.BankWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BankScalarFieldEnum | Prisma.BankScalarFieldEnum[]
+}
+
+/**
+ * User.bankCategoryRules
+ */
+export type User$bankCategoryRulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BankCategoryRule
+   */
+  select?: Prisma.BankCategoryRuleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BankCategoryRule
+   */
+  omit?: Prisma.BankCategoryRuleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BankCategoryRuleInclude<ExtArgs> | null
+  where?: Prisma.BankCategoryRuleWhereInput
+  orderBy?: Prisma.BankCategoryRuleOrderByWithRelationInput | Prisma.BankCategoryRuleOrderByWithRelationInput[]
+  cursor?: Prisma.BankCategoryRuleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BankCategoryRuleScalarFieldEnum | Prisma.BankCategoryRuleScalarFieldEnum[]
 }
 
 /**

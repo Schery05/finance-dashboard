@@ -13,6 +13,57 @@ function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Error";
 }
 
+type DebtImpact = {
+  debtId?: string | null;
+  amount: number;
+  paymentStatus: "PAGADO" | "PENDIENTE";
+  type: "INGRESO" | "GASTO";
+};
+
+function shouldApplyDebtPayment(tx: DebtImpact) {
+  return tx.type === "GASTO" && tx.paymentStatus === "PAGADO" && Boolean(tx.debtId);
+}
+
+async function applyDebtPayment(
+  db: Pick<typeof prisma, "debt">,
+  userId: string,
+  tx: DebtImpact,
+  direction: "apply" | "reverse"
+) {
+  if (!shouldApplyDebtPayment(tx)) return;
+
+  const debt = await db.debt.findFirst({
+    where: {
+      id: tx.debtId ?? "",
+      userId,
+    },
+    select: {
+      id: true,
+      currentBalance: true,
+    },
+  });
+
+  if (!debt) {
+    throw new Error("La deuda seleccionada no existe o no pertenece al usuario.");
+  }
+
+  const currentBalance = Number(debt.currentBalance);
+  const amount = Number(tx.amount) || 0;
+  const nextBalance =
+    direction === "apply"
+      ? Math.max(0, currentBalance - amount)
+      : currentBalance + amount;
+
+  await db.debt.update({
+    where: {
+      id: debt.id,
+    },
+    data: {
+      currentBalance: nextBalance,
+    },
+  });
+}
+
 export async function GET() {
   try {
     const session = await getServerSession();
@@ -86,19 +137,25 @@ export async function POST(req: Request) {
       },
     });
 
-    const transaction = await prisma.transaction.create({
-      data: {
-        date: mapped.date,
-        type: mapped.type,
-        amount: mapped.amount,
-        paymentStatus: mapped.paymentStatus,
-        additionalDescription: mapped.additionalDescription,
-        userId: user.id,
-        categoryId: category.id,
-      },
-      include: {
-        category: true,
-      },
+    const transaction = await prisma.$transaction(async (tx) => {
+      await applyDebtPayment(tx, user.id, mapped, "apply");
+
+      return tx.transaction.create({
+        data: {
+          date: mapped.date,
+          type: mapped.type,
+          amount: mapped.amount,
+          paymentStatus: mapped.paymentStatus,
+          additionalDescription: mapped.additionalDescription,
+          debtId: mapped.debtId,
+          debtInstallment: mapped.debtInstallment,
+          userId: user.id,
+          categoryId: category.id,
+        },
+        include: {
+          category: true,
+        },
+      });
     });
 
     return NextResponse.json({
@@ -153,22 +210,54 @@ export async function PATCH(req: Request) {
       },
     });
 
-    const transaction = await prisma.transaction.update({
-      where: {
-        id,
-        userId: user.id,
-      },
-      data: {
-        date: mapped.date,
-        type: mapped.type,
-        amount: mapped.amount,
-        paymentStatus: mapped.paymentStatus,
-        additionalDescription: mapped.additionalDescription,
-        categoryId: category.id,
-      },
-      include: {
-        category: true,
-      },
+    const transaction = await prisma.$transaction(async (tx) => {
+      const current = await tx.transaction.findFirst({
+        where: {
+          id,
+          userId: user.id,
+        },
+        select: {
+          id: true,
+          type: true,
+          amount: true,
+          paymentStatus: true,
+          debtId: true,
+        },
+      });
+
+      if (!current) throw new Error("No se encontro la transaccion.");
+
+      await applyDebtPayment(
+        tx,
+        user.id,
+        {
+          type: current.type,
+          amount: Number(current.amount),
+          paymentStatus: current.paymentStatus,
+          debtId: current.debtId,
+        },
+        "reverse"
+      );
+      await applyDebtPayment(tx, user.id, mapped, "apply");
+
+      return tx.transaction.update({
+        where: {
+          id,
+        },
+        data: {
+          date: mapped.date,
+          type: mapped.type,
+          amount: mapped.amount,
+          paymentStatus: mapped.paymentStatus,
+          additionalDescription: mapped.additionalDescription,
+          debtId: mapped.debtId,
+          debtInstallment: mapped.debtInstallment,
+          categoryId: category.id,
+        },
+        include: {
+          category: true,
+        },
+      });
     });
 
     return NextResponse.json({ ok: true, data: mapDBToUI(transaction) });

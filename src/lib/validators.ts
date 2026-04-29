@@ -1,13 +1,42 @@
 import { z } from "zod";
 
-export const TransactionSchema = z.object({
-  Fecha: z.string().min(1),
-  Tipo: z.enum(["Ingreso", "Gasto"]),
-  Categoría: z.string().min(1),
-  Importe: z.number().finite(),
-  EstadoPago: z.enum(["Pagado", "Pendiente"]),
-  DescripcionAdicional: z.string().optional().default(""),
-});
+export const TransactionSchema = z
+  .object({
+    Fecha: z.string().min(1),
+    Tipo: z.enum(["Ingreso", "Gasto"]),
+    Categoría: z.string().min(1),
+    Importe: z.number().finite(),
+    EstadoPago: z.enum(["Pagado", "Pendiente"]),
+    DescripcionAdicional: z.string().optional().default(""),
+    EsPagoDeuda: z.boolean().optional().default(false),
+    DeudaId: z.string().optional(),
+    CuotaActual: z.number().int().positive().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.EsPagoDeuda && data.Tipo !== "Gasto") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["EsPagoDeuda"],
+        message: "Solo los gastos pueden vincularse a una deuda.",
+      });
+    }
+    if (data.EsPagoDeuda) {
+      if (!data.DeudaId?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["DeudaId"],
+          message: "Selecciona una deuda activa.",
+        });
+      }
+      if (!data.CuotaActual) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["CuotaActual"],
+          message: "Selecciona la cuota actual.",
+        });
+      }
+    }
+  });
 
 export type TransactionInput = z.infer<typeof TransactionSchema>;
 
@@ -38,6 +67,7 @@ export const DebtSchema = z.object({
   monthlyPayment: z.number().finite().nonnegative(),
   paymentDay: z.number().int().min(1).max(31),
   type: z.enum(["TARJETA", "PRESTAMO_PERSONAL", "VEHICULO", "HIPOTECA", "OTRO"]),
+  openingDate: z.string().min(1).optional(),
 });
 
 export type DebtInput = z.infer<typeof DebtSchema>;

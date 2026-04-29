@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { AccessibilityPanel } from "@/components/AccessibilityPanel";
+import { BanksMaintenancePanel } from "@/components/BanksMaintenancePanel";
 import { BudgetsMaintenancePanel } from "@/components/BudgetsMaintenancePanel";
 import { CategoriesMaintenancePanel } from "@/components/CategoriesMaintenancePanel";
 import { DebtControlPanel } from "@/components/DebtControlPanel";
@@ -23,18 +25,23 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     | "score"
     | "asistente"
     | "deudas"
+    | "accesibilidad"
     | "ahorros"
     | "presupuesto"
     | "mantenimiento"
   >("finanzas");
   const [activeMaintenanceSection, setActiveMaintenanceSection] = useState<
-    "categorias"
+    "categorias" | "bancos"
   >("categorias");
+  const [activeDebtSection, setActiveDebtSection] = useState<
+    "gestion" | "listado"
+  >("gestion");
   const isSavingsModule = activeModule === "ahorros";
   const isCalendarModule = activeModule === "calendar";
   const isScoreModule = activeModule === "score";
   const isAssistantModule = activeModule === "asistente";
   const isDebtsModule = activeModule === "deudas";
+  const isAccessibilityModule = activeModule === "accesibilidad";
   const isBudgetsModule = activeModule === "presupuesto";
   const isMaintenanceModule = activeModule === "mantenimiento";
   const { transactions } = useFinanceStore();
@@ -73,6 +80,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <Sidebar
         activeModule={activeModule}
         setActiveModule={setActiveModule}
+        activeDebtSection={activeDebtSection}
+        setActiveDebtSection={setActiveDebtSection}
         activeMaintenanceSection={activeMaintenanceSection}
         setActiveMaintenanceSection={setActiveMaintenanceSection}
       />
@@ -98,6 +107,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 ? "Asistente Financiero"
                 : isDebtsModule
                 ? "Control de deudas"
+                : isAccessibilityModule
+                ? "Accesibilidad"
                 : isBudgetsModule
                 ? "Presupuesto"
                 : isMaintenanceModule
@@ -116,6 +127,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 ? "Consulta tus finanzas en lenguaje natural con recomendaciones accionables."
                 : isDebtsModule
                 ? "Gestiona balances, intereses y estrategia de pago de deudas."
+                : isAccessibilityModule
+                ? "Personaliza el modo visual de la aplicación."
                 : isBudgetsModule
                 ? "Controla tu limite mensual por categoria."
                 : isMaintenanceModule
@@ -149,9 +162,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         ) : isAssistantModule ? (
           <FinancialAssistantPanel />
         ) : isDebtsModule ? (
-          <DebtControlPanel />
+          <DebtControlPanel viewMode={activeDebtSection} />
+        ) : isAccessibilityModule ? (
+          <AccessibilityPanel />
         ) : isBudgetsModule ? (
           <BudgetsMaintenancePanel />
+        ) : isMaintenanceModule && activeMaintenanceSection === "bancos" ? (
+          <BanksMaintenancePanel />
         ) : isMaintenanceModule ? (
           <CategoriesMaintenancePanel />
         ) : (

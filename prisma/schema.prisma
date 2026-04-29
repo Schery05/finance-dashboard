@@ -52,7 +52,38 @@ model User {
   savingsGoals        SavingsGoal[]
   savingsMovements    SavingsMovement[]
   debts               Debt[]
+  banks               Bank[]
+  bankCategoryRules   BankCategoryRule[]
   readNotifications   ReadNotification[]
+}
+
+model BankCategoryRule {
+  id              String          @id @default(cuid())
+  pattern         String
+  categoryName    String
+  transactionType TransactionType
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, pattern])
+  @@index([userId, pattern])
+}
+
+model Bank {
+  id        String   @id @default(cuid())
+  name      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+  @@index([userId, isActive])
 }
 
 model Category {
@@ -90,9 +121,14 @@ model Transaction {
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
 
+  debtId String?
+  debt   Debt? @relation(fields: [debtId], references: [id])
+  debtInstallment Int?
+
   savingsMovement SavingsMovement?
 
   @@index([userId, date])
+  @@index([userId, debtId])
   @@index([userId, paymentStatus])
   @@index([userId, type])
   @@index([userId, recurrenceKey])
@@ -175,11 +211,14 @@ model Debt {
   monthlyPayment Decimal  @db.Decimal(12, 2)
   paymentDay     Int
   type           DebtType
+  openingDate    DateTime @default(now())
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   userId String
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  payments Transaction[]
 
   @@index([userId, type])
   @@index([userId, paymentDay])

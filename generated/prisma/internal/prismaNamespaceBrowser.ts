@@ -52,6 +52,8 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  BankCategoryRule: 'BankCategoryRule',
+  Bank: 'Bank',
   Category: 'Category',
   Transaction: 'Transaction',
   Budget: 'Budget',
@@ -90,6 +92,31 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const BankCategoryRuleScalarFieldEnum = {
+  id: 'id',
+  pattern: 'pattern',
+  categoryName: 'categoryName',
+  transactionType: 'transactionType',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type BankCategoryRuleScalarFieldEnum = (typeof BankCategoryRuleScalarFieldEnum)[keyof typeof BankCategoryRuleScalarFieldEnum]
+
+
+export const BankScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type BankScalarFieldEnum = (typeof BankScalarFieldEnum)[keyof typeof BankScalarFieldEnum]
+
+
 export const CategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -115,7 +142,9 @@ export const TransactionScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId',
-  categoryId: 'categoryId'
+  categoryId: 'categoryId',
+  debtId: 'debtId',
+  debtInstallment: 'debtInstallment'
 } as const
 
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
@@ -184,6 +213,7 @@ export const DebtScalarFieldEnum = {
   monthlyPayment: 'monthlyPayment',
   paymentDay: 'paymentDay',
   type: 'type',
+  openingDate: 'openingDate',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId'

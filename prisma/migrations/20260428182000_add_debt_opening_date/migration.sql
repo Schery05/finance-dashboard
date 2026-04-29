@@ -1,0 +1,8 @@
+ALTER TABLE "Debt" ADD COLUMN "openingDate" TIMESTAMP(3);
+
+UPDATE "Debt"
+SET "openingDate" = "createdAt"
+WHERE "openingDate" IS NULL;
+
+ALTER TABLE "Debt" ALTER COLUMN "openingDate" SET NOT NULL;
+ALTER TABLE "Debt" ALTER COLUMN "openingDate" SET DEFAULT CURRENT_TIMESTAMP;

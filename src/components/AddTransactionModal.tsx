@@ -10,7 +10,7 @@ import {
   loadManagedCategories,
   type ManagedCategories,
 } from "@/lib/categories";
-import type { Transaction } from "@/lib/types";
+import type { Debt, Transaction } from "@/lib/types";
 import type { TransactionInput } from "@/lib/validators";
 import { useFinanceStore } from "@/store/financeStore";
 
@@ -77,6 +77,7 @@ export function AddTransactionModal({
   const [categories, setCategories] = useState<ManagedCategories>(() =>
     loadManagedCategories()
   );
+  const [debts, setDebts] = useState<Debt[]>([]);
 
   const [form, setForm] = useState<TransactionInput>({
     Fecha: new Date().toISOString().slice(0, 10),
@@ -85,12 +86,28 @@ export function AddTransactionModal({
     Importe: 0,
     EstadoPago: "Pendiente",
     DescripcionAdicional: "",
+    EsPagoDeuda: false,
   });
 
   const update = <K extends keyof TransactionInput>(
     key: K,
     value: TransactionInput[K]
   ) => setForm((prev) => ({ ...prev, [key]: value }));
+
+  const money = (n: number) =>
+    new Intl.NumberFormat("es-DO", {
+      style: "currency",
+      currency: "DOP",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(Number.isFinite(n) ? n : 0);
+
+  function isDebtPaymentCategory(category?: string) {
+    const normalized = (category ?? "").trim().toLowerCase();
+    return /pago.*prestamo|prestamo.*pago|pago.*deuda|deuda.*pago/.test(
+      normalized
+    );
+  }
 
   const isEdit = !!editing;
   const isClone = !!cloning && !editing;
@@ -112,12 +129,65 @@ export function AddTransactionModal({
       window.removeEventListener(CATEGORIES_UPDATED_EVENT, refreshCategories);
   }, []);
 
+  const fetchDebts = async () => {
+    try {
+      const res = await fetch("/api/debts", { cache: "no-store" });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error ?? "Error cargando deudas");
+      setDebts(json.data as Debt[]);
+    } catch {
+      setDebts([]);
+    }
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    fetchDebts();
+  }, [open]);
+
   const categoryOptions = useMemo(() => {
     return categories[form.Tipo].map((category) => ({
       value: category,
       label: category,
     }));
   }, [categories, form.Tipo]);
+
+  const activeDebts = useMemo(
+    () => debts.filter((debt) => Number(debt.currentBalance) > 0),
+    [debts]
+  );
+
+  const selectedDebt = useMemo(
+    () => activeDebts.find((debt) => debt.id === form.DeudaId) ?? null,
+    [activeDebts, form.DeudaId]
+  );
+
+  const debtInstallmentOptions = useMemo(() => {
+    if (!selectedDebt) {
+      return Array.from({ length: 12 }, (_, index) => ({
+        value: String(index + 1),
+        label: `Cuota ${index + 1}`,
+      }));
+    }
+
+    const monthlyPayment = Number(selectedDebt.monthlyPayment) || 1;
+    const remainingMonths = Math.max(
+      1,
+      Math.min(
+        24,
+        Math.ceil(Number(selectedDebt.currentBalance) / monthlyPayment)
+      )
+    );
+
+    return Array.from({ length: remainingMonths }, (_, index) => ({
+      value: String(index + 1),
+      label: `Cuota ${index + 1}`,
+    }));
+  }, [selectedDebt]);
+
+  const shouldShowDebtSelection =
+    form.Tipo === "Gasto" &&
+    (form.EsPagoDeuda || isDebtPaymentCategory(form.Categoría));
 
   useEffect(() => {
     if (!open) return;
@@ -133,6 +203,9 @@ export function AddTransactionModal({
         Importe: Number(editing.Importe) || 0,
         EstadoPago: editing.EstadoPago,
         DescripcionAdicional: editing.DescripcionAdicional ?? "",
+        EsPagoDeuda: Boolean(editing.EsPagoDeuda),
+        DeudaId: editing.DeudaId ?? "",
+        CuotaActual: editing.CuotaActual,
       });
       return;
     }
@@ -148,6 +221,9 @@ export function AddTransactionModal({
         Importe: Number(cloning.Importe) || 0,
         EstadoPago: cloning.EstadoPago,
         DescripcionAdicional: cloning.DescripcionAdicional ?? "",
+        EsPagoDeuda: Boolean(cloning.EsPagoDeuda),
+        DeudaId: cloning.DeudaId ?? "",
+        CuotaActual: cloning.CuotaActual,
       });
       return;
     }
@@ -159,6 +235,7 @@ export function AddTransactionModal({
       Importe: 0,
       EstadoPago: "Pendiente",
       DescripcionAdicional: "",
+      EsPagoDeuda: false,
     });
   }, [open, editing, cloning, categories]);
 
@@ -178,6 +255,9 @@ export function AddTransactionModal({
       Importe: Number(form.Importe) || 0,
       EstadoPago: form.EstadoPago,
       DescripcionAdicional: form.DescripcionAdicional ?? "",
+      EsPagoDeuda: Boolean(form.EsPagoDeuda),
+      DeudaId: form.EsPagoDeuda ? form.DeudaId?.trim() ?? "" : undefined,
+      CuotaActual: form.EsPagoDeuda ? Number(form.CuotaActual ?? 1) : undefined,
     };
 
     if (editing) {
@@ -243,7 +323,15 @@ export function AddTransactionModal({
                   Tipo
                   <CustomSelect
                     value={form.Tipo}
-                    onChange={(value) => update("Tipo", normalizeTipo(value))}
+                    onChange={(value) => {
+                      const nextType = normalizeTipo(value);
+                      update("Tipo", nextType);
+                      if (nextType !== "Gasto") {
+                        update("EsPagoDeuda", false);
+                        update("DeudaId", "");
+                        update("CuotaActual", undefined as TransactionInput["CuotaActual"]);
+                      }
+                    }}
                     placeholder="Selecciona tipo"
                     options={[
                       { value: "Ingreso", label: "Ingreso" },
@@ -258,6 +346,8 @@ export function AddTransactionModal({
                     value={form.Categoría}
                     onChange={(value) => update("Categoría", value)}
                     placeholder="Selecciona categoria"
+                    searchable
+                    searchPlaceholder="Buscar categoria"
                     options={categoryOptions}
                   />
                 </label>
@@ -287,6 +377,110 @@ export function AddTransactionModal({
                   />
                 </label>
 
+                {shouldShowDebtSelection && (
+                  <div className="debt-payment-card md:col-span-2 space-y-4 rounded-3xl p-4">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <div className="inline-flex items-center gap-2 rounded-full bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100 ring-1 ring-cyan-300/20">
+                          Pago de deuda
+                        </div>
+                        <h4 className="mt-3 text-sm font-semibold text-white">
+                          Vincular este gasto a una deuda
+                        </h4>
+                        <p className="mt-1 text-sm leading-6 text-white/60">
+                          Si este movimiento es una cuota o abono, lo asociamos a tu deuda para mantener el balance actualizado.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={fetchDebts}
+                        className="rounded-xl bg-white/5 px-3 py-2 text-sm text-white ring-1 ring-white/10 transition hover:bg-white/10"
+                      >
+                        Actualizar deudas
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <div className="rounded-2xl bg-white/[0.04] p-3 ring-1 ring-white/10">
+                        <p className="mb-2 text-xs font-semibold uppercase text-white/45">
+                          ¿Corresponde a una deuda?
+                        </p>
+                        <div className="grid grid-cols-2 gap-2 rounded-2xl bg-black/10 p-1 ring-1 ring-white/10">
+                          {[
+                            { value: false, label: "No" },
+                            { value: true, label: "Sí" },
+                          ].map((option) => (
+                            <button
+                              key={option.label}
+                              type="button"
+                              onClick={() => {
+                                update("EsPagoDeuda", option.value as TransactionInput["EsPagoDeuda"]);
+                                if (!option.value) {
+                                  update("DeudaId", "");
+                                  update("CuotaActual", undefined as TransactionInput["CuotaActual"]);
+                                } else if (!form.CuotaActual) {
+                                  update("CuotaActual", 1 as TransactionInput["CuotaActual"]);
+                                }
+                              }}
+                              className={`rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                                form.EsPagoDeuda === option.value
+                                  ? "bg-cyan-300 text-slate-950 shadow-lg shadow-cyan-500/10"
+                                  : "text-white/65 hover:bg-white/10 hover:text-white"
+                              }`}
+                            >
+                              {option.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {form.EsPagoDeuda && (
+                        <label className="text-sm text-white/70">
+                          Deuda
+                          <CustomSelect
+                            value={form.DeudaId ?? ""}
+                            onChange={(value) => update("DeudaId", value)}
+                            placeholder="Selecciona deuda activa"
+                            searchable
+                            searchPlaceholder="Buscar deuda"
+                            options={activeDebts.map((debt) => ({
+                              value: debt.id,
+                              label: `${debt.name} - ${money(debt.currentBalance)}`,
+                            }))}
+                          />
+                        </label>
+                      )}
+                    </div>
+
+                    {form.EsPagoDeuda && (
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <label className="text-sm text-white/70">
+                          Cuota en curso
+                          <CustomSelect
+                            value={String(form.CuotaActual ?? 1)}
+                            onChange={(value) =>
+                              update("CuotaActual", Number(value) as TransactionInput["CuotaActual"])
+                            }
+                            placeholder="Cuota actual"
+                            options={debtInstallmentOptions}
+                          />
+                        </label>
+                        <div className="rounded-2xl bg-emerald-400/10 p-3 text-sm text-emerald-100 ring-1 ring-emerald-300/20">
+                          {form.EstadoPago === "Pagado"
+                            ? "Al guardar, este pago reducira el balance pendiente de la deuda."
+                            : "Como esta pendiente, se vinculara sin descontar el balance hasta marcarlo como pagado."}
+                        </div>
+                      </div>
+                    )}
+
+                    {form.EsPagoDeuda && activeDebts.length === 0 && (
+                      <p className="text-xs text-white/50">
+                        No hay deudas activas registradas. Agrega o actualiza una deuda en la sección Control de deudas.
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 <label className="text-sm text-white/70 md:col-span-2">
                   Descripcion adicional
                   <textarea
@@ -309,7 +503,11 @@ export function AddTransactionModal({
                 </button>
 
                 <button
-                  disabled={loading || !form.Categoría}
+                  disabled={
+                    loading ||
+                    !form.Categoría ||
+                    (form.EsPagoDeuda && (!form.DeudaId || !form.CuotaActual))
+                  }
                   onClick={submit}
                   className="rounded-xl bg-gradient-to-r from-cyan-500/80 to-fuchsia-500/80 px-4 py-2 text-sm font-medium ring-1 ring-white/15 hover:opacity-95 disabled:opacity-60"
                 >
@@ -323,3 +521,5 @@ export function AddTransactionModal({
     </AnimatePresence>
   );
 }
+
+

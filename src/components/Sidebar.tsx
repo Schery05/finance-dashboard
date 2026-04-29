@@ -5,7 +5,9 @@ import {
   BarChart3,
   Bot,
   CalendarDays,
+  ChevronDown,
   ChevronRight,
+  Eye,
   Gauge,
   Landmark,
   PiggyBank,
@@ -23,14 +25,18 @@ type ModuleKey =
   | "score"
   | "asistente"
   | "deudas"
+  | "accesibilidad"
   | "ahorros"
   | "presupuesto"
   | "mantenimiento";
-type MaintenanceSection = "categorias";
+type MaintenanceSection = "categorias" | "bancos";
+type DebtSection = "gestion" | "listado";
 
 type SidebarProps = {
   activeModule: ModuleKey;
   setActiveModule: (module: ModuleKey) => void;
+  activeDebtSection: DebtSection;
+  setActiveDebtSection: (section: DebtSection) => void;
   activeMaintenanceSection: MaintenanceSection;
   setActiveMaintenanceSection: (section: MaintenanceSection) => void;
 };
@@ -38,6 +44,8 @@ type SidebarProps = {
 export function Sidebar({
   activeModule,
   setActiveModule,
+  activeDebtSection,
+  setActiveDebtSection,
   activeMaintenanceSection,
   setActiveMaintenanceSection,
 }: SidebarProps) {
@@ -50,9 +58,19 @@ export function Sidebar({
       Icon: BarChart3,
     },
     {
-      key: "calendar" as const,
-      label: "Calendar Trxn",
-      Icon: CalendarDays,
+      key: "presupuesto" as const,
+      label: "Presupuesto",
+      Icon: WalletCards,
+    },
+    {
+      key: "ahorros" as const,
+      label: "Ahorros",
+      Icon: PiggyBank,
+    },
+    {
+      key: "deudas" as const,
+      label: "Control de deudas",
+      Icon: Landmark,
     },
     {
       key: "score" as const,
@@ -65,19 +83,14 @@ export function Sidebar({
       Icon: Bot,
     },
     {
-      key: "deudas" as const,
-      label: "Control de deudas",
-      Icon: Landmark,
+      key: "calendar" as const,
+      label: "Calendar Trxn",
+      Icon: CalendarDays,
     },
     {
-      key: "ahorros" as const,
-      label: "Ahorros",
-      Icon: PiggyBank,
-    },
-    {
-      key: "presupuesto" as const,
-      label: "Presupuesto",
-      Icon: WalletCards,
+      key: "accesibilidad" as const,
+      label: "Accesibilidad",
+      Icon: Eye,
     },
     {
       key: "mantenimiento" as const,
@@ -140,6 +153,9 @@ export function Sidebar({
               <button
                 onClick={() => {
                   setActiveModule(item.key);
+                  if (item.key === "deudas") {
+                    setActiveDebtSection("gestion");
+                  }
                   if (item.key === "mantenimiento") {
                     setActiveMaintenanceSection("categorias");
                   }
@@ -158,9 +174,45 @@ export function Sidebar({
                 <ItemIcon className="h-5 w-5" />
 
                 {!collapsed && <span>{item.label}</span>}
+                {!collapsed &&
+                  (item.key === "deudas" || item.key === "mantenimiento") && (
+                    <ChevronDown
+                      className={`ml-auto h-4 w-4 transition-transform ${
+                        active ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
               </button>
+            {item.key === "deudas" && active && !collapsed && (
+              <div className="ml-6 mt-2 space-y-2 border-l border-cyan-300/25 pl-3">
+                <button
+                  onClick={() => setActiveDebtSection("gestion")}
+                  className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-semibold ring-1 transition ${
+                    activeDebtSection === "gestion"
+                      ? "bg-cyan-300/15 text-cyan-100 ring-cyan-300/25 shadow-lg shadow-cyan-500/5"
+                      : "bg-white/5 text-white/60 ring-white/10 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-cyan-300" />
+                  <Landmark className="h-3.5 w-3.5" />
+                  <span>Gestion</span>
+                </button>
+                <button
+                  onClick={() => setActiveDebtSection("listado")}
+                  className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-semibold ring-1 transition ${
+                    activeDebtSection === "listado"
+                      ? "bg-cyan-300/15 text-cyan-100 ring-cyan-300/25 shadow-lg shadow-cyan-500/5"
+                      : "bg-white/5 text-white/60 ring-white/10 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-cyan-300" />
+                  <Tags className="h-3.5 w-3.5" />
+                  <span>Listado de Prestamos</span>
+                </button>
+              </div>
+            )}
             {item.key === "mantenimiento" && active && !collapsed && (
-              <div className="ml-6 mt-2 border-l border-cyan-300/25 pl-3">
+              <div className="ml-6 mt-2 space-y-2 border-l border-cyan-300/25 pl-3">
                 <button
                   onClick={() => setActiveMaintenanceSection("categorias")}
                   className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-semibold ring-1 transition ${
@@ -172,6 +224,18 @@ export function Sidebar({
                   <span className="h-1.5 w-1.5 rounded-full bg-cyan-300" />
                   <Tags className="h-3.5 w-3.5" />
                   <span>Categorias</span>
+                </button>
+                <button
+                  onClick={() => setActiveMaintenanceSection("bancos")}
+                  className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-semibold ring-1 transition ${
+                    activeMaintenanceSection === "bancos"
+                      ? "bg-cyan-300/15 text-cyan-100 ring-cyan-300/25 shadow-lg shadow-cyan-500/5"
+                      : "bg-white/5 text-white/60 ring-white/10 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-cyan-300" />
+                  <Landmark className="h-3.5 w-3.5" />
+                  <span>Listado Bancos</span>
                 </button>
               </div>
             )}

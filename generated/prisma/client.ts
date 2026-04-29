@@ -47,6 +47,16 @@ export { Prisma }
  */
 export type User = Prisma.UserModel
 /**
+ * Model BankCategoryRule
+ * 
+ */
+export type BankCategoryRule = Prisma.BankCategoryRuleModel
+/**
+ * Model Bank
+ * 
+ */
+export type Bank = Prisma.BankModel
+/**
  * Model Category
  * 
  */

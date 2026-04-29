@@ -15,6 +15,7 @@ export type DBDebt = {
   monthlyPayment: DecimalLike | number | string;
   paymentDay: number;
   type: Debt["type"] | string;
+  openingDate?: Date | null;
   createdAt: Date;
 };
 
@@ -26,6 +27,8 @@ function decimalToNumber(value: DecimalLike | number | string) {
 }
 
 export function mapDebtDBToUI(debt: DBDebt): Debt {
+  const openingDate = debt.openingDate ?? debt.createdAt;
+
   return {
     id: debt.id,
     name: debt.name,
@@ -35,6 +38,7 @@ export function mapDebtDBToUI(debt: DBDebt): Debt {
     monthlyPayment: decimalToNumber(debt.monthlyPayment),
     paymentDay: debt.paymentDay,
     type: debt.type as Debt["type"],
+    openingDate: openingDate.toISOString(),
     createdAt: debt.createdAt.toISOString(),
   };
 }
@@ -48,5 +52,6 @@ export function mapDebtUIToDB(data: DebtInput) {
     monthlyPayment: data.monthlyPayment,
     paymentDay: data.paymentDay,
     type: data.type,
+    openingDate: data.openingDate ? new Date(`${data.openingDate}T00:00:00`) : undefined,
   };
 }

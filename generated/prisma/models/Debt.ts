@@ -51,6 +51,7 @@ export type DebtMinAggregateOutputType = {
   monthlyPayment: runtime.Decimal | null
   paymentDay: number | null
   type: $Enums.DebtType | null
+  openingDate: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   userId: string | null
@@ -65,6 +66,7 @@ export type DebtMaxAggregateOutputType = {
   monthlyPayment: runtime.Decimal | null
   paymentDay: number | null
   type: $Enums.DebtType | null
+  openingDate: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   userId: string | null
@@ -79,6 +81,7 @@ export type DebtCountAggregateOutputType = {
   monthlyPayment: number
   paymentDay: number
   type: number
+  openingDate: number
   createdAt: number
   updatedAt: number
   userId: number
@@ -111,6 +114,7 @@ export type DebtMinAggregateInputType = {
   monthlyPayment?: true
   paymentDay?: true
   type?: true
+  openingDate?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -125,6 +129,7 @@ export type DebtMaxAggregateInputType = {
   monthlyPayment?: true
   paymentDay?: true
   type?: true
+  openingDate?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -139,6 +144,7 @@ export type DebtCountAggregateInputType = {
   monthlyPayment?: true
   paymentDay?: true
   type?: true
+  openingDate?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -240,6 +246,7 @@ export type DebtGroupByOutputType = {
   monthlyPayment: runtime.Decimal
   paymentDay: number
   type: $Enums.DebtType
+  openingDate: Date
   createdAt: Date
   updatedAt: Date
   userId: string
@@ -277,10 +284,12 @@ export type DebtWhereInput = {
   monthlyPayment?: Prisma.DecimalFilter<"Debt"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay?: Prisma.IntFilter<"Debt"> | number
   type?: Prisma.EnumDebtTypeFilter<"Debt"> | $Enums.DebtType
+  openingDate?: Prisma.DateTimeFilter<"Debt"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Debt"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Debt"> | Date | string
   userId?: Prisma.StringFilter<"Debt"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  payments?: Prisma.TransactionListRelationFilter
 }
 
 export type DebtOrderByWithRelationInput = {
@@ -292,10 +301,12 @@ export type DebtOrderByWithRelationInput = {
   monthlyPayment?: Prisma.SortOrder
   paymentDay?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  openingDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
+  payments?: Prisma.TransactionOrderByRelationAggregateInput
 }
 
 export type DebtWhereUniqueInput = Prisma.AtLeast<{
@@ -310,10 +321,12 @@ export type DebtWhereUniqueInput = Prisma.AtLeast<{
   monthlyPayment?: Prisma.DecimalFilter<"Debt"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay?: Prisma.IntFilter<"Debt"> | number
   type?: Prisma.EnumDebtTypeFilter<"Debt"> | $Enums.DebtType
+  openingDate?: Prisma.DateTimeFilter<"Debt"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Debt"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Debt"> | Date | string
   userId?: Prisma.StringFilter<"Debt"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  payments?: Prisma.TransactionListRelationFilter
 }, "id">
 
 export type DebtOrderByWithAggregationInput = {
@@ -325,6 +338,7 @@ export type DebtOrderByWithAggregationInput = {
   monthlyPayment?: Prisma.SortOrder
   paymentDay?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  openingDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -347,6 +361,7 @@ export type DebtScalarWhereWithAggregatesInput = {
   monthlyPayment?: Prisma.DecimalWithAggregatesFilter<"Debt"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay?: Prisma.IntWithAggregatesFilter<"Debt"> | number
   type?: Prisma.EnumDebtTypeWithAggregatesFilter<"Debt"> | $Enums.DebtType
+  openingDate?: Prisma.DateTimeWithAggregatesFilter<"Debt"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Debt"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Debt"> | Date | string
   userId?: Prisma.StringWithAggregatesFilter<"Debt"> | string
@@ -361,9 +376,11 @@ export type DebtCreateInput = {
   monthlyPayment: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay: number
   type: $Enums.DebtType
+  openingDate?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutDebtsInput
+  payments?: Prisma.TransactionCreateNestedManyWithoutDebtInput
 }
 
 export type DebtUncheckedCreateInput = {
@@ -375,9 +392,11 @@ export type DebtUncheckedCreateInput = {
   monthlyPayment: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay: number
   type: $Enums.DebtType
+  openingDate?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
   userId: string
+  payments?: Prisma.TransactionUncheckedCreateNestedManyWithoutDebtInput
 }
 
 export type DebtUpdateInput = {
@@ -389,9 +408,11 @@ export type DebtUpdateInput = {
   monthlyPayment?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumDebtTypeFieldUpdateOperationsInput | $Enums.DebtType
+  openingDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutDebtsNestedInput
+  payments?: Prisma.TransactionUpdateManyWithoutDebtNestedInput
 }
 
 export type DebtUncheckedUpdateInput = {
@@ -403,9 +424,11 @@ export type DebtUncheckedUpdateInput = {
   monthlyPayment?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumDebtTypeFieldUpdateOperationsInput | $Enums.DebtType
+  openingDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  payments?: Prisma.TransactionUncheckedUpdateManyWithoutDebtNestedInput
 }
 
 export type DebtCreateManyInput = {
@@ -417,6 +440,7 @@ export type DebtCreateManyInput = {
   monthlyPayment: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay: number
   type: $Enums.DebtType
+  openingDate?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
   userId: string
@@ -431,6 +455,7 @@ export type DebtUpdateManyMutationInput = {
   monthlyPayment?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumDebtTypeFieldUpdateOperationsInput | $Enums.DebtType
+  openingDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -444,6 +469,7 @@ export type DebtUncheckedUpdateManyInput = {
   monthlyPayment?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumDebtTypeFieldUpdateOperationsInput | $Enums.DebtType
+  openingDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -459,6 +485,11 @@ export type DebtOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type DebtNullableScalarRelationFilter = {
+  is?: Prisma.DebtWhereInput | null
+  isNot?: Prisma.DebtWhereInput | null
+}
+
 export type DebtCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
@@ -468,6 +499,7 @@ export type DebtCountOrderByAggregateInput = {
   monthlyPayment?: Prisma.SortOrder
   paymentDay?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  openingDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -490,6 +522,7 @@ export type DebtMaxOrderByAggregateInput = {
   monthlyPayment?: Prisma.SortOrder
   paymentDay?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  openingDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -504,6 +537,7 @@ export type DebtMinOrderByAggregateInput = {
   monthlyPayment?: Prisma.SortOrder
   paymentDay?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  openingDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -559,6 +593,22 @@ export type DebtUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.DebtScalarWhereInput | Prisma.DebtScalarWhereInput[]
 }
 
+export type DebtCreateNestedOneWithoutPaymentsInput = {
+  create?: Prisma.XOR<Prisma.DebtCreateWithoutPaymentsInput, Prisma.DebtUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.DebtCreateOrConnectWithoutPaymentsInput
+  connect?: Prisma.DebtWhereUniqueInput
+}
+
+export type DebtUpdateOneWithoutPaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.DebtCreateWithoutPaymentsInput, Prisma.DebtUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.DebtCreateOrConnectWithoutPaymentsInput
+  upsert?: Prisma.DebtUpsertWithoutPaymentsInput
+  disconnect?: Prisma.DebtWhereInput | boolean
+  delete?: Prisma.DebtWhereInput | boolean
+  connect?: Prisma.DebtWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DebtUpdateToOneWithWhereWithoutPaymentsInput, Prisma.DebtUpdateWithoutPaymentsInput>, Prisma.DebtUncheckedUpdateWithoutPaymentsInput>
+}
+
 export type EnumDebtTypeFieldUpdateOperationsInput = {
   set?: $Enums.DebtType
 }
@@ -572,8 +622,10 @@ export type DebtCreateWithoutUserInput = {
   monthlyPayment: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay: number
   type: $Enums.DebtType
+  openingDate?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  payments?: Prisma.TransactionCreateNestedManyWithoutDebtInput
 }
 
 export type DebtUncheckedCreateWithoutUserInput = {
@@ -585,8 +637,10 @@ export type DebtUncheckedCreateWithoutUserInput = {
   monthlyPayment: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay: number
   type: $Enums.DebtType
+  openingDate?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  payments?: Prisma.TransactionUncheckedCreateNestedManyWithoutDebtInput
 }
 
 export type DebtCreateOrConnectWithoutUserInput = {
@@ -627,9 +681,86 @@ export type DebtScalarWhereInput = {
   monthlyPayment?: Prisma.DecimalFilter<"Debt"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay?: Prisma.IntFilter<"Debt"> | number
   type?: Prisma.EnumDebtTypeFilter<"Debt"> | $Enums.DebtType
+  openingDate?: Prisma.DateTimeFilter<"Debt"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Debt"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Debt"> | Date | string
   userId?: Prisma.StringFilter<"Debt"> | string
+}
+
+export type DebtCreateWithoutPaymentsInput = {
+  id?: string
+  name: string
+  initialAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
+  interestRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  monthlyPayment: runtime.Decimal | runtime.DecimalJsLike | number | string
+  paymentDay: number
+  type: $Enums.DebtType
+  openingDate?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutDebtsInput
+}
+
+export type DebtUncheckedCreateWithoutPaymentsInput = {
+  id?: string
+  name: string
+  initialAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
+  interestRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  monthlyPayment: runtime.Decimal | runtime.DecimalJsLike | number | string
+  paymentDay: number
+  type: $Enums.DebtType
+  openingDate?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userId: string
+}
+
+export type DebtCreateOrConnectWithoutPaymentsInput = {
+  where: Prisma.DebtWhereUniqueInput
+  create: Prisma.XOR<Prisma.DebtCreateWithoutPaymentsInput, Prisma.DebtUncheckedCreateWithoutPaymentsInput>
+}
+
+export type DebtUpsertWithoutPaymentsInput = {
+  update: Prisma.XOR<Prisma.DebtUpdateWithoutPaymentsInput, Prisma.DebtUncheckedUpdateWithoutPaymentsInput>
+  create: Prisma.XOR<Prisma.DebtCreateWithoutPaymentsInput, Prisma.DebtUncheckedCreateWithoutPaymentsInput>
+  where?: Prisma.DebtWhereInput
+}
+
+export type DebtUpdateToOneWithWhereWithoutPaymentsInput = {
+  where?: Prisma.DebtWhereInput
+  data: Prisma.XOR<Prisma.DebtUpdateWithoutPaymentsInput, Prisma.DebtUncheckedUpdateWithoutPaymentsInput>
+}
+
+export type DebtUpdateWithoutPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  initialAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  interestRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  monthlyPayment?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  paymentDay?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumDebtTypeFieldUpdateOperationsInput | $Enums.DebtType
+  openingDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutDebtsNestedInput
+}
+
+export type DebtUncheckedUpdateWithoutPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  initialAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  interestRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  monthlyPayment?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  paymentDay?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumDebtTypeFieldUpdateOperationsInput | $Enums.DebtType
+  openingDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type DebtCreateManyUserInput = {
@@ -641,6 +772,7 @@ export type DebtCreateManyUserInput = {
   monthlyPayment: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay: number
   type: $Enums.DebtType
+  openingDate?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -654,8 +786,10 @@ export type DebtUpdateWithoutUserInput = {
   monthlyPayment?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumDebtTypeFieldUpdateOperationsInput | $Enums.DebtType
+  openingDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payments?: Prisma.TransactionUpdateManyWithoutDebtNestedInput
 }
 
 export type DebtUncheckedUpdateWithoutUserInput = {
@@ -667,8 +801,10 @@ export type DebtUncheckedUpdateWithoutUserInput = {
   monthlyPayment?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumDebtTypeFieldUpdateOperationsInput | $Enums.DebtType
+  openingDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payments?: Prisma.TransactionUncheckedUpdateManyWithoutDebtNestedInput
 }
 
 export type DebtUncheckedUpdateManyWithoutUserInput = {
@@ -680,10 +816,40 @@ export type DebtUncheckedUpdateManyWithoutUserInput = {
   monthlyPayment?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentDay?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumDebtTypeFieldUpdateOperationsInput | $Enums.DebtType
+  openingDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type DebtCountOutputType
+ */
+
+export type DebtCountOutputType = {
+  payments: number
+}
+
+export type DebtCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  payments?: boolean | DebtCountOutputTypeCountPaymentsArgs
+}
+
+/**
+ * DebtCountOutputType without action
+ */
+export type DebtCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DebtCountOutputType
+   */
+  select?: Prisma.DebtCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * DebtCountOutputType without action
+ */
+export type DebtCountOutputTypeCountPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TransactionWhereInput
+}
 
 
 export type DebtSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -695,10 +861,13 @@ export type DebtSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   monthlyPayment?: boolean
   paymentDay?: boolean
   type?: boolean
+  openingDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  payments?: boolean | Prisma.Debt$paymentsArgs<ExtArgs>
+  _count?: boolean | Prisma.DebtCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["debt"]>
 
 export type DebtSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -710,6 +879,7 @@ export type DebtSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   monthlyPayment?: boolean
   paymentDay?: boolean
   type?: boolean
+  openingDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
@@ -725,6 +895,7 @@ export type DebtSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   monthlyPayment?: boolean
   paymentDay?: boolean
   type?: boolean
+  openingDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
@@ -740,14 +911,17 @@ export type DebtSelectScalar = {
   monthlyPayment?: boolean
   paymentDay?: boolean
   type?: boolean
+  openingDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
 }
 
-export type DebtOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "initialAmount" | "currentBalance" | "interestRate" | "monthlyPayment" | "paymentDay" | "type" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["debt"]>
+export type DebtOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "initialAmount" | "currentBalance" | "interestRate" | "monthlyPayment" | "paymentDay" | "type" | "openingDate" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["debt"]>
 export type DebtInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  payments?: boolean | Prisma.Debt$paymentsArgs<ExtArgs>
+  _count?: boolean | Prisma.DebtCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type DebtIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -760,6 +934,7 @@ export type $DebtPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "Debt"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
+    payments: Prisma.$TransactionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -770,6 +945,7 @@ export type $DebtPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     monthlyPayment: runtime.Decimal
     paymentDay: number
     type: $Enums.DebtType
+    openingDate: Date
     createdAt: Date
     updatedAt: Date
     userId: string
@@ -1168,6 +1344,7 @@ readonly fields: DebtFieldRefs;
 export interface Prisma__DebtClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  payments<T extends Prisma.Debt$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Debt$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1205,6 +1382,7 @@ export interface DebtFieldRefs {
   readonly monthlyPayment: Prisma.FieldRef<"Debt", 'Decimal'>
   readonly paymentDay: Prisma.FieldRef<"Debt", 'Int'>
   readonly type: Prisma.FieldRef<"Debt", 'DebtType'>
+  readonly openingDate: Prisma.FieldRef<"Debt", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Debt", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Debt", 'DateTime'>
   readonly userId: Prisma.FieldRef<"Debt", 'String'>
@@ -1606,6 +1784,30 @@ export type DebtDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Debts to delete.
    */
   limit?: number
+}
+
+/**
+ * Debt.payments
+ */
+export type Debt$paymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Transaction
+   */
+  select?: Prisma.TransactionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Transaction
+   */
+  omit?: Prisma.TransactionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TransactionInclude<ExtArgs> | null
+  where?: Prisma.TransactionWhereInput
+  orderBy?: Prisma.TransactionOrderByWithRelationInput | Prisma.TransactionOrderByWithRelationInput[]
+  cursor?: Prisma.TransactionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TransactionScalarFieldEnum | Prisma.TransactionScalarFieldEnum[]
 }
 
 /**

@@ -16,6 +16,8 @@ export type DBTransactionWithCategory = {
   amount: DecimalLike | number | string;
   paymentStatus: DBPaymentStatus | string;
   additionalDescription: string | null;
+  debtId?: string | null;
+  debtInstallment?: number | null;
   isRecurringSuggestion?: boolean;
   category: {
     name: string;
@@ -29,6 +31,8 @@ export type DBTransactionInput = {
   paymentStatus: DBPaymentStatus;
   additionalDescription: string | null;
   categoryName: string;
+  debtId?: string | null;
+  debtInstallment?: number | null;
 };
 
 function decimalToNumber(value: DBTransactionWithCategory["amount"]) {
@@ -69,11 +73,16 @@ export function mapDBToUI(tx: DBTransactionWithCategory): Transaction {
     Importe: decimalToNumber(tx.amount),
     EstadoPago: mapPaymentStatusToUI(tx.paymentStatus),
     DescripcionAdicional: tx.additionalDescription ?? "",
+    EsPagoDeuda: Boolean(tx.debtId && tx.debtId.length > 0),
+    DeudaId: tx.debtId ?? undefined,
+    CuotaActual: tx.debtInstallment ?? undefined,
     EsSugerenciaRecurrente: Boolean(tx.isRecurringSuggestion),
   };
 }
 
 export function mapUIToDB(data: TransactionInput): DBTransactionInput {
+  const isDebtPayment = data.Tipo === "Gasto" && data.EsPagoDeuda;
+
   return {
     date: new Date(`${data.Fecha}T00:00:00.000Z`),
     type: mapTypeToDB(data.Tipo),
@@ -81,5 +90,7 @@ export function mapUIToDB(data: TransactionInput): DBTransactionInput {
     paymentStatus: mapPaymentStatusToDB(data.EstadoPago),
     additionalDescription: data.DescripcionAdicional?.trim() || null,
     categoryName: data.Categoría.trim(),
+    debtId: isDebtPayment ? data.DeudaId?.trim() || null : null,
+    debtInstallment: isDebtPayment ? data.CuotaActual ?? null : null,
   };
 }

@@ -8,6 +8,9 @@ export interface Transaction {
   Importe: number;
   EstadoPago: "Pagado" | "Pendiente";
   DescripcionAdicional: string;
+  EsPagoDeuda?: boolean;
+  DeudaId?: string;
+  CuotaActual?: number;
   EsSugerenciaRecurrente?: boolean;
 }
 
@@ -37,5 +40,6 @@ export interface Debt {
   monthlyPayment: number;
   paymentDay: number;
   type: DebtType;
+  openingDate: string;
   createdAt: string;
 }

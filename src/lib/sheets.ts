@@ -116,6 +116,7 @@ export async function readTransactions(): Promise<TransactionInput[]> {
       Importe: parseAmount(r[4]),
       EstadoPago: (r[5] ?? "Pendiente") as any, // "Pagado" | "Pendiente"
       DescripcionAdicional: String(r[6] ?? ""),
+      EsPagoDeuda: false,
     }))
     .filter((t) => t.ID); // evita filas s
 }

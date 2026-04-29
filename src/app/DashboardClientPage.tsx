@@ -7,6 +7,7 @@ import { ChartsPanel } from "@/components/ChartsPanel";
 import { TransactionsTable } from "@/components/TransactionsTable";
 import { FloatingAddButton } from "@/components/FloatingAddButton";
 import { AddTransactionModal } from "@/components/AddTransactionModal";
+import { BankImportModal } from "@/components/BankImportModal";
 import { useFinanceStore } from "@/store/financeStore";
 import type { Transaction } from "@/lib/types";
 
@@ -14,8 +15,12 @@ export default function DashboardClientPage() {
   const { transactions, fetchTransactions, loading, error } = useFinanceStore();
 
   const [open, setOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
   const [cloningTx, setCloningTx] = useState<Transaction | null>(null);
+  const [dashboardTransactions, setDashboardTransactions] = useState<
+    Transaction[] | null
+  >(null);
 
   const txs = useMemo(() => {
     return [...transactions].sort((a, b) =>
@@ -23,15 +28,35 @@ export default function DashboardClientPage() {
     );
   }, [transactions]);
 
+  const dashboardTxs = useMemo(() => {
+    const source = dashboardTransactions ?? transactions;
+    return [...source].sort((a, b) =>
+      String(b.Fecha).localeCompare(String(a.Fecha))
+    );
+  }, [dashboardTransactions, transactions]);
+
   useEffect(() => {
     fetchTransactions();
-
-    const id = setInterval(() => {
-      fetchTransactions();
-    }, 5000);
-
-    return () => clearInterval(id);
   }, [fetchTransactions]);
+
+  useEffect(() => {
+    setDashboardTransactions(transactions);
+  }, [transactions]);
+
+  useEffect(() => {
+    const fetchDashboardTransactions = async () => {
+      try {
+        const res = await fetch("/api/transactions", { cache: "no-store" });
+        const json = await res.json();
+        if (json.ok) setDashboardTransactions(json.data as Transaction[]);
+      } catch {
+        // Keep the last dashboard snapshot if the background refresh fails.
+      }
+    };
+
+    const id = setInterval(fetchDashboardTransactions, 60000);
+    return () => clearInterval(id);
+  }, []);
 
   const closeModal = () => {
     setOpen(false);
@@ -48,13 +73,21 @@ export default function DashboardClientPage() {
           </div>
         )}
 
-        <MetricCards txs={txs} />
-        <ChartsPanel txs={txs} />
+        <MetricCards txs={dashboardTxs} />
+        <ChartsPanel txs={dashboardTxs} />
+        {loading && (
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-white/60">Actualizando datos...</p>
+          </div>
+        )}
 
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-white/60">
-            {loading ? "Actualizando..." : "Listo"} • refresh cada 5s
-          </p>
+        <div className="flex justify-end">
+          <button
+            onClick={() => setImportOpen(true)}
+            className="rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/15 transition hover:bg-white/15"
+          >
+            Importar CSV bancario
+          </button>
         </div>
 
         <TransactionsTable
@@ -87,6 +120,11 @@ export default function DashboardClientPage() {
         editing={editingTx}
         cloning={cloningTx}
       />
+      <BankImportModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+      />
     </DashboardShell>
   );
 }
+

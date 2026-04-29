@@ -385,6 +385,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
+  BankCategoryRule: 'BankCategoryRule',
+  Bank: 'Bank',
   Category: 'Category',
   Transaction: 'Transaction',
   Budget: 'Budget',
@@ -407,7 +409,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "category" | "transaction" | "budget" | "savingsGoal" | "savingsMovement" | "readNotification" | "debt"
+    modelProps: "user" | "bankCategoryRule" | "bank" | "category" | "transaction" | "budget" | "savingsGoal" | "savingsMovement" | "readNotification" | "debt"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -482,6 +484,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UserCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UserCountAggregateOutputType> | number
+        }
+      }
+    }
+    BankCategoryRule: {
+      payload: Prisma.$BankCategoryRulePayload<ExtArgs>
+      fields: Prisma.BankCategoryRuleFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BankCategoryRuleFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankCategoryRulePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BankCategoryRuleFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankCategoryRulePayload>
+        }
+        findFirst: {
+          args: Prisma.BankCategoryRuleFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankCategoryRulePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BankCategoryRuleFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankCategoryRulePayload>
+        }
+        findMany: {
+          args: Prisma.BankCategoryRuleFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankCategoryRulePayload>[]
+        }
+        create: {
+          args: Prisma.BankCategoryRuleCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankCategoryRulePayload>
+        }
+        createMany: {
+          args: Prisma.BankCategoryRuleCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BankCategoryRuleCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankCategoryRulePayload>[]
+        }
+        delete: {
+          args: Prisma.BankCategoryRuleDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankCategoryRulePayload>
+        }
+        update: {
+          args: Prisma.BankCategoryRuleUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankCategoryRulePayload>
+        }
+        deleteMany: {
+          args: Prisma.BankCategoryRuleDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BankCategoryRuleUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BankCategoryRuleUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankCategoryRulePayload>[]
+        }
+        upsert: {
+          args: Prisma.BankCategoryRuleUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankCategoryRulePayload>
+        }
+        aggregate: {
+          args: Prisma.BankCategoryRuleAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBankCategoryRule>
+        }
+        groupBy: {
+          args: Prisma.BankCategoryRuleGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BankCategoryRuleGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BankCategoryRuleCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BankCategoryRuleCountAggregateOutputType> | number
+        }
+      }
+    }
+    Bank: {
+      payload: Prisma.$BankPayload<ExtArgs>
+      fields: Prisma.BankFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BankFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BankFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankPayload>
+        }
+        findFirst: {
+          args: Prisma.BankFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BankFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankPayload>
+        }
+        findMany: {
+          args: Prisma.BankFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankPayload>[]
+        }
+        create: {
+          args: Prisma.BankCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankPayload>
+        }
+        createMany: {
+          args: Prisma.BankCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BankCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankPayload>[]
+        }
+        delete: {
+          args: Prisma.BankDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankPayload>
+        }
+        update: {
+          args: Prisma.BankUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankPayload>
+        }
+        deleteMany: {
+          args: Prisma.BankDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BankUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BankUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankPayload>[]
+        }
+        upsert: {
+          args: Prisma.BankUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BankPayload>
+        }
+        aggregate: {
+          args: Prisma.BankAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBank>
+        }
+        groupBy: {
+          args: Prisma.BankGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BankGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BankCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BankCountAggregateOutputType> | number
         }
       }
     }
@@ -1055,6 +1205,31 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const BankCategoryRuleScalarFieldEnum = {
+  id: 'id',
+  pattern: 'pattern',
+  categoryName: 'categoryName',
+  transactionType: 'transactionType',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type BankCategoryRuleScalarFieldEnum = (typeof BankCategoryRuleScalarFieldEnum)[keyof typeof BankCategoryRuleScalarFieldEnum]
+
+
+export const BankScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type BankScalarFieldEnum = (typeof BankScalarFieldEnum)[keyof typeof BankScalarFieldEnum]
+
+
 export const CategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -1080,7 +1255,9 @@ export const TransactionScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId',
-  categoryId: 'categoryId'
+  categoryId: 'categoryId',
+  debtId: 'debtId',
+  debtInstallment: 'debtInstallment'
 } as const
 
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
@@ -1149,6 +1326,7 @@ export const DebtScalarFieldEnum = {
   monthlyPayment: 'monthlyPayment',
   paymentDay: 'paymentDay',
   type: 'type',
+  openingDate: 'openingDate',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId'
@@ -1430,6 +1608,8 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
+  bankCategoryRule?: Prisma.BankCategoryRuleOmit
+  bank?: Prisma.BankOmit
   category?: Prisma.CategoryOmit
   transaction?: Prisma.TransactionOmit
   budget?: Prisma.BudgetOmit
