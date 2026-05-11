@@ -47,18 +47,32 @@ function parseAmount(value: number | string | undefined) {
   const raw = String(value ?? "").trim();
   if (!raw) return 0;
 
-  const cleaned = raw.replace(/[^\d.,-]/g, "");
+  const readableDigits = raw
+    .replace(/[Nn]/g, "6")
+    .replace(/[Mm]/g, "5");
+  const cleaned = readableDigits.replace(/[^\d.,-]/g, "").replace(/-/g, "");
   const decimalMatch = cleaned.match(/(\d+)[,.](\d{2})$/);
   const normalized = decimalMatch
     ? cleaned.replace(/[,.](?=\d{3}(\D|$))/g, "").replace(",", ".")
-    : cleaned.replace(/[^\d-]/g, "");
+    : cleaned.replace(/[^\d]/g, "");
   const amount = Number(normalized);
   return Number.isFinite(amount) ? Math.abs(amount) : 0;
 }
 
 function parseSignedAmount(value: string) {
-  const sign = /-\s*[\dR]/i.test(value) || /RD\$\s*-/.test(value) ? -1 : 1;
+  const sign =
+    /-\s*[\dR$]/i.test(value) ||
+    /(?:RD)?\$\s*-/.test(value) ||
+    /-\s*$/.test(String(value ?? "").trim())
+      ? -1
+      : 1;
   return parseAmount(value) * sign;
+}
+
+function normalizeVisualDigits(value: string) {
+  return String(value ?? "")
+    .replace(/[Nn]/g, "6")
+    .replace(/[Mm]/g, "5");
 }
 
 function normalizeDate(value: string | undefined) {
@@ -113,6 +127,343 @@ function shouldIgnorePdfRow(description: string, category: string) {
     normalizeBankImportText(category) === "pago tarjeta" ||
     /^pago\s+via\s+app|^pago\s+via\s+cel/.test(text)
   );
+}
+
+function isFullDateLine(value: string) {
+  return /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(String(value ?? "").trim());
+}
+
+function isMoneyLine(value: string) {
+  return /^(?:RD)?\$\s*[\d,.]+-?$/i.test(String(value ?? "").trim());
+}
+
+function isLooseMoneyLine(value: string) {
+  return /^[\d.,NMnm]+$/.test(String(value ?? "").trim());
+}
+
+function isBanreservasDateLine(value: string) {
+  return /^[\dNMnm]{1,2}\/[A-Za-zÁÉÍÓÚáéíóúÑñ.]+$/.test(
+    String(value ?? "").trim()
+  );
+}
+
+function normalizeBanreservasMonth(value: string) {
+  const monthName = normalizeBankImportText(String(value ?? "").replace(/\./g, ""));
+
+  if (SPANISH_MONTHS.has(monthName)) return monthName;
+
+  const commonOcrAliases: Record<string, string> = {
+    bar: "mar",
+    barzo: "marzo",
+    bayo: "mayo",
+    bay: "may",
+  };
+
+  if (commonOcrAliases[monthName]) return commonOcrAliases[monthName];
+
+  if (monthName.startsWith("b")) {
+    const monthWithM = `m${monthName.slice(1)}`;
+    if (SPANISH_MONTHS.has(monthWithM)) return monthWithM;
+  }
+
+  return monthName;
+}
+
+function parseBanreservasDate(value: string, statementYear: number) {
+  const match = String(value ?? "").trim().match(/^([\dNMnm]{1,2})\/(.+)$/);
+  if (!match) return "";
+
+  const day = Number(normalizeVisualDigits(match[1]));
+  const monthName = normalizeBanreservasMonth(match[2]);
+  const month = SPANISH_MONTHS.get(monthName);
+
+  if (!day || !month) return "";
+
+  return `${statementYear}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
+function inferBanreservasStatementYear(text: string) {
+  const readableText = normalizeVisualDigits(text);
+  const preferredMatch =
+    readableText.match(/Fecha\s*A?de\s*A?Corte[\s\S]{0,120}?(20\d{2})/i) ??
+    readableText.match(/Fecha[\s\S]{0,30}Corte[\s\S]{0,120}?(20\d{2})/i) ??
+    readableText.match(/Fecha[\s\S]{0,30}pago[\s\S]{0,120}?(20\d{2})/i);
+
+  if (preferredMatch) return Number(preferredMatch[1]);
+
+  const currentYear = new Date().getFullYear();
+  const validYears = Array.from(readableText.matchAll(/20\d{2}/g))
+    .map((match) => Number(match[0]))
+    .filter((year) => year >= currentYear - 2 && year <= currentYear + 2);
+
+  return validYears[0] ?? currentYear;
+}
+
+function cleanBanreservasDescription(value: string) {
+  return cleanPdfText(value)
+    .replace(/A/g, " ")
+    .replace(/b/g, "M")
+    .replace(/c/g, "N")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isCloseAmount(a: number, b: number) {
+  return Math.abs(a - b) < 0.02;
+}
+
+function inferTypeFromDescription(description: string): "Ingreso" | "Gasto" {
+  const text = normalizeBankImportText(description);
+
+  if (
+    /credito|deposito|recibida|nomina|intereses|t24\s+cred|reverso|transferencia\s+recibida/.test(text)
+  ) {
+    return "Ingreso";
+  }
+
+  return "Gasto";
+}
+
+function inferTypeFromBalance({
+  amount,
+  balance,
+  nextOlderBalance,
+  description,
+}: {
+  amount: number;
+  balance: number;
+  nextOlderBalance?: number;
+  description: string;
+}): "Ingreso" | "Gasto" {
+  if (typeof nextOlderBalance === "number") {
+    if (isCloseAmount(balance - nextOlderBalance, amount)) return "Ingreso";
+    if (isCloseAmount(nextOlderBalance - balance, amount)) return "Gasto";
+  }
+
+  return inferTypeFromDescription(description);
+}
+
+function parseAccountStatementRows(text: string, sourceBank: string) {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const rows: ParsedBankTransaction[] = [];
+
+  for (let index = 0; index < lines.length - 4; index += 1) {
+    if (!isFullDateLine(lines[index])) continue;
+    if (!isFullDateLine(lines[index + 1])) continue;
+
+    const amountOffset = lines
+      .slice(index + 2, index + 14)
+      .findIndex((line) => isMoneyLine(line));
+
+    if (amountOffset < 1) continue;
+
+    const amountIndex = index + 2 + amountOffset;
+    const balanceIndex = amountIndex + 1;
+
+    if (!isMoneyLine(lines[balanceIndex] ?? "")) continue;
+
+    const detailLines = lines.slice(index + 2, amountIndex);
+    const reference =
+      /^\d{6,}$/.test(detailLines[0] ?? "") ? detailLines[0] : "";
+    const description = cleanPdfText(
+      (reference ? detailLines.slice(1) : detailLines).join(" ")
+    );
+    const signedAmount = parseSignedAmount(lines[amountIndex]);
+    const amount = Math.abs(signedAmount);
+
+    if (!description || amount <= 0) {
+      index = balanceIndex;
+      continue;
+    }
+
+    const inferred = inferBankTransactionCategory(description, "", amount);
+    if (shouldIgnorePdfRow(description, inferred.category)) {
+      index = balanceIndex;
+      continue;
+    }
+
+    const type = signedAmount < 0 ? "Gasto" : "Ingreso";
+    const category =
+      type === inferred.type
+        ? inferred.category
+        : type === "Ingreso"
+          ? "Reembolsos"
+          : inferred.category;
+
+    rows.push({
+      Fecha: normalizeDate(lines[index]),
+      Tipo: type,
+      "Categoría": category,
+      Importe: amount,
+      EstadoPago: "Pagado",
+      DescripcionAdicional: reference
+        ? `${description} | Ref ${reference}`
+        : description,
+      EsPagoDeuda: false,
+      sourceBank,
+      sourceReference: reference,
+      sourceRawDescription: description,
+    });
+
+    index = balanceIndex;
+  }
+
+  return rows;
+}
+
+function parseBhdSavingsRows(text: string, sourceBank: string) {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const rawRows: Array<{
+    date: string;
+    reference: string;
+    description: string;
+    amount: number;
+    balance: number;
+  }> = [];
+
+  for (let index = 0; index < lines.length - 4; index += 1) {
+    if (!isFullDateLine(lines[index])) continue;
+    if (!/^\d{4,}$/.test(lines[index + 1] ?? "")) continue;
+
+    const amountOffset = lines
+      .slice(index + 2, index + 12)
+      .findIndex((line) => isMoneyLine(line));
+    if (amountOffset < 1) continue;
+
+    const amountIndex = index + 2 + amountOffset;
+    const balanceIndex = amountIndex + 1;
+    if (!isMoneyLine(lines[balanceIndex] ?? "")) continue;
+
+    const description = cleanPdfText(lines.slice(index + 2, amountIndex).join(" "));
+    const amount = parseAmount(lines[amountIndex]);
+    const balance = parseAmount(lines[balanceIndex]);
+
+    if (!description || amount <= 0) {
+      index = balanceIndex;
+      continue;
+    }
+
+    rawRows.push({
+      date: lines[index],
+      reference: lines[index + 1],
+      description,
+      amount,
+      balance,
+    });
+
+    index = balanceIndex;
+  }
+
+  return rawRows
+    .map((row, index): ParsedBankTransaction | null => {
+      const type = inferTypeFromBalance({
+        amount: row.amount,
+        balance: row.balance,
+        nextOlderBalance: rawRows[index + 1]?.balance,
+        description: row.description,
+      });
+      const inferred = inferBankTransactionCategory(row.description, "", row.amount);
+
+      if (shouldIgnorePdfRow(row.description, inferred.category)) return null;
+
+      const category =
+        type === inferred.type
+          ? inferred.category
+          : type === "Ingreso"
+            ? "Reembolsos"
+            : inferred.category;
+
+      return {
+        Fecha: normalizeDate(row.date),
+        Tipo: type,
+        "Categoría": category,
+        Importe: row.amount,
+        EstadoPago: "Pagado",
+        DescripcionAdicional: `${row.description} | Ref ${row.reference}`,
+        EsPagoDeuda: false,
+        sourceBank,
+        sourceReference: row.reference,
+        sourceRawDescription: row.description,
+      };
+    })
+    .filter((row): row is ParsedBankTransaction => Boolean(row));
+}
+
+function parseBanreservasCreditCardRows(text: string, sourceBank: string) {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const rows: ParsedBankTransaction[] = [];
+  const statementYear = inferBanreservasStatementYear(text);
+
+  for (let index = 0; index < lines.length - 5; index += 1) {
+    const card = lines[index];
+    if (!/^\d{4}$/.test(card)) continue;
+    if (!isBanreservasDateLine(lines[index + 1])) continue;
+    const hasProcessDate = isBanreservasDateLine(lines[index + 2]);
+    const detailStartIndex = index + (hasProcessDate ? 3 : 2);
+
+    const amountOffset = lines
+      .slice(detailStartIndex, index + 12)
+      .findIndex((line) => isLooseMoneyLine(line));
+    if (amountOffset < 1) continue;
+
+    const debitIndex = detailStartIndex + amountOffset;
+    const creditIndex = debitIndex + 1;
+    if (!isLooseMoneyLine(lines[creditIndex] ?? "")) continue;
+
+    const description = cleanBanreservasDescription(
+      lines.slice(detailStartIndex, debitIndex).join(" ")
+    );
+    const debit = parseAmount(lines[debitIndex]);
+    const credit = parseAmount(lines[creditIndex]);
+    const amount = debit > 0 ? debit : credit;
+    const date = parseBanreservasDate(lines[index + 1], statementYear);
+
+    if (!date || !description || amount <= 0) {
+      index = creditIndex;
+      continue;
+    }
+
+    const type = debit > 0 ? "Gasto" : "Ingreso";
+    const inferred = inferBankTransactionCategory(description, "", amount);
+
+    if (type === "Gasto" && shouldIgnorePdfRow(description, inferred.category)) {
+      index = creditIndex;
+      continue;
+    }
+
+    const category =
+      type === inferred.type
+        ? inferred.category
+        : type === "Ingreso"
+          ? "Reembolsos"
+          : inferred.category;
+
+    rows.push({
+      Fecha: date,
+      Tipo: type,
+      "Categoría": category,
+      Importe: amount,
+      EstadoPago: "Pagado",
+      DescripcionAdicional: `${description} | Tarjeta ${card}`,
+      EsPagoDeuda: false,
+      sourceBank,
+      sourceReference: `${card}-${lines[index + 1]}-${hasProcessDate ? lines[index + 2] : ""}`,
+      sourceRawDescription: description,
+    });
+
+    index = creditIndex;
+  }
+
+  return rows;
 }
 
 function parseTextRows(text: string, sourceBank: string) {
@@ -291,6 +642,15 @@ async function extractRowsWithOpenAI(images: Buffer[], sourceBank: string) {
 
 export async function parseBankTransactionsPDF(buffer: Buffer, sourceBank = "PDF bancario") {
   const text = extractTextFromPdf(buffer);
+  const banreservasCreditCardRows = parseBanreservasCreditCardRows(text, sourceBank);
+  if (banreservasCreditCardRows.length > 0) return banreservasCreditCardRows;
+
+  const bhdSavingsRows = parseBhdSavingsRows(text, sourceBank);
+  if (bhdSavingsRows.length > 0) return bhdSavingsRows;
+
+  const accountRows = parseAccountStatementRows(text, sourceBank);
+  if (accountRows.length > 0) return accountRows;
+
   const textRows = parseTextRows(text, sourceBank);
   if (textRows.length > 0) return textRows;
 

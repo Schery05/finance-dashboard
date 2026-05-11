@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 import { AccessibilityPanel } from "@/components/AccessibilityPanel";
 import { BanksMaintenancePanel } from "@/components/BanksMaintenancePanel";
 import { BudgetsMaintenancePanel } from "@/components/BudgetsMaintenancePanel";
@@ -13,12 +14,16 @@ import { FinancialScorePanel } from "@/components/FinancialScorePanel";
 import { SavingsGoalsPanel } from "@/components/SavingsGoalsPanel";
 import { Sidebar } from "@/components/Sidebar";
 import { NotificationBell } from "@/components/NotificationBell";
-import { getDebtNotifications, getPaymentNotifications } from "@/lib/notifications";
-import type { Debt } from "@/lib/types";
+import type { Budget } from "@/lib/budgets";
+import {
+  getBudgetNotifications,
+  getPaymentNotifications,
+} from "@/lib/notifications";
 import { useFinanceStore } from "@/store/financeStore";
 import { UserMenu } from "@/components/UserMenu";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
+  const { data: session } = useSession();
   const [activeModule, setActiveModule] = useState<
     | "finanzas"
     | "calendar"
@@ -45,26 +50,33 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const isBudgetsModule = activeModule === "presupuesto";
   const isMaintenanceModule = activeModule === "mantenimiento";
   const { transactions } = useFinanceStore();
-  const [debtsForNotifications, setDebtsForNotifications] = useState<Debt[]>([]);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
   const notifications = [
     ...getPaymentNotifications(transactions),
-    ...getDebtNotifications({
-      debts: debtsForNotifications,
-      transactions,
-    }),
+    ...getBudgetNotifications({ budgets, transactions }),
   ];
+  const userName = session?.user?.name?.trim() || "Usuario";
+  const firstName = userName.split(/\s+/)[0] || userName;
 
-  React.useEffect(() => {
+  useEffect(() => {
     let mounted = true;
-    fetch("/api/debts", { cache: "no-store" })
-      .then((res) => res.json())
-      .then((json) => {
-        if (mounted && json.ok) setDebtsForNotifications(json.data as Debt[]);
-      })
-      .catch(() => undefined);
+
+    const fetchBudgets = async () => {
+      try {
+        const res = await fetch("/api/budgets", { cache: "no-store" });
+        const json = await res.json();
+        if (mounted && json.ok) setBudgets(json.data as Budget[]);
+      } catch {
+        if (mounted) setBudgets([]);
+      }
+    };
+
+    fetchBudgets();
+    const id = window.setInterval(fetchBudgets, 60000);
 
     return () => {
       mounted = false;
+      window.clearInterval(id);
     };
   }, []);
 
@@ -87,7 +99,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       />
 
 
-          <main className="relative mx-auto w-full max-w-7xl px-4 py-8 md:px-8">
+          <main className="relative mx-auto w-full max-w-[92rem] px-4 py-8 md:px-8">
            
           <motion.header
           initial={{ opacity: 0, y: 14 }}
@@ -113,7 +125,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 ? "Presupuesto"
                 : isMaintenanceModule
                 ? "Mantenimiento"
-                : "Centro de Control Financiero"}
+                : `Hola, ${firstName}`}
             </h1>
 
             <p className="max-w-2xl text-sm md:text-base leading-7 text-slate-300">

@@ -1,9 +1,8 @@
 "use client";
 
 import {
-  ChevronDown,
-  ChevronUp,
   Edit3,
+  History,
   Plus,
   Search,
   Trash2,
@@ -79,6 +78,14 @@ function monthKey(dateStr: string) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
+function previousPeriod(period: string) {
+  const [year, month] = period.split("-").map(Number);
+  if (!year || !month) return "";
+
+  const date = new Date(year, month - 2, 1);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
 function normalizeKey(value: string) {
   return String(value ?? "")
     .trim()
@@ -116,6 +123,9 @@ export function BudgetsMaintenancePanel() {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [periodFilter, setPeriodFilter] = useState(currentPeriod());
   const [search, setSearch] = useState("");
+  const [historyCategoryFilter, setHistoryCategoryFilter] = useState("Todas");
+  const [currentSearch, setCurrentSearch] = useState("");
+  const [currentCategoryFilter, setCurrentCategoryFilter] = useState("Todas");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Budget | null>(null);
   const [loading, setLoading] = useState(false);
@@ -179,20 +189,64 @@ export function BudgetsMaintenancePanel() {
       .sort((a, b) => a.category.localeCompare(b.category));
   }, [budgets, period]);
 
+  const currentCategoryFilterOptions = useMemo(() => {
+    return [
+      { value: "Todas", label: "Todas las categorias" },
+      ...currentBudgets.map((budget) => ({
+        value: budget.category,
+        label: budget.category,
+      })),
+    ];
+  }, [currentBudgets]);
+
+  const filteredCurrentBudgets = useMemo(() => {
+    const query = currentSearch.trim().toLowerCase();
+    const selectedCategory = normalizeKey(currentCategoryFilter);
+
+    return currentBudgets.filter((budget) => {
+      const matchesSearch =
+        !query ||
+        budget.category.toLowerCase().includes(query) ||
+        budget.period.toLowerCase().includes(query);
+      const matchesCategory =
+        currentCategoryFilter === "Todas" ||
+        normalizeKey(budget.category) === selectedCategory;
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [currentBudgets, currentSearch, currentCategoryFilter]);
+
   const historicalBudgets = useMemo(() => {
     const query = search.trim().toLowerCase();
+    const selectedCategory = normalizeKey(historyCategoryFilter);
 
     return budgets
       .filter((budget) => budget.period === periodFilter)
       .filter((budget) => {
-        if (!query) return true;
-        return (
+        const matchesSearch =
+          !query ||
           budget.category.toLowerCase().includes(query) ||
-          budget.period.toLowerCase().includes(query)
-        );
+          budget.period.toLowerCase().includes(query);
+        const matchesCategory =
+          historyCategoryFilter === "Todas" ||
+          normalizeKey(budget.category) === selectedCategory;
+
+        return matchesSearch && matchesCategory;
       })
       .sort((a, b) => a.category.localeCompare(b.category));
-  }, [budgets, periodFilter, search]);
+  }, [budgets, periodFilter, search, historyCategoryFilter]);
+
+  const historyCategoryOptions = useMemo(() => {
+    const periodCategories = budgets
+      .filter((budget) => budget.period === periodFilter)
+      .map((budget) => budget.category)
+      .sort((a, b) => a.localeCompare(b));
+
+    return [
+      { value: "Todas", label: "Todas las categorias" },
+      ...periodCategories.map((item) => ({ value: item, label: item })),
+    ];
+  }, [budgets, periodFilter]);
 
   const currentSpentByCategory = useMemo(() => {
     const totals = new Map<string, number>();
@@ -221,6 +275,87 @@ export function BudgetsMaintenancePanel() {
 
     return totals;
   }, [transactions, periodFilter]);
+
+  const previousSpentByCategory = useMemo(() => {
+    const previous = previousPeriod(period);
+    const totals = new Map<string, number>();
+
+    for (const tx of transactions) {
+      if (!isExpense(tx)) continue;
+      if (monthKey(tx.Fecha) !== previous) continue;
+
+      const categoryKey = normalizeKey(tx.Categoría);
+      totals.set(categoryKey, (totals.get(categoryKey) ?? 0) + (Number(tx.Importe) || 0));
+    }
+
+    return totals;
+  }, [transactions, period]);
+
+  const budgetSummary = useMemo(() => {
+    const previous = previousPeriod(period);
+    const previousBudgets = budgets.filter((budget) => budget.period === previous);
+    const totalLimit = currentBudgets.reduce(
+      (sum, budget) => sum + (Number(budget.monthlyLimit) || 0),
+      0
+    );
+    const previousLimit = previousBudgets.reduce(
+      (sum, budget) => sum + (Number(budget.monthlyLimit) || 0),
+      0
+    );
+    const budgetCategories = new Set(
+      currentBudgets.map((budget) => normalizeKey(budget.category))
+    );
+    const totalSpent = currentBudgets.reduce(
+      (sum, budget) =>
+        sum + (currentSpentByCategory.get(normalizeKey(budget.category)) ?? 0),
+      0
+    );
+    const previousSpent = previousBudgets.reduce(
+      (sum, budget) =>
+        sum + (previousSpentByCategory.get(normalizeKey(budget.category)) ?? 0),
+      0
+    );
+    const atRiskCount = currentBudgets.filter((budget) => {
+      const spent = currentSpentByCategory.get(normalizeKey(budget.category)) ?? 0;
+      const percent =
+        budget.monthlyLimit > 0 ? (spent / budget.monthlyLimit) * 100 : 0;
+      return percent > 80;
+    }).length;
+
+    return {
+      totalLimit,
+      previousLimit,
+      totalSpent,
+      previousSpent,
+      atRiskCount,
+      activeCount: budgetCategories.size,
+      usedPercent: totalLimit > 0 ? (totalSpent / totalLimit) * 100 : 0,
+    };
+  }, [
+    budgets,
+    currentBudgets,
+    currentSpentByCategory,
+    period,
+    previousSpentByCategory,
+  ]);
+
+  const percentChange = (current: number, previous: number) => {
+    if (previous <= 0) return null;
+    return ((current - previous) / previous) * 100;
+  };
+
+  const renderSummaryDelta = (current: number, previous: number) => {
+    const delta = percentChange(current, previous);
+    if (delta === null) return "Sin periodo anterior";
+
+    const isPositive = delta >= 0;
+    return (
+      <span className={isPositive ? "text-emerald-300" : "text-rose-300"}>
+        {isPositive ? "+" : ""}
+        {delta.toFixed(1)}% vs mes anterior
+      </span>
+    );
+  };
 
   const resetForm = () => {
     setCategory("");
@@ -403,15 +538,25 @@ export function BudgetsMaintenancePanel() {
   return (
     <section className="space-y-4">
       <div className="glass p-5">
-        <div className="mb-5 flex items-start justify-between gap-3">
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold">Presupuesto</h2>
             <p className="mt-1 text-sm text-white/60">
               Define limites mensuales por categoria para {period}.
             </p>
           </div>
-          <div className="rounded-2xl bg-emerald-400/10 p-3 text-emerald-300 ring-1 ring-emerald-300/20">
-            <WalletCards className="h-5 w-5" />
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setHistoryOpen(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/15 transition hover:bg-white/15"
+            >
+              <History className="h-4 w-4" />
+              Ver historico
+            </button>
+            <div className="rounded-2xl bg-emerald-400/10 p-3 text-emerald-300 ring-1 ring-emerald-300/20">
+              <WalletCards className="h-5 w-5" />
+            </div>
           </div>
         </div>
 
@@ -477,13 +622,94 @@ export function BudgetsMaintenancePanel() {
         </div>
       </div>
 
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="glass p-5">
+          <p className="text-xs font-medium uppercase tracking-wide text-white/45">
+            Limite mensual total
+          </p>
+          <p className="mt-3 text-2xl font-semibold">
+            {money(budgetSummary.totalLimit)}
+          </p>
+          <p className="mt-2 text-sm text-white/55">
+            En {budgetSummary.activeCount} categoria(s) activas
+          </p>
+          <p className="mt-1 text-xs font-semibold">
+            {renderSummaryDelta(
+              budgetSummary.totalLimit,
+              budgetSummary.previousLimit
+            )}
+          </p>
+        </div>
+
+        <div className="glass p-5">
+          <p className="text-xs font-medium uppercase tracking-wide text-white/45">
+            Total gastado
+          </p>
+          <p className="mt-3 text-2xl font-semibold">
+            {money(budgetSummary.totalSpent)}
+          </p>
+          <p className="mt-2 text-sm text-white/55">
+            {budgetSummary.usedPercent.toFixed(0)}% del limite total usado
+          </p>
+          <p className="mt-1 text-xs font-semibold">
+            {renderSummaryDelta(
+              budgetSummary.totalSpent,
+              budgetSummary.previousSpent
+            )}
+          </p>
+        </div>
+
+        <div className="glass p-5">
+          <p className="text-xs font-medium uppercase tracking-wide text-white/45">
+            Presupuesto en riesgo
+          </p>
+          <p className="mt-3 text-2xl font-semibold">
+            {budgetSummary.atRiskCount} categoria(s)
+          </p>
+          <p className="mt-2 text-sm text-white/55">
+            Sobre 80% de consumo del limite
+          </p>
+          <p className="mt-1 text-xs font-semibold text-amber-200">
+            Revisa estas categorias
+          </p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <div className="xl:col-span-2">
-          <div className="mb-1 flex items-center justify-between gap-3">
+          <div className="mb-3 flex items-center justify-between gap-3">
             <div>
               <h3 className="text-base font-semibold">Periodo actual</h3>
               <p className="mt-1 text-sm text-white/55">{period}</p>
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 rounded-2xl bg-white/[0.03] p-3 ring-1 ring-white/10 md:grid-cols-[1fr_260px] md:items-end">
+            <label className="text-sm text-white/70">
+              Buscar presupuesto
+              <div className="relative mt-1">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/45" />
+                <input
+                  value={currentSearch}
+                  onChange={(event) => setCurrentSearch(event.target.value)}
+                  placeholder="Buscar por categoria dentro del periodo"
+                  className="w-full rounded-xl bg-white/10 py-2 pl-9 pr-3 text-sm text-white outline-none ring-1 ring-white/15 placeholder:text-white/45 focus:ring-2 focus:ring-emerald-300/60"
+                />
+              </div>
+            </label>
+
+            <label className="text-sm text-white/70">
+              Filtrar categoria
+              <div className="mt-1">
+                <CustomSelect
+                  value={currentCategoryFilter}
+                  onChange={setCurrentCategoryFilter}
+                  options={currentCategoryFilterOptions}
+                  searchable
+                  searchPlaceholder="Buscar categoria"
+                />
+              </div>
+            </label>
           </div>
         </div>
 
@@ -495,73 +721,14 @@ export function BudgetsMaintenancePanel() {
           <div className="glass p-6 text-center text-sm text-white/55 xl:col-span-2">
             Aun no hay presupuesto para el periodo actual.
           </div>
+        ) : filteredCurrentBudgets.length === 0 ? (
+          <div className="glass p-6 text-center text-sm text-white/55 xl:col-span-2">
+            No hay presupuesto con la busqueda o categoria seleccionada.
+          </div>
         ) : (
-          currentBudgets.map((budget) =>
+          filteredCurrentBudgets.map((budget) =>
             renderBudgetCard(budget, currentSpentByCategory)
           )
-        )}
-      </div>
-
-      <div className="glass p-5">
-        <button
-          onClick={() => setHistoryOpen((value) => !value)}
-          className="flex w-full items-center justify-between gap-3 text-left"
-        >
-          <div>
-            <h3 className="text-base font-semibold">Consultar otro periodo</h3>
-            <p className="mt-1 text-sm text-white/55">
-              Revisa presupuesto de meses anteriores o periodos distintos.
-            </p>
-          </div>
-          <span className="rounded-xl bg-white/5 p-2 text-white/70 ring-1 ring-white/10">
-            {historyOpen ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </span>
-        </button>
-
-        {historyOpen && (
-          <div className="mt-5 space-y-4">
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-[180px_1fr] md:items-end">
-              <label className="text-sm text-white/70">
-                Periodo
-                <div className="mt-1">
-                <CustomSelect
-                  value={periodFilter}
-                  onChange={setPeriodFilter}
-                  options={availablePeriodOptions}
-                />
-                </div>
-              </label>
-
-              <label className="text-sm text-white/70">
-                Buscar
-                <div className="relative mt-1">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/45" />
-                  <input
-                    value={search}
-                    onChange={(event) => setSearch(event.target.value)}
-                    placeholder="Buscar por categoria"
-                    className="w-full rounded-xl bg-white/10 py-2 pl-9 pr-3 text-sm text-white outline-none ring-1 ring-white/15 placeholder:text-white/45 focus:ring-2 focus:ring-emerald-300/60"
-                  />
-                </div>
-              </label>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-              {historicalBudgets.length === 0 ? (
-                <div className="rounded-2xl bg-white/5 p-6 text-center text-sm text-white/55 ring-1 ring-white/10 xl:col-span-2">
-                  No hay presupuesto para la consulta seleccionada.
-                </div>
-              ) : (
-                historicalBudgets.map((budget) =>
-                  renderBudgetCard(budget, historicalSpentByCategory)
-                )
-              )}
-            </div>
-          </div>
         )}
       </div>
 
@@ -599,6 +766,85 @@ export function BudgetsMaintenancePanel() {
               >
                 {saving ? "Eliminando..." : "Si"}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {historyOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-6 backdrop-blur-sm">
+          <div className="glass max-h-[88vh] w-full max-w-5xl overflow-hidden p-0">
+            <div className="flex items-start justify-between gap-3 border-b border-white/10 p-5">
+              <div>
+                <h3 className="text-lg font-semibold">Historico de presupuesto</h3>
+                <p className="mt-1 text-sm text-white/55">
+                  Consulta presupuestos anteriores por periodo y categoria.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setHistoryOpen(false)}
+                className="rounded-xl bg-white/5 p-2 text-white/70 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white"
+                aria-label="Cerrar historico"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="max-h-[calc(88vh-96px)] overflow-y-auto p-5">
+              <div className="grid grid-cols-1 gap-3 lg:grid-cols-[180px_240px_1fr] lg:items-end">
+                <label className="text-sm text-white/70">
+                  Periodo
+                  <div className="mt-1">
+                    <CustomSelect
+                      value={periodFilter}
+                      onChange={(value) => {
+                        setPeriodFilter(value);
+                        setHistoryCategoryFilter("Todas");
+                      }}
+                      options={availablePeriodOptions}
+                    />
+                  </div>
+                </label>
+
+                <label className="text-sm text-white/70">
+                  Categoria
+                  <div className="mt-1">
+                    <CustomSelect
+                      value={historyCategoryFilter}
+                      onChange={setHistoryCategoryFilter}
+                      options={historyCategoryOptions}
+                      searchable
+                      searchPlaceholder="Buscar categoria"
+                    />
+                  </div>
+                </label>
+
+                <label className="text-sm text-white/70">
+                  Buscar
+                  <div className="relative mt-1">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/45" />
+                    <input
+                      value={search}
+                      onChange={(event) => setSearch(event.target.value)}
+                      placeholder="Buscar por categoria o periodo"
+                      className="w-full rounded-xl bg-white/10 py-2 pl-9 pr-3 text-sm text-white outline-none ring-1 ring-white/15 placeholder:text-white/45 focus:ring-2 focus:ring-emerald-300/60"
+                    />
+                  </div>
+                </label>
+              </div>
+
+              <div className="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-2">
+                {historicalBudgets.length === 0 ? (
+                  <div className="rounded-2xl bg-white/5 p-6 text-center text-sm text-white/55 ring-1 ring-white/10 xl:col-span-2">
+                    No hay presupuesto para la consulta seleccionada.
+                  </div>
+                ) : (
+                  historicalBudgets.map((budget) =>
+                    renderBudgetCard(budget, historicalSpentByCategory)
+                  )
+                )}
+              </div>
             </div>
           </div>
         </div>

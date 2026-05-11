@@ -17,6 +17,10 @@ export type DBDebt = {
   type: Debt["type"] | string;
   openingDate?: Date | null;
   createdAt: Date;
+  installmentStatuses?: Array<{
+    installment: number;
+    status: string;
+  }>;
 };
 
 function decimalToNumber(value: DecimalLike | number | string) {
@@ -40,6 +44,10 @@ export function mapDebtDBToUI(debt: DBDebt): Debt {
     type: debt.type as Debt["type"],
     openingDate: openingDate.toISOString(),
     createdAt: debt.createdAt.toISOString(),
+    installmentStatuses: debt.installmentStatuses?.map((item) => ({
+      installment: item.installment,
+      status: item.status === "PAGADO" ? "Pagado" : "Pendiente",
+    })),
   };
 }
 

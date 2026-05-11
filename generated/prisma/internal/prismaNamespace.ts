@@ -385,6 +385,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
+  PasswordResetToken: 'PasswordResetToken',
   BankCategoryRule: 'BankCategoryRule',
   Bank: 'Bank',
   Category: 'Category',
@@ -393,7 +394,8 @@ export const ModelName = {
   SavingsGoal: 'SavingsGoal',
   SavingsMovement: 'SavingsMovement',
   ReadNotification: 'ReadNotification',
-  Debt: 'Debt'
+  Debt: 'Debt',
+  DebtInstallmentStatus: 'DebtInstallmentStatus'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -409,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "bankCategoryRule" | "bank" | "category" | "transaction" | "budget" | "savingsGoal" | "savingsMovement" | "readNotification" | "debt"
+    modelProps: "user" | "passwordResetToken" | "bankCategoryRule" | "bank" | "category" | "transaction" | "budget" | "savingsGoal" | "savingsMovement" | "readNotification" | "debt" | "debtInstallmentStatus"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -484,6 +486,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UserCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UserCountAggregateOutputType> | number
+        }
+      }
+    }
+    PasswordResetToken: {
+      payload: Prisma.$PasswordResetTokenPayload<ExtArgs>
+      fields: Prisma.PasswordResetTokenFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PasswordResetTokenFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PasswordResetTokenFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>
+        }
+        findFirst: {
+          args: Prisma.PasswordResetTokenFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PasswordResetTokenFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>
+        }
+        findMany: {
+          args: Prisma.PasswordResetTokenFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>[]
+        }
+        create: {
+          args: Prisma.PasswordResetTokenCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>
+        }
+        createMany: {
+          args: Prisma.PasswordResetTokenCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PasswordResetTokenCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>[]
+        }
+        delete: {
+          args: Prisma.PasswordResetTokenDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>
+        }
+        update: {
+          args: Prisma.PasswordResetTokenUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>
+        }
+        deleteMany: {
+          args: Prisma.PasswordResetTokenDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PasswordResetTokenUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PasswordResetTokenUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>[]
+        }
+        upsert: {
+          args: Prisma.PasswordResetTokenUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetTokenPayload>
+        }
+        aggregate: {
+          args: Prisma.PasswordResetTokenAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePasswordResetToken>
+        }
+        groupBy: {
+          args: Prisma.PasswordResetTokenGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PasswordResetTokenGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PasswordResetTokenCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PasswordResetTokenCountAggregateOutputType> | number
         }
       }
     }
@@ -1153,6 +1229,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DebtInstallmentStatus: {
+      payload: Prisma.$DebtInstallmentStatusPayload<ExtArgs>
+      fields: Prisma.DebtInstallmentStatusFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DebtInstallmentStatusFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebtInstallmentStatusPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DebtInstallmentStatusFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebtInstallmentStatusPayload>
+        }
+        findFirst: {
+          args: Prisma.DebtInstallmentStatusFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebtInstallmentStatusPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DebtInstallmentStatusFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebtInstallmentStatusPayload>
+        }
+        findMany: {
+          args: Prisma.DebtInstallmentStatusFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebtInstallmentStatusPayload>[]
+        }
+        create: {
+          args: Prisma.DebtInstallmentStatusCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebtInstallmentStatusPayload>
+        }
+        createMany: {
+          args: Prisma.DebtInstallmentStatusCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DebtInstallmentStatusCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebtInstallmentStatusPayload>[]
+        }
+        delete: {
+          args: Prisma.DebtInstallmentStatusDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebtInstallmentStatusPayload>
+        }
+        update: {
+          args: Prisma.DebtInstallmentStatusUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebtInstallmentStatusPayload>
+        }
+        deleteMany: {
+          args: Prisma.DebtInstallmentStatusDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DebtInstallmentStatusUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DebtInstallmentStatusUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebtInstallmentStatusPayload>[]
+        }
+        upsert: {
+          args: Prisma.DebtInstallmentStatusUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DebtInstallmentStatusPayload>
+        }
+        aggregate: {
+          args: Prisma.DebtInstallmentStatusAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDebtInstallmentStatus>
+        }
+        groupBy: {
+          args: Prisma.DebtInstallmentStatusGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DebtInstallmentStatusGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DebtInstallmentStatusCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DebtInstallmentStatusCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1203,6 +1353,18 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt',
+  userId: 'userId'
+} as const
+
+export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
 
 
 export const BankCategoryRuleScalarFieldEnum = {
@@ -1333,6 +1495,19 @@ export const DebtScalarFieldEnum = {
 } as const
 
 export type DebtScalarFieldEnum = (typeof DebtScalarFieldEnum)[keyof typeof DebtScalarFieldEnum]
+
+
+export const DebtInstallmentStatusScalarFieldEnum = {
+  id: 'id',
+  installment: 'installment',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId',
+  debtId: 'debtId'
+} as const
+
+export type DebtInstallmentStatusScalarFieldEnum = (typeof DebtInstallmentStatusScalarFieldEnum)[keyof typeof DebtInstallmentStatusScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1608,6 +1783,7 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
+  passwordResetToken?: Prisma.PasswordResetTokenOmit
   bankCategoryRule?: Prisma.BankCategoryRuleOmit
   bank?: Prisma.BankOmit
   category?: Prisma.CategoryOmit
@@ -1617,6 +1793,7 @@ export type GlobalOmitConfig = {
   savingsMovement?: Prisma.SavingsMovementOmit
   readNotification?: Prisma.ReadNotificationOmit
   debt?: Prisma.DebtOmit
+  debtInstallmentStatus?: Prisma.DebtInstallmentStatusOmit
 }
 
 /* Types for Logging */

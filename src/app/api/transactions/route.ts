@@ -269,3 +269,73 @@ export async function PATCH(req: Request) {
     );
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const session = await getServerSession();
+
+    if (!session) {
+      return NextResponse.json(
+        { ok: false, error: "No autorizado" },
+        { status: 401 }
+      );
+    }
+
+    const body = await req.json();
+    const id = String(body.id ?? "").trim();
+    if (!id) throw new Error("Falta 'id' para eliminar");
+
+    const user = await getOrCreateUser(session);
+
+    await prisma.$transaction(async (tx) => {
+      const current = await tx.transaction.findFirst({
+        where: {
+          id,
+          userId: user.id,
+        },
+        select: {
+          id: true,
+          type: true,
+          amount: true,
+          paymentStatus: true,
+          debtId: true,
+        },
+      });
+
+      if (!current) throw new Error("No se encontro la transaccion.");
+
+      await applyDebtPayment(
+        tx,
+        user.id,
+        {
+          type: current.type,
+          amount: Number(current.amount),
+          paymentStatus: current.paymentStatus,
+          debtId: current.debtId,
+        },
+        "reverse"
+      );
+
+      await tx.savingsMovement.deleteMany({
+        where: {
+          transactionId: id,
+          userId: user.id,
+        },
+      });
+
+      await tx.transaction.delete({
+        where: {
+          id,
+        },
+      });
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch (error: unknown) {
+    console.error("API /transactions DELETE error:", error);
+    return NextResponse.json(
+      { ok: false, error: getErrorMessage(error) },
+      { status: 400 }
+    );
+  }
+}

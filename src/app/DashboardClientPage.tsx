@@ -12,7 +12,8 @@ import { useFinanceStore } from "@/store/financeStore";
 import type { Transaction } from "@/lib/types";
 
 export default function DashboardClientPage() {
-  const { transactions, fetchTransactions, loading, error } = useFinanceStore();
+  const { transactions, fetchTransactions, deleteTransaction, loading, error } =
+    useFinanceStore();
 
   const [open, setOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
@@ -101,6 +102,9 @@ export default function DashboardClientPage() {
             setEditingTx(null);
             setCloningTx(t);
             setOpen(true);
+          }}
+          onDelete={async (t) => {
+            await deleteTransaction(t.ID);
           }}
         />
       </div>

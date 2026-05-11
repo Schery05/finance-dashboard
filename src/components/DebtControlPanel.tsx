@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, Clock3, DollarSign, Edit3, Eye, FileUp, Filter, Landmark, Plus, Search, Trash2, TrendingUp, Upload, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -45,6 +45,8 @@ type DebtHistoryImportSummary = {
   skipped: number;
   total: number;
 };
+
+type InstallmentStatus = "Pagado" | "Pendiente";
 
 const money = (n: number) =>
   new Intl.NumberFormat("es-DO", {
@@ -155,10 +157,20 @@ function monthsBetween(start: Date, end: Date) {
   );
 }
 
+function getManualStatusByInstallment(debt: Debt) {
+  return new Map(
+    (debt.installmentStatuses ?? []).map((item) => [
+      item.installment,
+      item.status,
+    ])
+  );
+}
+
 function getInstallmentStatus(debt: Debt, transactions: Transaction[]) {
   const monthlyPayment = Number(debt.monthlyPayment) || 0;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  const manualStatusByInstallment = getManualStatusByInstallment(debt);
 
   const linkedPayments = transactions.filter(
     (tx) =>
@@ -200,7 +212,9 @@ function getInstallmentStatus(debt: Debt, transactions: Transaction[]) {
       const installment = index + 1;
       const dueDate = getDueDate(debt, installment);
       const paid = paidByInstallment.get(installment) ?? 0;
-      const remaining = Math.max(monthlyPayment - paid, 0);
+      const manualStatus = manualStatusByInstallment.get(installment);
+      const remaining =
+        manualStatus === "Pagado" ? 0 : Math.max(monthlyPayment - paid, 0);
       const isCovered = remaining <= 0;
       const isOverdue = dueDate < today && !isCovered;
       const isDueNow = dueDate.getTime() === today.getTime() && !isCovered;
@@ -244,7 +258,7 @@ function loanState(debt: Debt, transactions: Transaction[]) {
   return status.overdueCount > 0 ? "En mora" : "Al corriente";
 }
 
-function loanProgress(debt: Debt) {
+function loanProgress(debt: Debt, currentBalance = Number(debt.currentBalance) || 0) {
   const totalPayments =
     debt.monthlyPayment > 0
       ? Math.max(1, Math.ceil(debt.initialAmount / debt.monthlyPayment))
@@ -253,12 +267,12 @@ function loanProgress(debt: Debt) {
     debt.monthlyPayment > 0
       ? Math.min(
           totalPayments,
-          Math.floor(Math.max(debt.initialAmount - debt.currentBalance, 0) / debt.monthlyPayment)
+          Math.floor(Math.max(debt.initialAmount - currentBalance, 0) / debt.monthlyPayment)
         )
       : 0;
   const percent =
     debt.initialAmount > 0
-      ? Math.min(((debt.initialAmount - debt.currentBalance) / debt.initialAmount) * 100, 100)
+      ? Math.min(((debt.initialAmount - currentBalance) / debt.initialAmount) * 100, 100)
       : 0;
 
   return { totalPayments, paidPayments, percent };
@@ -287,6 +301,7 @@ function buildAmortizationSchedule(debt: Debt, transactions: Transaction[]) {
   const monthlyPayment = Number(debt.monthlyPayment) || 0;
   const monthlyRate = (Number(debt.interestRate) || 0) / 100 / 12;
   const paidByInstallment = getPaidByInstallment(debt, transactions);
+  const manualStatusByInstallment = getManualStatusByInstallment(debt);
   const rows = [];
   let balance = Number(debt.initialAmount) || 0;
   let installment = 1;
@@ -300,7 +315,13 @@ function buildAmortizationSchedule(debt: Debt, transactions: Transaction[]) {
     const payment = capital + interest;
     const dueDate = getDueDate(debt, installment);
     const paid = paidByInstallment.get(installment) ?? 0;
-    const isPaid = paid >= Math.min(monthlyPayment, payment) || balance <= 0;
+    const calculatedStatus: InstallmentStatus =
+      paid >= Math.min(monthlyPayment, payment) || balance <= 0
+        ? "Pagado"
+        : "Pendiente";
+    const status =
+      manualStatusByInstallment.get(installment) ?? calculatedStatus;
+    const isPaid = status === "Pagado";
 
     balance = Math.max(balance - capital, 0);
     totalInterest += interest;
@@ -317,7 +338,7 @@ function buildAmortizationSchedule(debt: Debt, transactions: Transaction[]) {
       interest,
       balance,
       paid,
-      status: isPaid ? "Pagado" : "Pendiente",
+      status,
     });
 
     if (capital <= 0) break;
@@ -334,6 +355,18 @@ function buildAmortizationSchedule(debt: Debt, transactions: Transaction[]) {
   };
 }
 
+function getScheduleCurrentBalance(
+  debt: Debt,
+  schedule: ReturnType<typeof buildAmortizationSchedule>
+) {
+  const paidCapital = schedule.rows.reduce(
+    (sum, row) => sum + (row.status === "Pagado" ? row.capital : 0),
+    0
+  );
+
+  return Math.max(Number(debt.initialAmount) - paidCapital, 0);
+}
+
 export function DebtControlPanel({
   viewMode,
 }: {
@@ -346,6 +379,7 @@ export function DebtControlPanel({
   const [period, setPeriod] = useState(currentPeriod());
   const [loanSearch, setLoanSearch] = useState("");
   const [loanStatusFilter, setLoanStatusFilter] = useState("Todos");
+  const [amortizationPage, setAmortizationPage] = useState(1);
   const [showDebtForm, setShowDebtForm] = useState(false);
   const [selectedDebtId, setSelectedDebtId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -355,9 +389,11 @@ export function DebtControlPanel({
   const [historySummary, setHistorySummary] = useState<DebtHistoryImportSummary | null>(null);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
+  const [installmentStatusSaving, setInstallmentStatusSaving] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const loansListRef = useRef<HTMLDivElement | null>(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -402,9 +438,21 @@ export function DebtControlPanel({
     };
   }, []);
 
+  const effectiveDebts = useMemo(
+    () =>
+      debts.map((debt) => {
+        const schedule = buildAmortizationSchedule(debt, transactions);
+        return {
+          ...debt,
+          currentBalance: getScheduleCurrentBalance(debt, schedule),
+        };
+      }),
+    [debts, transactions]
+  );
+
   const summary = useMemo(
-    () => getDebtControlSummary({ debts, transactions, strategy, period }),
-    [debts, transactions, strategy, period]
+    () => getDebtControlSummary({ debts: effectiveDebts, transactions, strategy, period }),
+    [effectiveDebts, transactions, strategy, period]
   );
   const alerts = useMemo(
     () => getDebtAlerts(summary, strategy),
@@ -422,13 +470,17 @@ export function DebtControlPanel({
     []
   );
   const activeLoans = useMemo(
-    () => debts.filter((debt) => Number(debt.currentBalance) > 0),
-    [debts]
+    () => effectiveDebts.filter((debt) => Number(debt.currentBalance) > 0),
+    [effectiveDebts]
   );
   const loanRows = useMemo(() => {
     const search = loanSearch.trim().toLowerCase();
+    const sourceLoans =
+      loanStatusFilter === "Saldado"
+        ? effectiveDebts.filter((debt) => Number(debt.currentBalance) <= 0)
+        : activeLoans;
 
-    return activeLoans
+    return sourceLoans
       .map((debt, index) => ({
         debt,
         code: loanCode(debt, index),
@@ -446,7 +498,7 @@ export function DebtControlPanel({
           loanStatusFilter === "Todos" || row.state === loanStatusFilter;
         return matchesSearch && matchesStatus;
       });
-  }, [activeLoans, loanSearch, loanStatusFilter, transactions]);
+  }, [activeLoans, effectiveDebts, loanSearch, loanStatusFilter, transactions]);
   const loansInGoodStanding = useMemo(
     () =>
       activeLoans.filter(
@@ -461,8 +513,8 @@ export function DebtControlPanel({
     [activeLoans, transactions]
   );
   const paidLoans = useMemo(
-    () => debts.filter((debt) => Number(debt.currentBalance) <= 0).length,
-    [debts]
+    () => effectiveDebts.filter((debt) => Number(debt.currentBalance) <= 0).length,
+    [effectiveDebts]
   );
   const totalMonthlyPayments = useMemo(
     () =>
@@ -472,6 +524,17 @@ export function DebtControlPanel({
       ),
     [activeLoans]
   );
+  const showPaidLoans = () => {
+    setLoanSearch("");
+    setLoanStatusFilter("Saldado");
+    setSelectedDebtId(null);
+    requestAnimationFrame(() => {
+      loansListRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  };
   const loanStatusOptions = useMemo(
     () => [
       { value: "Todos", label: "Todos" },
@@ -486,9 +549,13 @@ export function DebtControlPanel({
     [loanRows]
   );
   const selectedDebt = useMemo(
-    () => debts.find((debt) => debt.id === selectedDebtId) ?? null,
-    [debts, selectedDebtId]
+    () => effectiveDebts.find((debt) => debt.id === selectedDebtId) ?? null,
+    [effectiveDebts, selectedDebtId]
   );
+
+  useEffect(() => {
+    setAmortizationPage(1);
+  }, [selectedDebtId]);
 
   const resetForm = () => {
     setEditingId(null);
@@ -633,11 +700,90 @@ export function DebtControlPanel({
     }
   };
 
+  const updateInstallmentStatus = async (
+    debtId: string,
+    installment: number,
+    status: InstallmentStatus
+  ) => {
+    const savingKey = `${debtId}-${installment}`;
+    setInstallmentStatusSaving(savingKey);
+    setError(null);
+
+    const previousDebts = debts;
+    setDebts((prev) =>
+      prev.map((debt) => {
+        if (debt.id !== debtId) return debt;
+
+        const statuses = debt.installmentStatuses ?? [];
+        const exists = statuses.some((item) => item.installment === installment);
+        const nextDebt = {
+          ...debt,
+          installmentStatuses: exists
+            ? statuses.map((item) =>
+                item.installment === installment ? { ...item, status } : item
+              )
+            : [...statuses, { installment, status }],
+        };
+        const nextSchedule = buildAmortizationSchedule(nextDebt, transactions);
+
+        return {
+          ...nextDebt,
+          currentBalance: getScheduleCurrentBalance(nextDebt, nextSchedule),
+        };
+      })
+    );
+
+    try {
+      const res = await fetch(`/api/debts/${debtId}/installment-status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ installment, status }),
+      });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error ?? "No se pudo actualizar la cuota");
+      const nextBalance = Number(json.data?.currentBalance);
+      if (Number.isFinite(nextBalance)) {
+        setDebts((prev) =>
+          prev.map((debt) =>
+            debt.id === debtId ? { ...debt, currentBalance: nextBalance } : debt
+          )
+        );
+      }
+    } catch (err) {
+      setDebts(previousDebts);
+      setError(err instanceof Error ? err.message : "Error actualizando cuota");
+    } finally {
+      setInstallmentStatusSaving(null);
+    }
+  };
+
   if (viewMode === "gestion" && selectedDebt) {
     const schedule = buildAmortizationSchedule(selectedDebt, transactions);
-    const progress = loanProgress(selectedDebt);
+    const amortizationPageSize = 12;
+    const amortizationTotalPages = Math.max(
+      1,
+      Math.ceil(schedule.rows.length / amortizationPageSize)
+    );
+    const currentAmortizationPage = Math.min(
+      amortizationPage,
+      amortizationTotalPages
+    );
+    const amortizationPageRows = schedule.rows.slice(
+      (currentAmortizationPage - 1) * amortizationPageSize,
+      currentAmortizationPage * amortizationPageSize
+    );
+    const amortizationStart =
+      schedule.rows.length === 0
+        ? 0
+        : (currentAmortizationPage - 1) * amortizationPageSize + 1;
+    const amortizationEnd = Math.min(
+      currentAmortizationPage * amortizationPageSize,
+      schedule.rows.length
+    );
+    const scheduleCurrentBalance = getScheduleCurrentBalance(selectedDebt, schedule);
+    const progress = loanProgress(selectedDebt, scheduleCurrentBalance);
     const capitalPaid = Math.max(
-      Number(selectedDebt.initialAmount) - Number(selectedDebt.currentBalance),
+      Number(selectedDebt.initialAmount) - scheduleCurrentBalance,
       0
     );
     const chartRows = schedule.rows.map((row) => ({
@@ -674,6 +820,12 @@ export function DebtControlPanel({
           </button>
         </div>
 
+        {error && (
+          <div className="rounded-2xl bg-rose-500/10 p-3 text-sm text-rose-200 ring-1 ring-rose-300/20">
+            {error}
+          </div>
+        )}
+
         <div className="glass p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
@@ -684,7 +836,7 @@ export function DebtControlPanel({
               <p className="text-xs text-white/50">Estado del prestamo</p>
               <span className="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-400/10 px-3 py-2 text-sm font-semibold text-emerald-100 ring-1 ring-emerald-300/20">
                 <CheckCircle2 className="h-4 w-4" />
-                {Number(selectedDebt.currentBalance) <= 0 ? "Pagado" : "Activo"}
+                {scheduleCurrentBalance <= 0 ? "Pagado" : "Activo"}
               </span>
             </div>
           </div>
@@ -695,7 +847,7 @@ export function DebtControlPanel({
             </div>
             <div>
               <p className="text-sm text-white/45">Saldo Pendiente</p>
-              <p className="mt-1 text-lg font-semibold text-rose-200">{money(selectedDebt.currentBalance)}</p>
+              <p className="mt-1 text-lg font-semibold text-rose-200">{money(scheduleCurrentBalance)}</p>
             </div>
             <div>
               <p className="text-sm text-white/45">Tasa de Interes</p>
@@ -888,11 +1040,11 @@ export function DebtControlPanel({
                   <th className="px-5 py-4 text-right font-semibold">Capital</th>
                   <th className="px-5 py-4 text-right font-semibold">Interes</th>
                   <th className="px-5 py-4 text-right font-semibold">Saldo</th>
-                  <th className="px-5 py-4 text-left font-semibold">Estado</th>
+                  <th className="px-5 py-4 text-left font-semibold">Estado manual</th>
                 </tr>
               </thead>
               <tbody>
-                {schedule.rows.slice(0, 24).map((row) => (
+                {amortizationPageRows.map((row) => (
                   <tr key={row.installment} className="border-t border-white/10">
                     <td className="px-5 py-4 font-semibold">{row.installment}</td>
                     <td className="px-5 py-4 text-white/65">{longDate(row.date)}</td>
@@ -901,22 +1053,64 @@ export function DebtControlPanel({
                     <td className="px-5 py-4 text-right font-semibold text-amber-200">{money(row.interest)}</td>
                     <td className="px-5 py-4 text-right font-semibold">{money(row.balance)}</td>
                     <td className="px-5 py-4">
-                      <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${
-                        row.status === "Pagado"
-                          ? "bg-emerald-400/10 text-emerald-100 ring-emerald-300/20"
-                          : "bg-amber-400/10 text-amber-100 ring-amber-300/20"
-                      }`}>
-                        {row.status}
-                      </span>
+                      <select
+                        value={row.status}
+                        disabled={
+                          installmentStatusSaving ===
+                          `${selectedDebt.id}-${row.installment}`
+                        }
+                        onChange={(event) =>
+                          updateInstallmentStatus(
+                            selectedDebt.id,
+                            row.installment,
+                            event.target.value as InstallmentStatus
+                          )
+                        }
+                        className={`rounded-xl px-3 py-2 text-xs font-semibold outline-none ring-1 transition focus:ring-2 focus:ring-cyan-300/60 disabled:cursor-not-allowed disabled:opacity-60 ${
+                          row.status === "Pagado"
+                            ? "bg-emerald-400/10 text-emerald-100 ring-emerald-300/20"
+                            : "bg-amber-400/10 text-amber-100 ring-amber-300/20"
+                        }`}
+                      >
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Pagado">Pagado</option>
+                      </select>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          {schedule.rows.length > 24 && (
-            <div className="border-t border-white/10 p-5 text-center text-sm text-white/55">
-              Mostrando primeros 24 pagos de {schedule.rows.length} meses.
+          {schedule.rows.length > 0 && (
+            <div className="flex flex-col gap-3 border-t border-white/10 p-5 text-sm text-white/55 sm:flex-row sm:items-center sm:justify-between">
+              <span>
+                Mostrando meses {amortizationStart}-{amortizationEnd} de {schedule.rows.length}.
+              </span>
+              <div className="flex items-center justify-end gap-2">
+                <button
+                  onClick={() =>
+                    setAmortizationPage((page) => Math.max(1, page - 1))
+                  }
+                  disabled={currentAmortizationPage <= 1}
+                  className="rounded-xl bg-white/5 px-3 py-2 font-semibold text-white/75 ring-1 ring-white/10 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Anterior
+                </button>
+                <span className="min-w-[72px] text-center font-semibold text-white/75">
+                  {currentAmortizationPage} / {amortizationTotalPages}
+                </span>
+                <button
+                  onClick={() =>
+                    setAmortizationPage((page) =>
+                      Math.min(amortizationTotalPages, page + 1)
+                    )
+                  }
+                  disabled={currentAmortizationPage >= amortizationTotalPages}
+                  className="rounded-xl bg-white/5 px-3 py-2 font-semibold text-white/75 ring-1 ring-white/10 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Siguiente
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -1187,16 +1381,23 @@ export function DebtControlPanel({
           <p className="text-sm text-white/80">Pago Mensual Total</p>
           <p className="mt-2 text-3xl font-semibold">{money(totalMonthlyPayments)}</p>
         </div>
-        <div className="rounded-2xl bg-emerald-600 p-5 text-white shadow-xl shadow-emerald-950/20">
+        <button
+          type="button"
+          onClick={showPaidLoans}
+          className="rounded-2xl bg-emerald-600 p-5 text-left text-white shadow-xl shadow-emerald-950/20 transition hover:-translate-y-0.5 hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+        >
           <div className="mb-5 inline-flex rounded-2xl bg-white/20 p-3">
             <CheckCircle2 className="h-5 w-5" />
           </div>
           <p className="text-sm text-white/80">Prestamos Pagados</p>
           <p className="mt-2 text-3xl font-semibold">{paidLoans}</p>
-        </div>
+          <p className="mt-3 text-xs font-semibold text-white/75">
+            Ver listado saldado
+          </p>
+        </button>
       </div>
 
-      <div className="glass p-5">
+      <div ref={loansListRef} className="glass p-5">
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_220px_auto]">
           <label className="relative">
             <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/45" />
@@ -1253,7 +1454,7 @@ export function DebtControlPanel({
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         {loading ? (
           <div className="glass p-6 text-center text-sm text-white/55 xl:col-span-2">Cargando deudas...</div>
-        ) : activeLoans.length === 0 ? (
+        ) : debts.length === 0 ? (
           <div className="glass p-8 text-center text-sm text-white/55 xl:col-span-2">No hay prestamos disponibles para visualizar.</div>
         ) : loanRows.length === 0 ? (
           <div className="glass p-8 text-center text-sm text-white/55 xl:col-span-2">No hay prestamos que coincidan con los filtros actuales.</div>

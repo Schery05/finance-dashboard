@@ -24,6 +24,7 @@ interface FinanceState {
   fetchTransactions: () => Promise<void>;
   addTransaction: (tx: TransactionInput) => Promise<void>;
   updateTransaction: (id: string, tx: Omit<TransactionInput, "ID">) => Promise<void>;
+  deleteTransaction: (id: string) => Promise<void>;
 }
 
 export const useFinanceStore = create<FinanceState>((set, get) => ({
@@ -83,6 +84,23 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
     set({ error: e?.message ?? "Error", loading: false });
   }
 },
+
+  deleteTransaction: async (id) => {
+    set({ loading: true, error: undefined });
+    try {
+      const res = await fetch("/api/transactions", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error ?? "Delete failed");
+      await get().fetchTransactions();
+    } catch (e: any) {
+      set({ error: e?.message ?? "Error", loading: false });
+      throw e;
+    }
+  },
   
 }));
 

@@ -52,9 +52,25 @@ model User {
   savingsGoals        SavingsGoal[]
   savingsMovements    SavingsMovement[]
   debts               Debt[]
+  debtInstallmentStatuses DebtInstallmentStatus[]
   banks               Bank[]
   bankCategoryRules   BankCategoryRule[]
   readNotifications   ReadNotification[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  tokenHash String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, tokenHash])
+  @@index([expiresAt])
 }
 
 model BankCategoryRule {
@@ -219,7 +235,26 @@ model Debt {
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   payments Transaction[]
+  installmentStatuses DebtInstallmentStatus[]
 
   @@index([userId, type])
   @@index([userId, paymentDay])
+}
+
+model DebtInstallmentStatus {
+  id          String        @id @default(cuid())
+  installment Int
+  status      PaymentStatus
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  debtId String
+  debt   Debt @relation(fields: [debtId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, debtId, installment])
+  @@index([userId, status])
+  @@index([debtId, installment])
 }

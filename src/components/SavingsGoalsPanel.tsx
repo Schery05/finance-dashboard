@@ -354,37 +354,59 @@ export function SavingsGoalsPanel() {
           </div>
 
           <div className="space-y-3">
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Nombre de la meta"
-              className="w-full rounded-xl bg-white/10 px-3 py-2 text-sm text-white outline-none ring-1 ring-white/15 placeholder:text-white/45 focus:ring-2 focus:ring-emerald-300/60"
-            />
+            <label className="block space-y-1.5">
+              <span className="text-xs font-medium text-white/65">
+                Nombre de la meta
+              </span>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Ej. Inicial de vivienda"
+                className="w-full rounded-xl bg-white/10 px-3 py-2.5 text-sm font-medium text-white outline-none ring-1 ring-white/15 placeholder:text-white/45 focus:ring-2 focus:ring-emerald-300/60"
+              />
+            </label>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <input
-                value={targetAmount}
-                onChange={(e) => setTargetAmount(formatAmountInput(e.target.value))}
-                placeholder="Monto objetivo"
-                inputMode="decimal"
-                className="w-full rounded-xl bg-white/10 px-3 py-2 text-sm text-white outline-none ring-1 ring-white/15 placeholder:text-white/45 focus:ring-2 focus:ring-emerald-300/60"
-              />
-              <input
-                value={initialBalance}
-                onChange={(e) =>
-                  setInitialBalance(formatAmountInput(e.target.value))
-                }
-                placeholder="Ya ahorrado"
-                inputMode="decimal"
-                className="w-full rounded-xl bg-white/10 px-3 py-2 text-sm text-white outline-none ring-1 ring-white/15 placeholder:text-white/45 focus:ring-2 focus:ring-emerald-300/60"
-              />
-              <input
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                type="date"
-                className="w-full rounded-xl bg-white/10 px-3 py-2 text-sm text-white outline-none ring-1 ring-white/15 focus:ring-2 focus:ring-emerald-300/60 sm:col-span-2"
-              />
+              <label className="block space-y-1.5">
+                <span className="text-xs font-medium text-white/65">
+                  Monto objetivo
+                </span>
+                <input
+                  value={targetAmount}
+                  onChange={(e) =>
+                    setTargetAmount(formatAmountInput(e.target.value))
+                  }
+                  placeholder="0"
+                  inputMode="decimal"
+                  className="w-full rounded-xl bg-white/10 px-3 py-2.5 text-sm font-medium text-white outline-none ring-1 ring-white/15 placeholder:text-white/45 focus:ring-2 focus:ring-emerald-300/60"
+                />
+              </label>
+              <label className="block space-y-1.5">
+                <span className="text-xs font-medium text-white/65">
+                  Ya ahorrado
+                </span>
+                <input
+                  value={initialBalance}
+                  onChange={(e) =>
+                    setInitialBalance(formatAmountInput(e.target.value))
+                  }
+                  placeholder="0"
+                  inputMode="decimal"
+                  className="w-full rounded-xl bg-white/10 px-3 py-2.5 text-sm font-medium text-white outline-none ring-1 ring-white/15 placeholder:text-white/45 focus:ring-2 focus:ring-emerald-300/60"
+                />
+              </label>
+              <label className="block space-y-1.5 sm:col-span-2">
+                <span className="text-xs font-medium text-white/65">
+                  Fecha objetivo
+                </span>
+                <input
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  type="date"
+                  className="w-full rounded-xl bg-white/10 px-3 py-2.5 text-sm font-medium text-white outline-none ring-1 ring-white/15 focus:ring-2 focus:ring-emerald-300/60"
+                />
+              </label>
             </div>
-<div className="flex flex-col gap-2 sm:flex-row">
+            <div className="flex flex-col gap-2 sm:flex-row">
                 <button
                   onClick={saveGoal}
                   disabled={saving}

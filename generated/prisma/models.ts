@@ -9,6 +9,7 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/User'
+export type * from './models/PasswordResetToken'
 export type * from './models/BankCategoryRule'
 export type * from './models/Bank'
 export type * from './models/Category'
@@ -18,4 +19,5 @@ export type * from './models/SavingsGoal'
 export type * from './models/SavingsMovement'
 export type * from './models/ReadNotification'
 export type * from './models/Debt'
+export type * from './models/DebtInstallmentStatus'
 export type * from './commonInputTypes'

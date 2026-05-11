@@ -318,37 +318,14 @@ export async function DELETE(req: Request) {
 
     if (!category) return NextResponse.json({ ok: true });
 
-    const [transactionsCount, budgetsCount] = await Promise.all([
-      prisma.transaction.count({
-        where: {
-          userId: user.id,
-          categoryId: category.id,
-        },
-      }),
-      prisma.budget.count({
-        where: {
-          userId: user.id,
-          categoryId: category.id,
-        },
-      }),
-    ]);
-
-    if (transactionsCount === 0 && budgetsCount === 0) {
-      await prisma.category.delete({
-        where: {
-          id: category.id,
-        },
-      });
-    } else {
-      await prisma.category.update({
-        where: {
-          id: category.id,
-        },
-        data: {
-          isActive: false,
-        },
-      });
-    }
+    await prisma.category.update({
+      where: {
+        id: category.id,
+      },
+      data: {
+        isActive: false,
+      },
+    });
 
     return NextResponse.json({ ok: true });
   } catch (error) {

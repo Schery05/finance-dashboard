@@ -23,6 +23,11 @@ export * from './enums';
  */
 export type User = Prisma.UserModel
 /**
+ * Model PasswordResetToken
+ * 
+ */
+export type PasswordResetToken = Prisma.PasswordResetTokenModel
+/**
  * Model BankCategoryRule
  * 
  */
@@ -67,3 +72,8 @@ export type ReadNotification = Prisma.ReadNotificationModel
  * 
  */
 export type Debt = Prisma.DebtModel
+/**
+ * Model DebtInstallmentStatus
+ * 
+ */
+export type DebtInstallmentStatus = Prisma.DebtInstallmentStatusModel

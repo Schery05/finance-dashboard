@@ -4,11 +4,11 @@ import {
   AlertTriangle,
   Bell,
   CheckCircle2,
-  CreditCard,
   WalletCards,
   X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import type { CSSProperties } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { PaymentNotification } from "@/lib/notifications";
 
 type NotificationBellProps = {
@@ -18,42 +18,125 @@ type NotificationBellProps = {
 function notificationTone(type: PaymentNotification["type"]) {
   if (type === "overdue") {
     return {
-      card: "border-rose-300/25 bg-rose-500/10",
+      card: "notification-card-overdue border-rose-300/30 bg-rose-500/10",
       icon: "bg-rose-400/15 text-rose-100 ring-rose-300/20",
       badge: "bg-rose-400/15 text-rose-100 ring-rose-300/20",
       label: "Vencido",
       Icon: AlertTriangle,
+      style: {
+        "--notification-card-bg": "rgba(244, 63, 94, 0.12)",
+        "--notification-card-border": "rgba(253, 164, 175, 0.32)",
+        "--notification-accent-bg": "rgba(244, 63, 94, 0.16)",
+        "--notification-accent-color": "#fecdd3",
+      } as CSSProperties,
     };
   }
 
-  if (type.startsWith("debt")) {
+  if (type === "budget-overrun") {
     return {
-      card: "border-cyan-300/25 bg-cyan-500/10",
-      icon: "bg-cyan-400/15 text-cyan-100 ring-cyan-300/20",
-      badge: "bg-cyan-400/15 text-cyan-100 ring-cyan-300/20",
-      label: "Deuda",
-      Icon: CreditCard,
+      card: "notification-card-overdue border-rose-300/30 bg-rose-500/10",
+      icon: "bg-rose-400/15 text-rose-100 ring-rose-300/20",
+      badge: "bg-rose-400/15 text-rose-100 ring-rose-300/20",
+      label: "Presupuesto",
+      Icon: AlertTriangle,
+      style: {
+        "--notification-card-bg": "rgba(244, 63, 94, 0.12)",
+        "--notification-card-border": "rgba(253, 164, 175, 0.32)",
+        "--notification-accent-bg": "rgba(244, 63, 94, 0.16)",
+        "--notification-accent-color": "#fecdd3",
+      } as CSSProperties,
     };
   }
 
   return {
-    card: "border-amber-300/25 bg-amber-500/10",
+    card: "notification-card-upcoming border-amber-300/30 bg-amber-500/10",
     icon: "bg-amber-400/15 text-amber-100 ring-amber-300/20",
     badge: "bg-amber-400/15 text-amber-100 ring-amber-300/20",
-    label: "Proximo",
+    label: "Próximo",
     Icon: WalletCards,
+    style: {
+      "--notification-card-bg": "rgba(245, 158, 11, 0.12)",
+      "--notification-card-border": "rgba(252, 211, 77, 0.32)",
+      "--notification-accent-bg": "rgba(245, 158, 11, 0.16)",
+      "--notification-accent-color": "#fde68a",
+    } as CSSProperties,
   };
 }
 
 export function NotificationBell({ notifications }: NotificationBellProps) {
   const [open, setOpen] = useState(false);
-  const unreadCount = notifications.length;
+  const [activeView, setActiveView] = useState<"pending" | "history">("pending");
+  const [readIds, setReadIds] = useState<Set<string>>(() => new Set());
+  const [markingRead, setMarkingRead] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchReadNotifications = async () => {
+      try {
+        const res = await fetch("/api/notifications/read", { cache: "no-store" });
+        const json = await res.json();
+        if (mounted && json.ok && Array.isArray(json.data)) {
+          setReadIds(new Set(json.data as string[]));
+        }
+      } catch {
+        // Keep notifications visible if read-state cannot be loaded.
+      }
+    };
+
+    fetchReadNotifications();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const availableNotifications = useMemo(
+    () =>
+      notifications.filter((item) => !item.type.startsWith("debt")),
+    [notifications]
+  );
+  const pendingNotifications = useMemo(
+    () => availableNotifications.filter((item) => !readIds.has(item.id)),
+    [availableNotifications, readIds]
+  );
+  const readNotifications = useMemo(
+    () => availableNotifications.filter((item) => readIds.has(item.id)),
+    [availableNotifications, readIds]
+  );
+  const visibleNotifications = useMemo(
+    () => (activeView === "pending" ? pendingNotifications : readNotifications),
+    [activeView, pendingNotifications, readNotifications]
+  );
+  const unreadCount = pendingNotifications.length;
   const summary = useMemo(() => {
-    const debts = notifications.filter((item) => item.type.startsWith("debt")).length;
-    const overdue = notifications.filter((item) => item.type === "overdue").length;
-    const upcoming = notifications.filter((item) => item.type === "upcoming").length;
-    return { debts, overdue, upcoming };
-  }, [notifications]);
+    const overdue = pendingNotifications.filter((item) => item.type === "overdue").length;
+    const upcoming = pendingNotifications.filter((item) => item.type === "upcoming").length;
+    const budget = pendingNotifications.filter((item) => item.type === "budget-overrun").length;
+    return { overdue, upcoming, budget };
+  }, [pendingNotifications]);
+
+  const markAsRead = async (notificationIds: string[]) => {
+    const ids = notificationIds.filter(Boolean);
+    if (ids.length === 0 || markingRead) return;
+
+    setMarkingRead(true);
+    const previous = readIds;
+    setReadIds((current) => new Set([...current, ...ids]));
+
+    try {
+      const res = await fetch("/api/notifications/read", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notificationIds: ids }),
+      });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error ?? "No se pudo marcar como leida.");
+    } catch {
+      setReadIds(previous);
+    } finally {
+      setMarkingRead(false);
+    }
+  };
 
   return (
     <div className="relative">
@@ -95,37 +178,74 @@ export function NotificationBell({ notifications }: NotificationBellProps) {
               </button>
             </div>
 
+            <div className="mt-4 grid grid-cols-2 rounded-2xl bg-white/5 p-1 ring-1 ring-white/10">
+              <button
+                onClick={() => setActiveView("pending")}
+                className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${
+                  activeView === "pending"
+                    ? "bg-white text-slate-950"
+                    : "text-white/60 hover:text-white"
+                }`}
+              >
+                Pendientes ({pendingNotifications.length})
+              </button>
+              <button
+                onClick={() => setActiveView("history")}
+                className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${
+                  activeView === "history"
+                    ? "bg-white text-slate-950"
+                    : "text-white/60 hover:text-white"
+                }`}
+              >
+                Historico ({readNotifications.length})
+              </button>
+            </div>
+
+            {unreadCount > 0 && (
+              <button
+                onClick={() =>
+                  markAsRead(pendingNotifications.map((item) => item.id))
+                }
+                disabled={markingRead}
+                className="mt-4 w-full rounded-xl bg-white/5 px-3 py-2 text-xs font-semibold text-white/70 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Marcar todas como leidas
+              </button>
+            )}
+
             {unreadCount > 0 && (
               <div className="mt-4 grid grid-cols-3 gap-2">
-                <div className="notification-summary-card rounded-2xl bg-white/[0.04] p-3 ring-1 ring-white/10">
+                <div className="notification-summary-card notification-summary-overdue rounded-2xl bg-rose-500/10 p-3 ring-1 ring-rose-300/20">
                   <p className="text-lg font-semibold text-rose-100">{summary.overdue}</p>
-                  <p className="notification-muted text-[11px] text-white/45">Vencidas</p>
+                  <p className="text-[11px] font-medium text-rose-100/80">Vencidas</p>
                 </div>
-                <div className="notification-summary-card rounded-2xl bg-white/[0.04] p-3 ring-1 ring-white/10">
+                <div className="notification-summary-card notification-summary-upcoming rounded-2xl bg-amber-500/10 p-3 ring-1 ring-amber-300/20">
                   <p className="text-lg font-semibold text-amber-100">{summary.upcoming}</p>
-                  <p className="notification-muted text-[11px] text-white/45">Proximas</p>
+                  <p className="text-[11px] font-medium text-amber-100/80">Próximas</p>
                 </div>
-                <div className="notification-summary-card rounded-2xl bg-white/[0.04] p-3 ring-1 ring-white/10">
-                  <p className="text-lg font-semibold text-cyan-100">{summary.debts}</p>
-                  <p className="notification-muted text-[11px] text-white/45">Deudas</p>
+                <div className="notification-summary-card notification-summary-overdue rounded-2xl bg-rose-500/10 p-3 ring-1 ring-rose-300/20">
+                  <p className="text-lg font-semibold text-rose-100">{summary.budget}</p>
+                  <p className="text-[11px] font-medium text-rose-100/80">Presupuesto</p>
                 </div>
               </div>
             )}
           </div>
 
-          {notifications.length === 0 ? (
+          {visibleNotifications.length === 0 ? (
             <div className="p-5">
               <div className="notification-empty rounded-2xl bg-emerald-400/10 p-4 text-sm text-emerald-100 ring-1 ring-emerald-300/20">
                 <div className="mb-2 flex items-center gap-2 font-semibold">
                   <CheckCircle2 className="h-4 w-4" />
-                  Todo tranquilo
+                  {activeView === "pending" ? "Todo tranquilo" : "Sin historico"}
                 </div>
-                No tienes alertas por ahora.
+                {activeView === "pending"
+                  ? "No tienes alertas por ahora."
+                  : "Las notificaciones marcadas como leidas apareceran aqui."}
               </div>
             </div>
           ) : (
             <div className="max-h-[420px] space-y-2 overflow-y-auto p-3">
-              {notifications.map((notification) => {
+              {visibleNotifications.map((notification) => {
                 const tone = notificationTone(notification.type);
                 const Icon = tone.Icon;
 
@@ -134,6 +254,7 @@ export function NotificationBell({ notifications }: NotificationBellProps) {
                     key={notification.id}
                     className={`notification-card rounded-2xl border p-3 ${tone.card}`}
                     style={{
+                      ...tone.style,
                       background: "var(--notification-card-bg)",
                       borderColor: "var(--notification-card-border)",
                     }}
@@ -172,6 +293,23 @@ export function NotificationBell({ notifications }: NotificationBellProps) {
                         >
                           {notification.message}
                         </p>
+                        {activeView === "pending" ? (
+                          <button
+                            onClick={() => markAsRead([notification.id])}
+                            disabled={markingRead}
+                            className="mt-3 rounded-lg bg-white/5 px-2.5 py-1.5 text-[11px] font-semibold ring-1 ring-white/10 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                            style={{ color: "var(--notification-message-color)" }}
+                          >
+                            Marcar como leida
+                          </button>
+                        ) : (
+                          <p
+                            className="mt-3 text-[11px] font-semibold"
+                            style={{ color: "var(--notification-message-color)" }}
+                          >
+                            Leida
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>

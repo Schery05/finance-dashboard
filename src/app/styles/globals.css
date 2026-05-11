@@ -669,6 +669,64 @@ body[data-theme="light"] .notification-card {
   color: #0f172a !important;
 }
 
+html[data-theme="light"] .notification-summary-overdue,
+body[data-theme="light"] .notification-summary-overdue,
+html[data-theme="light"] .notification-card-overdue,
+body[data-theme="light"] .notification-card-overdue {
+  background: #fff1f2 !important;
+  border-color: rgba(225, 29, 72, 0.28) !important;
+  --tw-ring-color: rgba(225, 29, 72, 0.22) !important;
+}
+
+html[data-theme="light"] .notification-summary-upcoming,
+body[data-theme="light"] .notification-summary-upcoming,
+html[data-theme="light"] .notification-card-upcoming,
+body[data-theme="light"] .notification-card-upcoming {
+  background: #fffbeb !important;
+  border-color: rgba(217, 119, 6, 0.3) !important;
+  --tw-ring-color: rgba(217, 119, 6, 0.22) !important;
+}
+
+html[data-theme="light"] .notification-summary-overdue p:first-child,
+body[data-theme="light"] .notification-summary-overdue p:first-child {
+  color: #be123c !important;
+}
+
+html[data-theme="light"] .notification-summary-overdue p:last-child,
+body[data-theme="light"] .notification-summary-overdue p:last-child {
+  color: #9f1239 !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="light"] .notification-summary-upcoming p:first-child,
+body[data-theme="light"] .notification-summary-upcoming p:first-child {
+  color: #b45309 !important;
+}
+
+html[data-theme="light"] .notification-summary-upcoming p:last-child,
+body[data-theme="light"] .notification-summary-upcoming p:last-child {
+  color: #92400e !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="light"] .notification-card-overdue .notification-card-icon,
+body[data-theme="light"] .notification-card-overdue .notification-card-icon,
+html[data-theme="light"] .notification-card-overdue .notification-badge,
+body[data-theme="light"] .notification-card-overdue .notification-badge {
+  background: #ffe4e6 !important;
+  color: #be123c !important;
+  --tw-ring-color: rgba(225, 29, 72, 0.22) !important;
+}
+
+html[data-theme="light"] .notification-card-upcoming .notification-card-icon,
+body[data-theme="light"] .notification-card-upcoming .notification-card-icon,
+html[data-theme="light"] .notification-card-upcoming .notification-badge,
+body[data-theme="light"] .notification-card-upcoming .notification-badge {
+  background: #fef3c7 !important;
+  color: #b45309 !important;
+  --tw-ring-color: rgba(217, 119, 6, 0.24) !important;
+}
+
 html[data-theme="light"] .notification-card-icon,
 body[data-theme="light"] .notification-card-icon,
 html[data-theme="light"] .notification-badge,

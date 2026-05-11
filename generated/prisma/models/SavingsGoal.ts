@@ -509,10 +509,6 @@ export type SavingsGoalUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.SavingsGoalScalarWhereInput | Prisma.SavingsGoalScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type SavingsGoalCreateNestedOneWithoutMovementsInput = {
   create?: Prisma.XOR<Prisma.SavingsGoalCreateWithoutMovementsInput, Prisma.SavingsGoalUncheckedCreateWithoutMovementsInput>
   connectOrCreate?: Prisma.SavingsGoalCreateOrConnectWithoutMovementsInput

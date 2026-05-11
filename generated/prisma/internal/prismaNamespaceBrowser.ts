@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  PasswordResetToken: 'PasswordResetToken',
   BankCategoryRule: 'BankCategoryRule',
   Bank: 'Bank',
   Category: 'Category',
@@ -60,7 +61,8 @@ export const ModelName = {
   SavingsGoal: 'SavingsGoal',
   SavingsMovement: 'SavingsMovement',
   ReadNotification: 'ReadNotification',
-  Debt: 'Debt'
+  Debt: 'Debt',
+  DebtInstallmentStatus: 'DebtInstallmentStatus'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -90,6 +92,18 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt',
+  userId: 'userId'
+} as const
+
+export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
 
 
 export const BankCategoryRuleScalarFieldEnum = {
@@ -220,6 +234,19 @@ export const DebtScalarFieldEnum = {
 } as const
 
 export type DebtScalarFieldEnum = (typeof DebtScalarFieldEnum)[keyof typeof DebtScalarFieldEnum]
+
+
+export const DebtInstallmentStatusScalarFieldEnum = {
+  id: 'id',
+  installment: 'installment',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId',
+  debtId: 'debtId'
+} as const
+
+export type DebtInstallmentStatusScalarFieldEnum = (typeof DebtInstallmentStatusScalarFieldEnum)[keyof typeof DebtInstallmentStatusScalarFieldEnum]
 
 
 export const SortOrder = {

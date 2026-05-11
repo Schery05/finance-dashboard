@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
@@ -189,6 +189,14 @@ export function AddTransactionModal({
     form.Tipo === "Gasto" &&
     (form.EsPagoDeuda || isDebtPaymentCategory(form.Categoría));
 
+
+  const modalModeKey = open
+    ? editing?.ID
+      ? `edit:${editing.ID}`
+      : cloning?.ID
+        ? `clone:${cloning.ID}`
+        : "new"
+    : "closed";
   useEffect(() => {
     if (!open) return;
 
@@ -237,7 +245,10 @@ export function AddTransactionModal({
       DescripcionAdicional: "",
       EsPagoDeuda: false,
     });
-  }, [open, editing, cloning, categories]);
+    // Solo inicializa al abrir o cambiar de registro. Un refresh de datos/categorias
+    // no debe pisar lo que el usuario esta escribiendo.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modalModeKey]);
 
   useEffect(() => {
     if (!form.Categoría) return;
@@ -521,5 +532,6 @@ export function AddTransactionModal({
     </AnimatePresence>
   );
 }
+
 
 

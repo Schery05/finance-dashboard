@@ -290,6 +290,7 @@ export type DebtWhereInput = {
   userId?: Prisma.StringFilter<"Debt"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   payments?: Prisma.TransactionListRelationFilter
+  installmentStatuses?: Prisma.DebtInstallmentStatusListRelationFilter
 }
 
 export type DebtOrderByWithRelationInput = {
@@ -307,6 +308,7 @@ export type DebtOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   payments?: Prisma.TransactionOrderByRelationAggregateInput
+  installmentStatuses?: Prisma.DebtInstallmentStatusOrderByRelationAggregateInput
 }
 
 export type DebtWhereUniqueInput = Prisma.AtLeast<{
@@ -327,6 +329,7 @@ export type DebtWhereUniqueInput = Prisma.AtLeast<{
   userId?: Prisma.StringFilter<"Debt"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   payments?: Prisma.TransactionListRelationFilter
+  installmentStatuses?: Prisma.DebtInstallmentStatusListRelationFilter
 }, "id">
 
 export type DebtOrderByWithAggregationInput = {
@@ -381,6 +384,7 @@ export type DebtCreateInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutDebtsInput
   payments?: Prisma.TransactionCreateNestedManyWithoutDebtInput
+  installmentStatuses?: Prisma.DebtInstallmentStatusCreateNestedManyWithoutDebtInput
 }
 
 export type DebtUncheckedCreateInput = {
@@ -397,6 +401,7 @@ export type DebtUncheckedCreateInput = {
   updatedAt?: Date | string
   userId: string
   payments?: Prisma.TransactionUncheckedCreateNestedManyWithoutDebtInput
+  installmentStatuses?: Prisma.DebtInstallmentStatusUncheckedCreateNestedManyWithoutDebtInput
 }
 
 export type DebtUpdateInput = {
@@ -413,6 +418,7 @@ export type DebtUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutDebtsNestedInput
   payments?: Prisma.TransactionUpdateManyWithoutDebtNestedInput
+  installmentStatuses?: Prisma.DebtInstallmentStatusUpdateManyWithoutDebtNestedInput
 }
 
 export type DebtUncheckedUpdateInput = {
@@ -429,6 +435,7 @@ export type DebtUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   payments?: Prisma.TransactionUncheckedUpdateManyWithoutDebtNestedInput
+  installmentStatuses?: Prisma.DebtInstallmentStatusUncheckedUpdateManyWithoutDebtNestedInput
 }
 
 export type DebtCreateManyInput = {
@@ -551,6 +558,11 @@ export type DebtSumOrderByAggregateInput = {
   paymentDay?: Prisma.SortOrder
 }
 
+export type DebtScalarRelationFilter = {
+  is?: Prisma.DebtWhereInput
+  isNot?: Prisma.DebtWhereInput
+}
+
 export type DebtCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.DebtCreateWithoutUserInput, Prisma.DebtUncheckedCreateWithoutUserInput> | Prisma.DebtCreateWithoutUserInput[] | Prisma.DebtUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.DebtCreateOrConnectWithoutUserInput | Prisma.DebtCreateOrConnectWithoutUserInput[]
@@ -613,6 +625,20 @@ export type EnumDebtTypeFieldUpdateOperationsInput = {
   set?: $Enums.DebtType
 }
 
+export type DebtCreateNestedOneWithoutInstallmentStatusesInput = {
+  create?: Prisma.XOR<Prisma.DebtCreateWithoutInstallmentStatusesInput, Prisma.DebtUncheckedCreateWithoutInstallmentStatusesInput>
+  connectOrCreate?: Prisma.DebtCreateOrConnectWithoutInstallmentStatusesInput
+  connect?: Prisma.DebtWhereUniqueInput
+}
+
+export type DebtUpdateOneRequiredWithoutInstallmentStatusesNestedInput = {
+  create?: Prisma.XOR<Prisma.DebtCreateWithoutInstallmentStatusesInput, Prisma.DebtUncheckedCreateWithoutInstallmentStatusesInput>
+  connectOrCreate?: Prisma.DebtCreateOrConnectWithoutInstallmentStatusesInput
+  upsert?: Prisma.DebtUpsertWithoutInstallmentStatusesInput
+  connect?: Prisma.DebtWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DebtUpdateToOneWithWhereWithoutInstallmentStatusesInput, Prisma.DebtUpdateWithoutInstallmentStatusesInput>, Prisma.DebtUncheckedUpdateWithoutInstallmentStatusesInput>
+}
+
 export type DebtCreateWithoutUserInput = {
   id?: string
   name: string
@@ -626,6 +652,7 @@ export type DebtCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   payments?: Prisma.TransactionCreateNestedManyWithoutDebtInput
+  installmentStatuses?: Prisma.DebtInstallmentStatusCreateNestedManyWithoutDebtInput
 }
 
 export type DebtUncheckedCreateWithoutUserInput = {
@@ -641,6 +668,7 @@ export type DebtUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   payments?: Prisma.TransactionUncheckedCreateNestedManyWithoutDebtInput
+  installmentStatuses?: Prisma.DebtInstallmentStatusUncheckedCreateNestedManyWithoutDebtInput
 }
 
 export type DebtCreateOrConnectWithoutUserInput = {
@@ -700,6 +728,7 @@ export type DebtCreateWithoutPaymentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutDebtsInput
+  installmentStatuses?: Prisma.DebtInstallmentStatusCreateNestedManyWithoutDebtInput
 }
 
 export type DebtUncheckedCreateWithoutPaymentsInput = {
@@ -715,6 +744,7 @@ export type DebtUncheckedCreateWithoutPaymentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   userId: string
+  installmentStatuses?: Prisma.DebtInstallmentStatusUncheckedCreateNestedManyWithoutDebtInput
 }
 
 export type DebtCreateOrConnectWithoutPaymentsInput = {
@@ -746,6 +776,7 @@ export type DebtUpdateWithoutPaymentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutDebtsNestedInput
+  installmentStatuses?: Prisma.DebtInstallmentStatusUpdateManyWithoutDebtNestedInput
 }
 
 export type DebtUncheckedUpdateWithoutPaymentsInput = {
@@ -761,6 +792,87 @@ export type DebtUncheckedUpdateWithoutPaymentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  installmentStatuses?: Prisma.DebtInstallmentStatusUncheckedUpdateManyWithoutDebtNestedInput
+}
+
+export type DebtCreateWithoutInstallmentStatusesInput = {
+  id?: string
+  name: string
+  initialAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
+  interestRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  monthlyPayment: runtime.Decimal | runtime.DecimalJsLike | number | string
+  paymentDay: number
+  type: $Enums.DebtType
+  openingDate?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutDebtsInput
+  payments?: Prisma.TransactionCreateNestedManyWithoutDebtInput
+}
+
+export type DebtUncheckedCreateWithoutInstallmentStatusesInput = {
+  id?: string
+  name: string
+  initialAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
+  interestRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  monthlyPayment: runtime.Decimal | runtime.DecimalJsLike | number | string
+  paymentDay: number
+  type: $Enums.DebtType
+  openingDate?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userId: string
+  payments?: Prisma.TransactionUncheckedCreateNestedManyWithoutDebtInput
+}
+
+export type DebtCreateOrConnectWithoutInstallmentStatusesInput = {
+  where: Prisma.DebtWhereUniqueInput
+  create: Prisma.XOR<Prisma.DebtCreateWithoutInstallmentStatusesInput, Prisma.DebtUncheckedCreateWithoutInstallmentStatusesInput>
+}
+
+export type DebtUpsertWithoutInstallmentStatusesInput = {
+  update: Prisma.XOR<Prisma.DebtUpdateWithoutInstallmentStatusesInput, Prisma.DebtUncheckedUpdateWithoutInstallmentStatusesInput>
+  create: Prisma.XOR<Prisma.DebtCreateWithoutInstallmentStatusesInput, Prisma.DebtUncheckedCreateWithoutInstallmentStatusesInput>
+  where?: Prisma.DebtWhereInput
+}
+
+export type DebtUpdateToOneWithWhereWithoutInstallmentStatusesInput = {
+  where?: Prisma.DebtWhereInput
+  data: Prisma.XOR<Prisma.DebtUpdateWithoutInstallmentStatusesInput, Prisma.DebtUncheckedUpdateWithoutInstallmentStatusesInput>
+}
+
+export type DebtUpdateWithoutInstallmentStatusesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  initialAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  interestRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  monthlyPayment?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  paymentDay?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumDebtTypeFieldUpdateOperationsInput | $Enums.DebtType
+  openingDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutDebtsNestedInput
+  payments?: Prisma.TransactionUpdateManyWithoutDebtNestedInput
+}
+
+export type DebtUncheckedUpdateWithoutInstallmentStatusesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  initialAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  interestRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  monthlyPayment?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  paymentDay?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumDebtTypeFieldUpdateOperationsInput | $Enums.DebtType
+  openingDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  payments?: Prisma.TransactionUncheckedUpdateManyWithoutDebtNestedInput
 }
 
 export type DebtCreateManyUserInput = {
@@ -790,6 +902,7 @@ export type DebtUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   payments?: Prisma.TransactionUpdateManyWithoutDebtNestedInput
+  installmentStatuses?: Prisma.DebtInstallmentStatusUpdateManyWithoutDebtNestedInput
 }
 
 export type DebtUncheckedUpdateWithoutUserInput = {
@@ -805,6 +918,7 @@ export type DebtUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   payments?: Prisma.TransactionUncheckedUpdateManyWithoutDebtNestedInput
+  installmentStatuses?: Prisma.DebtInstallmentStatusUncheckedUpdateManyWithoutDebtNestedInput
 }
 
 export type DebtUncheckedUpdateManyWithoutUserInput = {
@@ -828,10 +942,12 @@ export type DebtUncheckedUpdateManyWithoutUserInput = {
 
 export type DebtCountOutputType = {
   payments: number
+  installmentStatuses: number
 }
 
 export type DebtCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   payments?: boolean | DebtCountOutputTypeCountPaymentsArgs
+  installmentStatuses?: boolean | DebtCountOutputTypeCountInstallmentStatusesArgs
 }
 
 /**
@@ -851,6 +967,13 @@ export type DebtCountOutputTypeCountPaymentsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.TransactionWhereInput
 }
 
+/**
+ * DebtCountOutputType without action
+ */
+export type DebtCountOutputTypeCountInstallmentStatusesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DebtInstallmentStatusWhereInput
+}
+
 
 export type DebtSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -867,6 +990,7 @@ export type DebtSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   userId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   payments?: boolean | Prisma.Debt$paymentsArgs<ExtArgs>
+  installmentStatuses?: boolean | Prisma.Debt$installmentStatusesArgs<ExtArgs>
   _count?: boolean | Prisma.DebtCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["debt"]>
 
@@ -921,6 +1045,7 @@ export type DebtOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type DebtInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   payments?: boolean | Prisma.Debt$paymentsArgs<ExtArgs>
+  installmentStatuses?: boolean | Prisma.Debt$installmentStatusesArgs<ExtArgs>
   _count?: boolean | Prisma.DebtCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type DebtIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -935,6 +1060,7 @@ export type $DebtPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     payments: Prisma.$TransactionPayload<ExtArgs>[]
+    installmentStatuses: Prisma.$DebtInstallmentStatusPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1345,6 +1471,7 @@ export interface Prisma__DebtClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   payments<T extends Prisma.Debt$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Debt$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  installmentStatuses<T extends Prisma.Debt$installmentStatusesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Debt$installmentStatusesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DebtInstallmentStatusPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1808,6 +1935,30 @@ export type Debt$paymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.TransactionScalarFieldEnum | Prisma.TransactionScalarFieldEnum[]
+}
+
+/**
+ * Debt.installmentStatuses
+ */
+export type Debt$installmentStatusesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DebtInstallmentStatus
+   */
+  select?: Prisma.DebtInstallmentStatusSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DebtInstallmentStatus
+   */
+  omit?: Prisma.DebtInstallmentStatusOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DebtInstallmentStatusInclude<ExtArgs> | null
+  where?: Prisma.DebtInstallmentStatusWhereInput
+  orderBy?: Prisma.DebtInstallmentStatusOrderByWithRelationInput | Prisma.DebtInstallmentStatusOrderByWithRelationInput[]
+  cursor?: Prisma.DebtInstallmentStatusWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DebtInstallmentStatusScalarFieldEnum | Prisma.DebtInstallmentStatusScalarFieldEnum[]
 }
 
 /**

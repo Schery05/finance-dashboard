@@ -1,3 +1,4 @@
+import type { Budget } from "@/lib/budgets";
 import type { Debt, Transaction } from "@/lib/types";
 import {
   getDebtAlerts,
@@ -11,9 +12,41 @@ export type PaymentNotification = {
   debtId?: string;
   title: string;
   message: string;
-  type: "overdue" | "upcoming" | "debt-interest" | "debt-low-payment" | "debt-priority";
+  type:
+    | "overdue"
+    | "upcoming"
+    | "budget-overrun"
+    | "debt-interest"
+    | "debt-low-payment"
+    | "debt-priority";
   daysDifference?: number;
+  budgetId?: string;
+  category?: string;
+  period?: string;
 };
+
+const money = (value: number) =>
+  new Intl.NumberFormat("es-DO", {
+    style: "currency",
+    currency: "DOP",
+  }).format(Number.isFinite(value) ? value : 0);
+
+function normalizeKey(value: string) {
+  return String(value ?? "")
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .toLowerCase();
+}
+
+function getTransactionCategory(tx: Transaction) {
+  const entry = Object.entries(tx as unknown as Record<string, unknown>).find(
+    ([key]) => normalizeKey(key) === "categoria"
+  );
+
+  return String(entry?.[1] ?? "");
+}
 
 function normalizeDate(dateValue: string) {
   const value = String(dateValue ?? "").trim();
@@ -67,10 +100,7 @@ export function getPaymentNotifications(
         (paymentDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
       );
 
-      const amount = new Intl.NumberFormat("es-DO", {
-        style: "currency",
-        currency: "DOP",
-      }).format(Number(tx.Importe) || 0);
+      const amount = money(Number(tx.Importe) || 0);
 
       if (diffDays < 0) {
         return {
@@ -98,6 +128,61 @@ export function getPaymentNotifications(
       }
 
       return null;
+    })
+    .filter(Boolean) as PaymentNotification[];
+}
+
+function periodKey(dateValue: string) {
+  const date = normalizeDate(dateValue);
+  if (!date) return "";
+
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+export function getBudgetNotifications({
+  budgets,
+  transactions,
+}: {
+  budgets: Budget[];
+  transactions: Transaction[];
+}): PaymentNotification[] {
+  if (budgets.length === 0 || transactions.length === 0) return [];
+
+  const spentByPeriodAndCategory = new Map<string, number>();
+
+  for (const tx of transactions) {
+    if (normalizeKey(tx.Tipo) !== "gasto") continue;
+
+    const period = periodKey(tx.Fecha);
+    const category = normalizeKey(getTransactionCategory(tx));
+    if (!period || !category) continue;
+
+    const key = `${period}:${category}`;
+    spentByPeriodAndCategory.set(
+      key,
+      (spentByPeriodAndCategory.get(key) ?? 0) + (Number(tx.Importe) || 0)
+    );
+  }
+
+  return budgets
+    .map((budget) => {
+      const limit = Number(budget.monthlyLimit) || 0;
+      if (limit <= 0) return null;
+
+      const key = `${budget.period}:${normalizeKey(budget.category)}`;
+      const spent = spentByPeriodAndCategory.get(key) ?? 0;
+      if (spent <= limit) return null;
+
+      const excess = spent - limit;
+      return {
+        id: `budget-overrun-${budget.id}-${budget.period}`,
+        budgetId: budget.id,
+        category: budget.category,
+        period: budget.period,
+        title: "Presupuesto superado",
+        message: `${budget.category} supero el presupuesto de ${budget.period}: gastado ${money(spent)} de ${money(limit)} (${money(excess)} por encima).`,
+        type: "budget-overrun" as const,
+      };
     })
     .filter(Boolean) as PaymentNotification[];
 }

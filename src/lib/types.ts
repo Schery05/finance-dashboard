@@ -42,4 +42,10 @@ export interface Debt {
   type: DebtType;
   openingDate: string;
   createdAt: string;
+  installmentStatuses?: DebtInstallmentStatus[];
+}
+
+export interface DebtInstallmentStatus {
+  installment: number;
+  status: "Pagado" | "Pendiente";
 }

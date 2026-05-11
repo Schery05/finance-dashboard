@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Copy, Pencil } from "lucide-react";
+import { ChevronLeft, ChevronRight, Copy, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import type { Transaction } from "@/lib/types";
@@ -118,7 +118,7 @@ function matchesTransactionQuery(query: string, text: string, amount: number) {
   );
 }
 
-function matchesImporteQuery(query: string, amount: number) {
+function matchesMainQuery(query: string, description: string, amount: number) {
   const normalizedQuery = normalizeQueryText(query);
   if (!normalizedQuery) return true;
 
@@ -130,6 +130,8 @@ function matchesImporteQuery(query: string, amount: number) {
   ].join(" ");
 
   return (
+    normalizeQueryText(description).includes(normalizedQuery) ||
+    compactQueryText(description).includes(compactQueryText(normalizedQuery)) ||
     normalizeQueryText(amountText).includes(normalizedQuery) ||
     compactQueryText(amountText).includes(compactQueryText(normalizedQuery)) ||
     matchesAmountQuery(normalizedQuery, amount)
@@ -140,10 +142,12 @@ export function TransactionsTable({
   txs,
   onEdit,
   onClone,
+  onDelete,
 }: {
   txs: Transaction[];
   onClone: (t: Transaction) => void;
   onEdit: (t: Transaction) => void;
+  onDelete: (t: Transaction) => Promise<void>;
 }) {
   const {
     search,
@@ -158,9 +162,13 @@ export function TransactionsTable({
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [excludeSearch, setExcludeSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("Todas");
   const [excludeMonth, setExcludeMonth] = useState("Ninguno");
   const [excludeDate, setExcludeDate] = useState("");
   const [hideRecurringSuggestions, setHideRecurringSuggestions] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const months = Array.from(new Set(txs.map((t) => monthKey(t.Fecha))))
     .filter((m) => m && m !== "N/A")
@@ -168,6 +176,17 @@ export function TransactionsTable({
   const monthOptions = [
     { value: "Todos", label: "Todos los meses" },
     ...months.map((item) => ({ value: item, label: item })),
+  ];
+  const categories = Array.from(
+    new Set(
+      txs
+        .map((t) => String(t.Categoría ?? "").trim())
+        .filter(Boolean)
+    )
+  ).sort((a, b) => a.localeCompare(b));
+  const categoryOptions = [
+    { value: "Todas", label: "Todas categorias" },
+    ...categories.map((item) => ({ value: item, label: item })),
   ];
   const typeOptions = [
     { value: "Todos", label: "Todos" },
@@ -215,8 +234,10 @@ export function TransactionsTable({
       t.EsSugerenciaRecurrente ? "recurrente sugerido" : "",
     ].join(" ");
 
-    const matchesSearch = matchesImporteQuery(s, importe);
+    const matchesSearch = matchesMainQuery(s, desc, importe);
     const matchesMonth = month === "Todos" ? true : m === month;
+    const matchesCategory =
+      categoryFilter === "Todas" ? true : categoria === categoryFilter;
     const matchesType = type === "Todos" ? true : t.Tipo === type;
     const matchesStatus = status === "Todos" ? true : estado.toLowerCase() === status.toLowerCase();
     const excludedBySearch =
@@ -228,6 +249,7 @@ export function TransactionsTable({
     return (
       matchesSearch &&
       matchesMonth &&
+      matchesCategory &&
       matchesType &&
       matchesStatus &&
       !excludedBySearch &&
@@ -239,6 +261,7 @@ export function TransactionsTable({
     txs,
     search,
     month,
+    categoryFilter,
     type,
     status,
     excludeSearch,
@@ -252,6 +275,7 @@ export function TransactionsTable({
   }, [
     search,
     month,
+    categoryFilter,
     type,
     status,
     pageSize,
@@ -282,6 +306,26 @@ export function TransactionsTable({
   const selectClass = "native-filter-select";
   const optionClass = "native-filter-option";
 
+  const confirmDelete = async () => {
+    if (!deleteTarget || deleting) return;
+
+    setDeleting(true);
+    setDeleteError("");
+
+    try {
+      await onDelete(deleteTarget);
+      setDeleteTarget(null);
+    } catch (error) {
+      setDeleteError(
+        error instanceof Error
+          ? error.message
+          : "No se pudo eliminar la transaccion."
+      );
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
@@ -299,11 +343,11 @@ export function TransactionsTable({
         </div>
 
         {/* Filtros */}
-        <div className="grid w-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(240px,1.6fr)_minmax(150px,1fr)_minmax(120px,0.8fr)_minmax(150px,1fr)] xl:max-w-[900px] xl:items-center">
+        <div className="grid w-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1.35fr)_minmax(140px,0.85fr)_minmax(170px,1fr)_minmax(120px,0.7fr)_minmax(140px,0.85fr)] xl:max-w-[980px] xl:items-center">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por importe (ej. 20,000)"
+            placeholder="Buscar por descripcion o importe"
             className={
               controlBase +
               " native-filter-input w-full min-w-0 placeholder-white/50 sm:col-span-2 lg:col-span-1"
@@ -315,6 +359,13 @@ export function TransactionsTable({
             onChange={setMonth}
             options={monthOptions}
             triggerClassName={selectClass}
+          />
+          <CustomSelect
+            value={categoryFilter}
+            onChange={setCategoryFilter}
+            options={categoryOptions}
+            triggerClassName={selectClass}
+            contentClassName="max-h-72"
           />
           <CustomSelect
             value={type}
@@ -400,17 +451,28 @@ export function TransactionsTable({
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl ring-1 ring-white/10">
-        <table className="min-w-full text-sm">
+      <div className="overflow-hidden rounded-2xl ring-1 ring-white/10">
+        <table className="w-full table-fixed text-sm">
+          <colgroup>
+            <col className="w-[9%]" />
+            <col className="w-[7%]" />
+            <col className="w-[17%]" />
+            <col className="w-[11%]" />
+            <col className="w-[9%]" />
+            <col />
+            <col className="w-[236px]" />
+          </colgroup>
           <thead className="bg-white/5 text-white/70">
             <tr>
-              <th className="px-4 py-3 text-left font-medium">Fecha</th>
-              <th className="px-4 py-3 text-left font-medium">Tipo</th>
-              <th className="px-4 py-3 text-left font-medium">Categoría</th>
-              <th className="px-4 py-3 text-right font-medium">Importe</th>
-              <th className="px-4 py-3 text-left font-medium">Estado</th>
-              <th className="px-4 py-3 text-left font-medium">Descripción</th>
-              <th className="px-4 py-3 text-right font-medium">Acciones</th>
+              <th className="px-3 py-3 text-left font-medium">Fecha</th>
+              <th className="px-3 py-3 text-left font-medium">Tipo</th>
+              <th className="px-3 py-3 text-left font-medium">Categoría</th>
+              <th className="px-3 py-3 text-right font-medium">Importe</th>
+              <th className="px-3 py-3 text-left font-medium">Estado</th>
+              <th className="px-3 py-3 text-left font-medium">Descripción</th>
+              <th className="px-3 py-3 text-right font-medium">
+                Acciones
+              </th>
             </tr>
           </thead>
 
@@ -420,9 +482,9 @@ export function TransactionsTable({
 
               return (
                 <tr key={t.ID} className="border-t border-white/10 hover:bg-white/[0.03]">
-                  <td className="px-4 py-3 whitespace-nowrap text-white/80">{t.Fecha}</td>
+                  <td className="px-3 py-3 whitespace-nowrap text-white/80">{t.Fecha}</td>
 
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-3">
                     <span
                       className={`rounded-full px-2 py-1 text-xs ring-1 transition-all duration-200 ${
                         isIngreso
@@ -434,11 +496,13 @@ export function TransactionsTable({
                     </span>
                   </td>
 
-                  <td className="px-4 py-3 text-white/80">{t.Categoría}</td>
+                  <td className="px-3 py-3 text-white/80">
+                    <span className="block truncate">{t.Categoría}</span>
+                  </td>
 
-                  <td className="px-4 py-3 text-right font-medium">{money(Number(t.Importe) || 0)}</td>
+                  <td className="px-3 py-3 text-right font-medium">{money(Number(t.Importe) || 0)}</td>
 
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-3">
                     <span
                       className={`rounded-full px-2 py-1 text-xs ring-1 ${
                         t.EstadoPago === "Pagado"
@@ -450,8 +514,8 @@ export function TransactionsTable({
                     </span>
                   </td>
 
-                  <td className="px-4 py-3 text-white/70">
-                    <div className="flex max-w-[420px] flex-col gap-1">
+                  <td className="px-3 py-3 text-white/70">
+                    <div className="flex min-w-0 flex-col gap-1">
                       {t.EsSugerenciaRecurrente && (
                         <span className="recurring-suggestion-badge w-fit rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1">
                           <span className="recurring-suggestion-dot" />
@@ -464,11 +528,11 @@ export function TransactionsTable({
                     </div>
                   </td>
 
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex justify-end gap-2">
+                  <td className="px-3 py-3 text-right">
+                    <div className="flex flex-nowrap justify-end gap-1.5">
                       <button
                         onClick={() => onEdit(t)}
-                        className="inline-flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-xs ring-1 ring-white/10 hover:bg-white/10"
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-white/5 px-2.5 py-2 text-[11px] font-medium ring-1 ring-white/10 transition hover:bg-white/10"
                       >
                         <Pencil className="h-3.5 w-3.5 text-orange-300" />
                         Editar
@@ -476,13 +540,23 @@ export function TransactionsTable({
 
                       <button
                         onClick={() => {
-                          console.log("CLONE CLICK", t);
                           onClone(t);
                         }}
-                        className="inline-flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-xs ring-1 ring-white/10 hover:bg-white/10"
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-white/5 px-2.5 py-2 text-[11px] font-medium ring-1 ring-white/10 transition hover:bg-white/10"
                       >
                         <Copy className="h-3.5 w-3.5 text-violet-300" />
                         Clonar
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setDeleteError("");
+                          setDeleteTarget(t);
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-rose-500/10 px-2.5 py-2 text-[11px] font-medium text-rose-100 ring-1 ring-rose-300/20 transition hover:bg-rose-500/15"
+                      >
+                        <Trash2 className="h-3.5 w-3.5 text-rose-300" />
+                        Eliminar
                       </button>
                     </div>
                   </td>
@@ -555,6 +629,69 @@ export function TransactionsTable({
           </div>
         </div>
       </div>
+
+      {deleteTarget && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl border border-white/10 bg-slate-950 p-5 text-white shadow-2xl shadow-black/40">
+            <div className="mb-4 flex items-start gap-3">
+              <div className="rounded-2xl bg-rose-500/10 p-3 text-rose-200 ring-1 ring-rose-300/20">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold">Eliminar transaccion</h3>
+                <p className="mt-1 text-sm leading-6 text-white/60">
+                  Estas seguro de que deseas eliminar esta transaccion? Esta accion no se puede deshacer.
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-white/[0.04] p-3 text-sm ring-1 ring-white/10">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-white/55">Fecha</span>
+                <span className="font-medium">{deleteTarget.Fecha}</span>
+              </div>
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <span className="text-white/55">Categoria</span>
+                <span className="max-w-[240px] truncate font-medium">
+                  {deleteTarget.Categoría}
+                </span>
+              </div>
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <span className="text-white/55">Importe</span>
+                <span className="font-semibold">{money(Number(deleteTarget.Importe) || 0)}</span>
+              </div>
+            </div>
+
+            {deleteError && (
+              <div className="mt-4 rounded-2xl bg-rose-500/10 p-3 text-sm text-rose-100 ring-1 ring-rose-300/20">
+                {deleteError}
+              </div>
+            )}
+
+            <div className="mt-5 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  if (deleting) return;
+                  setDeleteTarget(null);
+                  setDeleteError("");
+                }}
+                className="rounded-xl bg-white/5 px-4 py-2 text-sm font-semibold text-white/75 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={confirmDelete}
+                disabled={deleting}
+                className="rounded-xl bg-rose-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-rose-500/20 transition hover:bg-rose-400 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {deleting ? "Eliminando..." : "Si, eliminar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }

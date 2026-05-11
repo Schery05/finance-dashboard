@@ -22,6 +22,9 @@ export async function GET() {
     const user = await getAuthenticatedUser();
     const debts = await prisma.debt.findMany({
       where: { userId: user.id },
+      include: {
+        installmentStatuses: true,
+      },
       orderBy: [{ currentBalance: "desc" }, { name: "asc" }],
     });
 

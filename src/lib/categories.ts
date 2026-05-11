@@ -85,11 +85,8 @@ export function loadManagedCategories(): ManagedCategories {
 
     const parsed = JSON.parse(raw) as Partial<ManagedCategories>;
     return {
-      Ingreso: uniqueSorted([
-        ...DEFAULT_INGRESO_CATEGORIES,
-        ...(parsed.Ingreso ?? []),
-      ]),
-      Gasto: uniqueSorted([...DEFAULT_GASTO_CATEGORIES, ...(parsed.Gasto ?? [])]),
+      Ingreso: uniqueSorted(parsed.Ingreso ?? []),
+      Gasto: uniqueSorted(parsed.Gasto ?? []),
     };
   } catch {
     return DEFAULT_CATEGORIES;
