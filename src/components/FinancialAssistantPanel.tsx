@@ -1,7 +1,7 @@
 "use client";
 
 import { Bot, Lightbulb, Send, Sparkles } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Budget } from "@/lib/budgets";
 import {
   answerFinancialQuestion,
@@ -15,6 +15,15 @@ type ChatMessage = {
   id: string;
   role: "assistant" | "user";
   content: string;
+};
+
+type AssistantApiResponse = {
+  ok: boolean;
+  data?: {
+    answer: string;
+    source: "openai" | "local";
+  };
+  error?: string;
 };
 
 const quickQuestions = [
@@ -44,10 +53,12 @@ async function fetchJson<T>(url: string, fallback: T): Promise<T> {
 
 export function FinancialAssistantPanel() {
   const transactions = useFinanceStore((state) => state.transactions);
+  const messageIdRef = useRef(0);
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [debts, setDebts] = useState<Debt[]>([]);
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [question, setQuestion] = useState("");
+  const [isAsking, setIsAsking] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "welcome",
@@ -86,18 +97,46 @@ export function FinancialAssistantPanel() {
     [context]
   );
 
-  const ask = (text: string) => {
+  const ask = async (text: string) => {
     const clean = text.trim();
-    if (!clean) return;
+    if (!clean || isAsking) return;
 
-    const answer = answerFinancialQuestion(clean, context);
-    const now = Date.now();
+    messageIdRef.current += 1;
+    const nextId = messageIdRef.current;
     setMessages((prev) => [
       ...prev,
-      { id: `u-${now}`, role: "user", content: clean },
-      { id: `a-${now}`, role: "assistant", content: answer },
+      { id: `u-${nextId}`, role: "user", content: clean },
     ]);
     setQuestion("");
+    setIsAsking(true);
+
+    try {
+      const res = await fetch("/api/financial-assistant", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ question: clean, context }),
+      });
+      const json = (await res.json()) as AssistantApiResponse;
+      if (!json.ok || !json.data?.answer) {
+        throw new Error(json.error ?? "No se pudo generar la respuesta.");
+      }
+      const answer = json.data.answer;
+
+      setMessages((prev) => [
+        ...prev,
+        { id: `a-${nextId}`, role: "assistant", content: answer },
+      ]);
+    } catch {
+      const answer = answerFinancialQuestion(clean, context);
+      setMessages((prev) => [
+        ...prev,
+        { id: `a-${nextId}`, role: "assistant", content: answer },
+      ]);
+    } finally {
+      setIsAsking(false);
+    }
   };
 
   return (
@@ -152,7 +191,7 @@ export function FinancialAssistantPanel() {
               {quickQuestions.map((item) => (
                 <button
                   key={item}
-                  onClick={() => ask(item)}
+                  onClick={() => void ask(item)}
                   className="assistant-quick-question rounded-full px-3 py-2 text-xs ring-1 transition"
                 >
                   {item}
@@ -177,7 +216,7 @@ export function FinancialAssistantPanel() {
                 className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-6 ${
+                  className={`max-w-[82%] whitespace-pre-line rounded-2xl px-4 py-3 text-sm leading-6 ${
                     message.role === "user"
                       ? "assistant-message-user"
                       : "assistant-message-bot ring-1"
@@ -187,6 +226,13 @@ export function FinancialAssistantPanel() {
                 </div>
               </div>
             ))}
+            {isAsking && (
+              <div className="flex justify-start">
+                <div className="assistant-message-bot max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-6 ring-1">
+                  Analizando tus datos financieros...
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
@@ -194,17 +240,19 @@ export function FinancialAssistantPanel() {
               value={question}
               onChange={(event) => setQuestion(event.target.value)}
               onKeyDown={(event) => {
-                if (event.key === "Enter") ask(question);
+                if (event.key === "Enter") void ask(question);
               }}
               placeholder="Ej. Estoy gastando mucho este mes?"
+              disabled={isAsking}
               className="assistant-input min-h-11 flex-1 rounded-xl px-4 py-3 text-sm outline-none ring-1 focus:ring-2"
             />
             <button
-              onClick={() => ask(question)}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
+              onClick={() => void ask(question)}
+              disabled={isAsking}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Send className="h-4 w-4" />
-              Enviar
+              {isAsking ? "Analizando" : "Enviar"}
             </button>
           </div>
         </div>

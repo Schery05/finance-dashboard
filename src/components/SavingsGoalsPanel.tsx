@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   CalendarDays,
   CheckCircle2,
+  Clock3,
   Loader2,
   Plus,
   Target,
@@ -64,6 +65,71 @@ const dateLabel = (date: string) => {
     month: "short",
     year: "numeric",
   }).format(parsed);
+};
+
+const parseLocalDate = (date: string) => {
+  if (!date) return null;
+  const parsed = new Date(`${date}T00:00:00`);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const daysUntil = (date: string) => {
+  const target = parseLocalDate(date);
+  if (!target) return null;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Math.ceil((target.getTime() - today.getTime()) / 86400000);
+};
+
+const deadlineStatus = (goal: SavingsGoal, percent: number) => {
+  const days = daysUntil(goal.FechaLimite);
+
+  if (percent >= 100) {
+    return {
+      label: "Meta completada",
+      className: "bg-emerald-400/10 text-emerald-200 ring-emerald-300/20",
+      priority: 4,
+    };
+  }
+
+  if (days === null) {
+    return {
+      label: "Sin fecha objetivo",
+      className: "bg-white/5 text-white/55 ring-white/10",
+      priority: 3,
+    };
+  }
+
+  if (days < 0) {
+    return {
+      label: `Vencida hace ${Math.abs(days)} dia${Math.abs(days) === 1 ? "" : "s"}`,
+      className: "bg-rose-500/10 text-rose-200 ring-rose-300/25",
+      priority: 0,
+    };
+  }
+
+  if (days === 0) {
+    return {
+      label: "Vence hoy",
+      className: "bg-rose-500/10 text-rose-200 ring-rose-300/25",
+      priority: 0,
+    };
+  }
+
+  if (days <= 30) {
+    return {
+      label: `Faltan ${days} dia${days === 1 ? "" : "s"}`,
+      className: "bg-amber-400/10 text-amber-200 ring-amber-300/25",
+      priority: 1,
+    };
+  }
+
+  return {
+    label: `Faltan ${days} dias`,
+    className: "bg-blue-500/10 text-blue-100 ring-blue-300/20",
+    priority: 2,
+  };
 };
 
 const isSavingsTransaction = (t: Transaction) => {
@@ -161,7 +227,7 @@ export function SavingsGoalsPanel() {
 
   const activeGoal = goals.find((goal) => goal.ID === activeGoalId) ?? goals[0];
 
-  const goalProgress = (goal: SavingsGoal) => {
+  const goalProgress = useCallback((goal: SavingsGoal) => {
     const transactionTotal = goal.TransaccionesAsociadas.reduce((sum, id) => {
       const tx = txById.get(id);
       return sum + (Number(tx?.Importe) || 0);
@@ -179,7 +245,28 @@ export function SavingsGoalsPanel() {
       percent,
       remaining: Math.max(goal.MontoObjetivo - current, 0),
     };
-  };
+  }, [txById]);
+
+  const prioritizedGoals = useMemo(() => {
+    return [...goals].sort((a, b) => {
+      const aProgress = goalProgress(a);
+      const bProgress = goalProgress(b);
+      const aStatus = deadlineStatus(a, aProgress.percent);
+      const bStatus = deadlineStatus(b, bProgress.percent);
+      if (aStatus.priority !== bStatus.priority) {
+        return aStatus.priority - bStatus.priority;
+      }
+
+      const aDays = daysUntil(a.FechaLimite);
+      const bDays = daysUntil(b.FechaLimite);
+      if (aDays !== null && bDays !== null && aDays !== bDays) {
+        return aDays - bDays;
+      }
+      if (aDays !== null) return -1;
+      if (bDays !== null) return 1;
+      return a.Nombre.localeCompare(b.Nombre);
+    });
+  }, [goals, goalProgress]);
 
   const createGoal = async () => {
     const amount = parseAmountInput(targetAmount);
@@ -456,8 +543,9 @@ export function SavingsGoalsPanel() {
               Aun no tienes metas. Elige una sugerencia o crea tu primera meta.
             </div>
           ) : (
-            goals.map((goal) => {
+            prioritizedGoals.map((goal) => {
               const progress = goalProgress(goal);
+              const status = deadlineStatus(goal, progress.percent);
               const selected = activeGoal?.ID === goal.ID;
 
               return (
@@ -477,6 +565,12 @@ export function SavingsGoalsPanel() {
                         <CalendarDays className="h-3.5 w-3.5" />
                         {dateLabel(goal.FechaLimite)}
                       </p>
+                      <span
+                        className={`mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ${status.className}`}
+                      >
+                        <Clock3 className="h-3.5 w-3.5" />
+                        {status.label}
+                      </span>
                     </div>
                     <span className="rounded-full bg-white/10 px-2 py-1 text-xs text-white/70">
                       {progress.percent.toFixed(0)}%

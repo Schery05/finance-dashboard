@@ -1,15 +1,29 @@
 "use client";
 
 import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  CalendarDays,
+  CheckCircle2,
   Edit3,
   History,
+  MoreHorizontal,
   Plus,
   Search,
+  SlidersHorizontal,
   Trash2,
   WalletCards,
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import {
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+} from "recharts";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import {
   CATEGORIES_UPDATED_EVENT,
@@ -109,6 +123,122 @@ function progressTextTone(percent: number) {
   if (percent <= 70) return "text-emerald-200";
   if (percent <= 90) return "text-amber-200";
   return "text-rose-200";
+}
+
+function statusStyles(percent: number) {
+  if (percent <= 70) {
+    return {
+      label: "En control",
+      badge:
+        "bg-emerald-400/10 text-emerald-200 ring-emerald-300/20 budget-status-good",
+      stroke: "#7c5cff",
+    };
+  }
+  if (percent <= 90) {
+    return {
+      label: "Necesita atencion",
+      badge:
+        "bg-amber-400/10 text-amber-200 ring-amber-300/25 budget-status-warning",
+      stroke: "#f59e0b",
+    };
+  }
+  return {
+    label: "Sobre limite",
+    badge: "bg-rose-400/10 text-rose-200 ring-rose-300/25 budget-status-danger",
+    stroke: "#fb7185",
+  };
+}
+
+function CircularBudgetProgress({
+  percent,
+  spent,
+  stroke,
+}: {
+  percent: number;
+  spent: number;
+  stroke: string;
+}) {
+  const radius = 46;
+  const circumference = 2 * Math.PI * radius;
+  const progress = Math.min(Math.max(percent, 0), 100);
+  const offset = circumference - (progress / 100) * circumference;
+
+  return (
+    <div className="relative h-32 w-32 shrink-0">
+      <svg className="h-32 w-32 -rotate-90" viewBox="0 0 120 120" aria-hidden>
+        <circle
+          cx="60"
+          cy="60"
+          r={radius}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="10"
+          className="budget-ring-track"
+        />
+        <circle
+          cx="60"
+          cy="60"
+          r={radius}
+          fill="none"
+          stroke={stroke}
+          strokeLinecap="round"
+          strokeWidth="10"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+        <span className="text-xs font-medium text-white/45">
+          {progress.toFixed(0)}%
+        </span>
+        <span className="mt-1 max-w-[5.8rem] break-words text-sm font-semibold leading-tight text-white">
+          {money(spent)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function MonthlyBudgetArc({
+  percent,
+  spent,
+}: {
+  percent: number;
+  spent: number;
+}) {
+  const progress = Math.min(Math.max(percent, 0), 100);
+  const circumference = 220;
+  const offset = circumference - (progress / 100) * circumference;
+
+  return (
+    <div className="relative mx-auto mt-5 h-36 max-w-[260px]">
+      <svg viewBox="0 0 260 150" className="h-full w-full" aria-hidden>
+        <path
+          d="M 34 126 A 96 96 0 0 1 226 126"
+          fill="none"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeWidth="18"
+          className="budget-ring-track"
+          pathLength={circumference}
+        />
+        <path
+          d="M 34 126 A 96 96 0 0 1 226 126"
+          fill="none"
+          stroke="#7c5cff"
+          strokeLinecap="round"
+          strokeWidth="18"
+          pathLength={circumference}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+        />
+      </svg>
+      <div className="absolute inset-x-0 bottom-2 text-center">
+        <p className="text-xs text-white/45">{progress.toFixed(0)}% usado</p>
+        <p className="mt-1 text-2xl font-semibold text-white">{money(spent)}</p>
+      </div>
+    </div>
+  );
 }
 
 export function BudgetsMaintenancePanel() {
@@ -339,23 +469,51 @@ export function BudgetsMaintenancePanel() {
     previousSpentByCategory,
   ]);
 
-  const percentChange = (current: number, previous: number) => {
-    if (previous <= 0) return null;
-    return ((current - previous) / previous) * 100;
-  };
+  const currentExpenseRows = useMemo(() => {
+    return currentBudgets
+      .map((budget) => {
+        const categoryKey = normalizeKey(budget.category);
+        const amount = currentSpentByCategory.get(categoryKey) ?? 0;
+        const previousAmount = previousSpentByCategory.get(categoryKey) ?? 0;
+        const delta =
+          previousAmount > 0 ? ((amount - previousAmount) / previousAmount) * 100 : null;
 
-  const renderSummaryDelta = (current: number, previous: number) => {
-    const delta = percentChange(current, previous);
-    if (delta === null) return "Sin periodo anterior";
+        return {
+          category: budget.category,
+          amount,
+          delta,
+        };
+      })
+      .filter((item) => item.amount > 0)
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 6);
+  }, [currentBudgets, currentSpentByCategory, previousSpentByCategory]);
 
-    const isPositive = delta >= 0;
-    return (
-      <span className={isPositive ? "text-emerald-300" : "text-rose-300"}>
-        {isPositive ? "+" : ""}
-        {delta.toFixed(1)}% vs mes anterior
-      </span>
-    );
-  };
+  const budgetTrendData = useMemo(() => {
+    const months = availablePeriods.slice(0, 6).reverse();
+
+    return months.map((item) => {
+      const monthBudgets = budgets.filter((budget) => budget.period === item);
+      const limit = monthBudgets.reduce(
+        (sum, budget) => sum + (Number(budget.monthlyLimit) || 0),
+        0
+      );
+      const spent = transactions.reduce((sum, tx) => {
+        if (!isExpense(tx)) return sum;
+        if (monthKey(tx.Fecha) !== item) return sum;
+        const hasBudget = monthBudgets.some(
+          (budget) => normalizeKey(budget.category) === normalizeKey(tx.Categoría)
+        );
+        return hasBudget ? sum + (Number(tx.Importe) || 0) : sum;
+      }, 0);
+
+      return {
+        period: item.slice(5),
+        limite: limit,
+        gastado: spent,
+      };
+    });
+  }, [availablePeriods, budgets, transactions]);
 
   const resetForm = () => {
     setCategory("");
@@ -452,29 +610,30 @@ export function BudgetsMaintenancePanel() {
       budget.monthlyLimit > 0
         ? Math.min((spent / budget.monthlyLimit) * 100, 100)
         : 0;
+    const rawPercent =
+      budget.monthlyLimit > 0 ? (spent / budget.monthlyLimit) * 100 : 0;
+    const status = statusStyles(rawPercent);
 
     return (
-      <div key={budget.id} className="glass p-5">
+      <div key={budget.id} className="budget-card p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="break-words text-base font-semibold">
+            <h3 className="break-words text-base font-semibold text-white">
               {budget.category}
             </h3>
-            <p className={`mt-1 text-sm font-medium ${progressTextTone(percent)}`}>
-              {percent.toFixed(0)}% consumido
-            </p>
+            <p className="mt-1 text-xs text-white/45">{budget.period}</p>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => editBudget(budget)}
-              className="rounded-xl bg-white/5 p-2 text-white/70 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white"
+              className="budget-icon-button"
               aria-label={`Editar ${budget.category}`}
             >
               <Edit3 className="h-4 w-4" />
             </button>
             <button
               onClick={() => setDeleteTarget(budget)}
-              className="rounded-xl bg-rose-500/10 p-2 text-rose-200 ring-1 ring-rose-300/20 transition hover:bg-rose-500/15"
+              className="budget-icon-button text-rose-200 hover:text-rose-100"
               aria-label={`Eliminar ${budget.category}`}
             >
               <Trash2 className="h-4 w-4" />
@@ -482,14 +641,41 @@ export function BudgetsMaintenancePanel() {
           </div>
         </div>
 
-        <div className="mt-4 h-2.5 rounded-full bg-white/10">
+        <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <CircularBudgetProgress
+            percent={percent}
+            spent={spent}
+            stroke={status.stroke}
+          />
+          <div className="min-w-0 flex-1">
+            <p className="text-xs text-white/45">Restante</p>
+            <p className="mt-1 text-2xl font-semibold text-white">
+              {money(remaining)}
+            </p>
+            <p className="mt-1 text-xs text-white/45">
+              de {money(budget.monthlyLimit)}
+            </p>
+            <span
+              className={`mt-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ${status.badge}`}
+            >
+              {rawPercent <= 70 ? (
+                <CheckCircle2 className="h-3.5 w-3.5" />
+              ) : (
+                <ArrowUp className="h-3.5 w-3.5" />
+              )}
+              {status.label}
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-5 h-2 rounded-full bg-white/10 budget-line-track">
           <div
             className={`h-full rounded-full ${progressTone(percent)}`}
             style={{ width: `${percent}%` }}
           />
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+        <div className="mt-4 grid grid-cols-3 gap-3 text-xs">
           <div>
             <p className="text-white/45">Gastado</p>
             <p className="mt-1 font-semibold text-white">{money(spent)}</p>
@@ -501,12 +687,10 @@ export function BudgetsMaintenancePanel() {
             </p>
           </div>
           <div>
-            <p className="text-white/45">Restante</p>
-            <p className="mt-1 font-semibold text-white">{money(remaining)}</p>
-          </div>
-          <div>
-            <p className="text-white/45">Periodo</p>
-            <p className="mt-1 font-semibold text-white">{budget.period}</p>
+            <p className="text-white/45">Uso</p>
+            <p className={`mt-1 font-semibold ${progressTextTone(percent)}`}>
+              {rawPercent.toFixed(0)}%
+            </p>
           </div>
         </div>
       </div>
@@ -536,200 +720,265 @@ export function BudgetsMaintenancePanel() {
   };
 
   return (
-    <section className="space-y-4">
-      <div className="glass p-5">
-        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold">Presupuesto</h2>
-            <p className="mt-1 text-sm text-white/60">
-              Define limites mensuales por categoria para {period}.
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setHistoryOpen(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/15 transition hover:bg-white/15"
-            >
-              <History className="h-4 w-4" />
-              Ver historico
-            </button>
-            <div className="rounded-2xl bg-emerald-400/10 p-3 text-emerald-300 ring-1 ring-emerald-300/20">
-              <WalletCards className="h-5 w-5" />
-            </div>
-          </div>
+    <section className="budget-dashboard-shell">
+      <div className="budget-dashboard-header">
+        <div>
+          <h2 className="text-2xl font-semibold text-white">Presupuesto</h2>
+          <p className="mt-1 text-sm text-white/55">
+            Crea y da seguimiento a tus limites por categoria.
+          </p>
         </div>
-
-        {error && (
-          <div className="mb-4 rounded-2xl bg-rose-500/10 p-3 text-sm text-rose-200 ring-1 ring-rose-300/20">
-            {error}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(240px,1fr)_180px_220px_auto] lg:items-end">
-          <label className="text-sm text-white/70">
-            Categoria
-            <CustomSelect
-              value={category}
-              onChange={setCategory}
-              placeholder="Selecciona categoria"
-              options={categoryOptions}
-            />
-          </label>
-
-          <label className="text-sm text-white/70">
-            Periodo
-            <input
-              type="month"
-              value={budgetPeriod}
-              onChange={(event) => setBudgetPeriod(event.target.value)}
-              className="mt-1 w-full rounded-xl bg-white/10 px-3 py-2 text-sm text-white outline-none ring-1 ring-white/15 focus:ring-2 focus:ring-emerald-300/60"
-            />
-          </label>
-
-          <label className="text-sm text-white/70">
-            Monto limite mensual
-            <input
-              value={monthlyLimit}
-              onChange={(event) =>
-                setMonthlyLimit(formatAmountInput(event.target.value))
-              }
-              placeholder="0.00"
-              inputMode="decimal"
-              className="mt-1 w-full rounded-xl bg-white/10 px-3 py-2 text-sm text-white outline-none ring-1 ring-white/15 placeholder:text-white/45 focus:ring-2 focus:ring-emerald-300/60"
-            />
-          </label>
-
-          <div className="flex gap-2">
-            {editingId && (
-              <button
-                onClick={resetForm}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/15 transition hover:bg-white/15"
-              >
-                <X className="h-4 w-4" />
-                Cancelar
-              </button>
-            )}
-            <button
-              onClick={saveBudget}
-              disabled={saving}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-200"
-            >
-              {editingId ? <Edit3 className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-              {saving ? "Guardando..." : editingId ? "Actualizar" : "Crear"}
-            </button>
-          </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button className="budget-toolbar-button" type="button">
+            <CalendarDays className="h-4 w-4" />
+            Este mes
+          </button>
+          <button className="budget-toolbar-icon" type="button" aria-label="Ordenar">
+            <ArrowUpDown className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setHistoryOpen(true)}
+            className="budget-toolbar-button"
+          >
+            <History className="h-4 w-4" />
+            Historico
+          </button>
+          <button className="budget-toolbar-icon" type="button" aria-label="Filtros">
+            <SlidersHorizontal className="h-4 w-4" />
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="glass p-5">
-          <p className="text-xs font-medium uppercase tracking-wide text-white/45">
-            Limite mensual total
-          </p>
-          <p className="mt-3 text-2xl font-semibold">
-            {money(budgetSummary.totalLimit)}
-          </p>
-          <p className="mt-2 text-sm text-white/55">
-            En {budgetSummary.activeCount} categoria(s) activas
-          </p>
-          <p className="mt-1 text-xs font-semibold">
-            {renderSummaryDelta(
-              budgetSummary.totalLimit,
-              budgetSummary.previousLimit
-            )}
-          </p>
+      {error && (
+        <div className="rounded-2xl bg-rose-500/10 p-3 text-sm text-rose-200 ring-1 ring-rose-300/20">
+          {error}
         </div>
+      )}
 
-        <div className="glass p-5">
-          <p className="text-xs font-medium uppercase tracking-wide text-white/45">
-            Total gastado
-          </p>
-          <p className="mt-3 text-2xl font-semibold">
-            {money(budgetSummary.totalSpent)}
-          </p>
-          <p className="mt-2 text-sm text-white/55">
-            {budgetSummary.usedPercent.toFixed(0)}% del limite total usado
-          </p>
-          <p className="mt-1 text-xs font-semibold">
-            {renderSummaryDelta(
-              budgetSummary.totalSpent,
-              budgetSummary.previousSpent
-            )}
-          </p>
-        </div>
-
-        <div className="glass p-5">
-          <p className="text-xs font-medium uppercase tracking-wide text-white/45">
-            Presupuesto en riesgo
-          </p>
-          <p className="mt-3 text-2xl font-semibold">
-            {budgetSummary.atRiskCount} categoria(s)
-          </p>
-          <p className="mt-2 text-sm text-white/55">
-            Sobre 80% de consumo del limite
-          </p>
-          <p className="mt-1 text-xs font-semibold text-amber-200">
-            Revisa estas categorias
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <div className="xl:col-span-2">
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <div>
-              <h3 className="text-base font-semibold">Periodo actual</h3>
-              <p className="mt-1 text-sm text-white/55">{period}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 rounded-2xl bg-white/[0.03] p-3 ring-1 ring-white/10 md:grid-cols-[1fr_260px] md:items-end">
-            <label className="text-sm text-white/70">
-              Buscar presupuesto
-              <div className="relative mt-1">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/45" />
-                <input
-                  value={currentSearch}
-                  onChange={(event) => setCurrentSearch(event.target.value)}
-                  placeholder="Buscar por categoria dentro del periodo"
-                  className="w-full rounded-xl bg-white/10 py-2 pl-9 pr-3 text-sm text-white outline-none ring-1 ring-white/15 placeholder:text-white/45 focus:ring-2 focus:ring-emerald-300/60"
-                />
-              </div>
-            </label>
-
-            <label className="text-sm text-white/70">
-              Filtrar categoria
-              <div className="mt-1">
+      <div className="grid grid-cols-1 gap-6 2xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="space-y-6">
+          <div className="budget-form-panel p-5">
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(260px,1fr)_170px_220px_auto] xl:items-end">
+              <label className="text-sm text-white/70">
+                Categoria
                 <CustomSelect
-                  value={currentCategoryFilter}
-                  onChange={setCurrentCategoryFilter}
-                  options={currentCategoryFilterOptions}
-                  searchable
-                  searchPlaceholder="Buscar categoria"
+                  value={category}
+                  onChange={setCategory}
+                  placeholder="Selecciona categoria"
+                  options={categoryOptions}
                 />
+              </label>
+
+              <label className="text-sm text-white/70">
+                Periodo
+                <input
+                  type="month"
+                  value={budgetPeriod}
+                  onChange={(event) => setBudgetPeriod(event.target.value)}
+                  className="budget-input mt-1"
+                />
+              </label>
+
+              <label className="text-sm text-white/70">
+                Monto limite
+                <input
+                  value={monthlyLimit}
+                  onChange={(event) =>
+                    setMonthlyLimit(formatAmountInput(event.target.value))
+                  }
+                  placeholder="0.00"
+                  inputMode="decimal"
+                  className="budget-input mt-1"
+                />
+              </label>
+
+              <div className="flex gap-2">
+                {editingId && (
+                  <button onClick={resetForm} className="budget-toolbar-button">
+                    <X className="h-4 w-4" />
+                    Cancelar
+                  </button>
+                )}
+                <button
+                  onClick={saveBudget}
+                  disabled={saving}
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-emerald-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {editingId ? <Edit3 className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                  {saving ? "Guardando..." : editingId ? "Actualizar" : "Nuevo presupuesto"}
+                </button>
               </div>
-            </label>
+            </div>
+          </div>
+
+          <div className="budget-filter-panel flex flex-col gap-4 p-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-white">
+                {filteredCurrentBudgets.length} items
+              </p>
+              <p className="mt-1 text-xs text-white/45">
+                Presupuestos activos para {period}
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:w-[620px] md:grid-cols-[1fr_240px]">
+              <label className="text-sm text-white/70">
+                Buscar
+                <div className="relative mt-1">
+                  <Search className="pointer-events-none absolute left-5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/45" />
+                  <input
+                    value={currentSearch}
+                    onChange={(event) => setCurrentSearch(event.target.value)}
+                    placeholder="Buscar categoria"
+                    className="budget-input budget-search-input w-full py-2 pr-3"
+                  />
+                </div>
+              </label>
+              <label className="text-sm text-white/70">
+                Categoria
+                <div className="mt-1">
+                  <CustomSelect
+                    value={currentCategoryFilter}
+                    onChange={setCurrentCategoryFilter}
+                    options={currentCategoryFilterOptions}
+                    searchable
+                    searchPlaceholder="Buscar categoria"
+                  />
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+            {loading ? (
+              <div className="budget-card p-6 text-center text-sm text-white/55 xl:col-span-2">
+                Cargando presupuesto...
+              </div>
+            ) : currentBudgets.length === 0 ? (
+              <div className="budget-card p-6 text-center text-sm text-white/55 xl:col-span-2">
+                Aun no hay presupuesto para el periodo actual.
+              </div>
+            ) : filteredCurrentBudgets.length === 0 ? (
+              <div className="budget-card p-6 text-center text-sm text-white/55 xl:col-span-2">
+                No hay presupuesto con la busqueda o categoria seleccionada.
+              </div>
+            ) : (
+              filteredCurrentBudgets.map((budget) =>
+                renderBudgetCard(budget, currentSpentByCategory)
+              )
+            )}
           </div>
         </div>
 
-        {loading ? (
-          <div className="glass p-6 text-center text-sm text-white/55 xl:col-span-2">
-            Cargando presupuesto...
+        <aside className="space-y-4">
+          <div className="budget-side-card p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="text-lg font-semibold text-white">Presupuesto mensual</h3>
+                <p className="mt-1 text-sm text-white/50">{period}</p>
+              </div>
+              <button className="budget-toolbar-icon" type="button" aria-label="Mas opciones">
+                <MoreHorizontal className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="mt-4 text-3xl font-semibold text-white">
+              {money(budgetSummary.totalLimit)}
+            </p>
+            <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 px-2.5 py-1 text-xs font-medium text-emerald-200 ring-1 ring-emerald-300/20 budget-status-good">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              {budgetSummary.usedPercent <= 100 ? "En control" : "Sobre limite"}
+            </span>
+            <MonthlyBudgetArc
+              percent={budgetSummary.usedPercent}
+              spent={budgetSummary.totalSpent}
+            />
+            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+              <div className="rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
+                <p className="text-white/45">Restante</p>
+                <p className="mt-1 font-semibold text-white">
+                  {money(Math.max(budgetSummary.totalLimit - budgetSummary.totalSpent, 0))}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
+                <p className="text-white/45">En riesgo</p>
+                <p className="mt-1 font-semibold text-white">
+                  {budgetSummary.atRiskCount}
+                </p>
+              </div>
+            </div>
           </div>
-        ) : currentBudgets.length === 0 ? (
-          <div className="glass p-6 text-center text-sm text-white/55 xl:col-span-2">
-            Aun no hay presupuesto para el periodo actual.
+
+          <div className="budget-side-card p-5">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-base font-semibold text-white">Mas gastos</h3>
+              <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/55 ring-1 ring-white/10">
+                Este mes
+              </span>
+            </div>
+            <div className="mt-4 space-y-3">
+              {currentExpenseRows.length === 0 ? (
+                <p className="rounded-2xl bg-white/5 p-4 text-sm text-white/55 ring-1 ring-white/10">
+                  No hay gastos registrados para este periodo.
+                </p>
+              ) : (
+                currentExpenseRows.map((item) => {
+                  const isDown = item.delta !== null && item.delta < 0;
+                  return (
+                    <div key={item.category} className="flex items-center gap-3">
+                      <div className="budget-expense-icon">
+                        <WalletCards className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-white">
+                          {money(item.amount)}
+                        </p>
+                        <p className="truncate text-xs text-white/45">{item.category}</p>
+                      </div>
+                      {item.delta !== null && (
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold ${
+                            isDown
+                              ? "bg-emerald-400/10 text-emerald-200"
+                              : "bg-rose-400/10 text-rose-200"
+                          }`}
+                        >
+                          {isDown ? (
+                            <ArrowDown className="h-3 w-3" />
+                          ) : (
+                            <ArrowUp className="h-3 w-3" />
+                          )}
+                          {Math.abs(item.delta).toFixed(1)}%
+                        </span>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
-        ) : filteredCurrentBudgets.length === 0 ? (
-          <div className="glass p-6 text-center text-sm text-white/55 xl:col-span-2">
-            No hay presupuesto con la busqueda o categoria seleccionada.
+
+          <div className="budget-side-card p-5">
+            <h3 className="text-base font-semibold text-white">Tendencia</h3>
+            <div className="mt-4 h-44">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={budgetTrendData}>
+                  <XAxis dataKey="period" tickLine={false} axisLine={false} tick={{ fill: "var(--chart-axis)", fontSize: 11 }} />
+                  <Tooltip
+                    formatter={(value) => money(Number(value))}
+                    contentStyle={{
+                      background: "var(--chart-tooltip-bg)",
+                      border: "1px solid var(--chart-tooltip-border)",
+                      borderRadius: 14,
+                      color: "var(--foreground)",
+                    }}
+                  />
+                  <Line type="monotone" dataKey="limite" stroke="#7c5cff" strokeWidth={3} dot={false} />
+                  <Line type="monotone" dataKey="gastado" stroke="#22c55e" strokeWidth={3} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-        ) : (
-          filteredCurrentBudgets.map((budget) =>
-            renderBudgetCard(budget, currentSpentByCategory)
-          )
-        )}
+        </aside>
       </div>
 
       {deleteTarget && (
