@@ -57,6 +57,15 @@ const parseAmountInput = (value: string) => {
   return Number.isFinite(amount) ? amount : 0;
 };
 
+const normalizeAmountInput = (value: string) => {
+  const clean = value.replace(/[^\d.,]/g, "");
+  const [integer = "", ...decimalParts] = clean.split(".");
+  const decimals = decimalParts.join("").slice(0, 2);
+
+  if (decimalParts.length > 0) return `${integer}.${decimals}`;
+  return integer;
+};
+
 const formatAmountInput = (value: number) => {
   if (!Number.isFinite(value)) return "";
   return amountInputFormatter.format(value);
@@ -88,6 +97,7 @@ export function AddTransactionModal({
     DescripcionAdicional: "",
     EsPagoDeuda: false,
   });
+  const [amountInput, setAmountInput] = useState("");
 
   const update = <K extends keyof TransactionInput>(
     key: K,
@@ -215,6 +225,7 @@ export function AddTransactionModal({
         DeudaId: editing.DeudaId ?? "",
         CuotaActual: editing.CuotaActual,
       });
+      setAmountInput(formatAmountInput(Number(editing.Importe) || 0));
       return;
     }
 
@@ -233,9 +244,11 @@ export function AddTransactionModal({
         DeudaId: cloning.DeudaId ?? "",
         CuotaActual: cloning.CuotaActual,
       });
+      setAmountInput(formatAmountInput(Number(cloning.Importe) || 0));
       return;
     }
 
+    setAmountInput("");
     setForm({
       Fecha: new Date().toISOString().slice(0, 10),
       Tipo: "Gasto",
@@ -259,11 +272,12 @@ export function AddTransactionModal({
   }, [categories, form.Tipo]);
 
   const submit = async () => {
+    const amount = parseAmountInput(amountInput);
     const payload: TransactionInput = {
       Fecha: form.Fecha,
       Tipo: form.Tipo,
       Categoría: form.Categoría,
-      Importe: Number(form.Importe) || 0,
+      Importe: amount,
       EstadoPago: form.EstadoPago,
       DescripcionAdicional: form.DescripcionAdicional ?? "",
       EsPagoDeuda: Boolean(form.EsPagoDeuda),
@@ -367,8 +381,13 @@ export function AddTransactionModal({
                   Importe
                   <input
                     type="text"
-                    value={formatAmountInput(form.Importe)}
-                    onChange={(e) => update("Importe", parseAmountInput(e.target.value))}
+                    value={amountInput}
+                    onChange={(e) => {
+                      const next = normalizeAmountInput(e.target.value);
+                      setAmountInput(next);
+                      update("Importe", parseAmountInput(next));
+                    }}
+                    inputMode="decimal"
                     className="mt-1 w-full rounded-xl bg-white/5 px-3 py-2 text-sm outline-none ring-1 ring-white/10"
                   />
                 </label>

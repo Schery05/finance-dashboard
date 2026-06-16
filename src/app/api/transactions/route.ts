@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { getOrCreateUser } from "@/lib/auth-user";  
 import { mapDBToUI, mapUIToDB } from "@/lib/mappers/transaction.mapper";
@@ -62,6 +63,63 @@ async function applyDebtPayment(
       currentBalance: nextBalance,
     },
   });
+}
+
+type RecurringSuggestionDismissalWriter = {
+  recurringSuggestionDismissal?: {
+    upsert: (args: {
+      where: {
+        userId_recurrenceKey_date: {
+          userId: string;
+          recurrenceKey: string;
+          date: Date;
+        };
+      };
+      update: Record<string, never>;
+      create: {
+        userId: string;
+        recurrenceKey: string;
+        date: Date;
+      };
+    }) => Promise<unknown>;
+  };
+  $executeRawUnsafe: (query: string, ...values: unknown[]) => Promise<unknown>;
+};
+
+async function recordRecurringSuggestionDismissal(
+  db: RecurringSuggestionDismissalWriter,
+  userId: string,
+  recurrenceKey: string,
+  date: Date
+) {
+  if (db.recurringSuggestionDismissal) {
+    await db.recurringSuggestionDismissal.upsert({
+      where: {
+        userId_recurrenceKey_date: {
+          userId,
+          recurrenceKey,
+          date,
+        },
+      },
+      update: {},
+      create: {
+        userId,
+        recurrenceKey,
+        date,
+      },
+    });
+    return;
+  }
+
+  await db.$executeRawUnsafe(
+    `INSERT INTO "RecurringSuggestionDismissal" ("id", "recurrenceKey", "date", "userId")
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT ("userId", "recurrenceKey", "date") DO NOTHING`,
+    randomUUID(),
+    recurrenceKey,
+    date,
+    userId
+  );
 }
 
 export async function GET() {
@@ -282,55 +340,88 @@ export async function DELETE(req: Request) {
     }
 
     const body = await req.json();
-    const id = String(body.id ?? "").trim();
-    if (!id) throw new Error("Falta 'id' para eliminar");
+    const rawIds: unknown[] = Array.isArray(body.ids) ? body.ids : [body.id];
+    const ids = Array.from(
+      new Set(
+        rawIds
+          .map((value) => String(value ?? "").trim())
+          .filter(Boolean)
+      )
+    );
+    if (ids.length === 0) throw new Error("Falta 'id' para eliminar");
 
     const user = await getOrCreateUser(session);
+    let deleted = 0;
 
     await prisma.$transaction(async (tx) => {
-      const current = await tx.transaction.findFirst({
+      const currentTransactions = await tx.transaction.findMany({
         where: {
-          id,
+          id: {
+            in: ids,
+          },
           userId: user.id,
         },
         select: {
           id: true,
+          date: true,
           type: true,
           amount: true,
           paymentStatus: true,
           debtId: true,
+          recurrenceKey: true,
+          isRecurringSuggestion: true,
         },
       });
 
-      if (!current) throw new Error("No se encontro la transaccion.");
+      if (currentTransactions.length === 0) {
+        throw new Error("No se encontro la transaccion.");
+      }
 
-      await applyDebtPayment(
-        tx,
-        user.id,
-        {
-          type: current.type,
-          amount: Number(current.amount),
-          paymentStatus: current.paymentStatus,
-          debtId: current.debtId,
-        },
-        "reverse"
-      );
+      for (const current of currentTransactions) {
+        await applyDebtPayment(
+          tx,
+          user.id,
+          {
+            type: current.type,
+            amount: Number(current.amount),
+            paymentStatus: current.paymentStatus,
+            debtId: current.debtId,
+          },
+          "reverse"
+        );
+
+        if (current.isRecurringSuggestion && current.recurrenceKey) {
+          await recordRecurringSuggestionDismissal(
+            tx as unknown as RecurringSuggestionDismissalWriter,
+            user.id,
+            current.recurrenceKey,
+            current.date
+          );
+        }
+      }
 
       await tx.savingsMovement.deleteMany({
         where: {
-          transactionId: id,
+          transactionId: {
+            in: currentTransactions.map((transaction) => transaction.id),
+          },
           userId: user.id,
         },
       });
 
-      await tx.transaction.delete({
+      const result = await tx.transaction.deleteMany({
         where: {
-          id,
+          id: {
+            in: currentTransactions.map((transaction) => transaction.id),
+          },
+          userId: user.id,
         },
       });
+
+      deleted = result.count;
     });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, deleted });
   } catch (error: unknown) {
     console.error("API /transactions DELETE error:", error);
     return NextResponse.json(

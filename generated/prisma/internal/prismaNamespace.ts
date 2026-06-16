@@ -385,11 +385,13 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
+  Subscription: 'Subscription',
   PasswordResetToken: 'PasswordResetToken',
   BankCategoryRule: 'BankCategoryRule',
   Bank: 'Bank',
   Category: 'Category',
   Transaction: 'Transaction',
+  RecurringSuggestionDismissal: 'RecurringSuggestionDismissal',
   Budget: 'Budget',
   SavingsGoal: 'SavingsGoal',
   SavingsMovement: 'SavingsMovement',
@@ -411,7 +413,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "passwordResetToken" | "bankCategoryRule" | "bank" | "category" | "transaction" | "budget" | "savingsGoal" | "savingsMovement" | "readNotification" | "debt" | "debtInstallmentStatus"
+    modelProps: "user" | "subscription" | "passwordResetToken" | "bankCategoryRule" | "bank" | "category" | "transaction" | "recurringSuggestionDismissal" | "budget" | "savingsGoal" | "savingsMovement" | "readNotification" | "debt" | "debtInstallmentStatus"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -486,6 +488,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UserCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UserCountAggregateOutputType> | number
+        }
+      }
+    }
+    Subscription: {
+      payload: Prisma.$SubscriptionPayload<ExtArgs>
+      fields: Prisma.SubscriptionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SubscriptionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SubscriptionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>
+        }
+        findFirst: {
+          args: Prisma.SubscriptionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SubscriptionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>
+        }
+        findMany: {
+          args: Prisma.SubscriptionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>[]
+        }
+        create: {
+          args: Prisma.SubscriptionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>
+        }
+        createMany: {
+          args: Prisma.SubscriptionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SubscriptionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>[]
+        }
+        delete: {
+          args: Prisma.SubscriptionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>
+        }
+        update: {
+          args: Prisma.SubscriptionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>
+        }
+        deleteMany: {
+          args: Prisma.SubscriptionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SubscriptionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SubscriptionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>[]
+        }
+        upsert: {
+          args: Prisma.SubscriptionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>
+        }
+        aggregate: {
+          args: Prisma.SubscriptionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSubscription>
+        }
+        groupBy: {
+          args: Prisma.SubscriptionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SubscriptionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SubscriptionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SubscriptionCountAggregateOutputType> | number
         }
       }
     }
@@ -856,6 +932,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.TransactionCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.TransactionCountAggregateOutputType> | number
+        }
+      }
+    }
+    RecurringSuggestionDismissal: {
+      payload: Prisma.$RecurringSuggestionDismissalPayload<ExtArgs>
+      fields: Prisma.RecurringSuggestionDismissalFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RecurringSuggestionDismissalFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringSuggestionDismissalPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RecurringSuggestionDismissalFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringSuggestionDismissalPayload>
+        }
+        findFirst: {
+          args: Prisma.RecurringSuggestionDismissalFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringSuggestionDismissalPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RecurringSuggestionDismissalFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringSuggestionDismissalPayload>
+        }
+        findMany: {
+          args: Prisma.RecurringSuggestionDismissalFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringSuggestionDismissalPayload>[]
+        }
+        create: {
+          args: Prisma.RecurringSuggestionDismissalCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringSuggestionDismissalPayload>
+        }
+        createMany: {
+          args: Prisma.RecurringSuggestionDismissalCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RecurringSuggestionDismissalCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringSuggestionDismissalPayload>[]
+        }
+        delete: {
+          args: Prisma.RecurringSuggestionDismissalDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringSuggestionDismissalPayload>
+        }
+        update: {
+          args: Prisma.RecurringSuggestionDismissalUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringSuggestionDismissalPayload>
+        }
+        deleteMany: {
+          args: Prisma.RecurringSuggestionDismissalDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RecurringSuggestionDismissalUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RecurringSuggestionDismissalUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringSuggestionDismissalPayload>[]
+        }
+        upsert: {
+          args: Prisma.RecurringSuggestionDismissalUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringSuggestionDismissalPayload>
+        }
+        aggregate: {
+          args: Prisma.RecurringSuggestionDismissalAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRecurringSuggestionDismissal>
+        }
+        groupBy: {
+          args: Prisma.RecurringSuggestionDismissalGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RecurringSuggestionDismissalGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RecurringSuggestionDismissalCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RecurringSuggestionDismissalCountAggregateOutputType> | number
         }
       }
     }
@@ -1355,6 +1505,25 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const SubscriptionScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  category: 'category',
+  amount: 'amount',
+  currency: 'currency',
+  frequency: 'frequency',
+  nextChargeDate: 'nextChargeDate',
+  autoRenew: 'autoRenew',
+  status: 'status',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum]
+
+
 export const PasswordResetTokenScalarFieldEnum = {
   id: 'id',
   tokenHash: 'tokenHash',
@@ -1423,6 +1592,17 @@ export const TransactionScalarFieldEnum = {
 } as const
 
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
+
+
+export const RecurringSuggestionDismissalScalarFieldEnum = {
+  id: 'id',
+  recurrenceKey: 'recurrenceKey',
+  date: 'date',
+  createdAt: 'createdAt',
+  userId: 'userId'
+} as const
+
+export type RecurringSuggestionDismissalScalarFieldEnum = (typeof RecurringSuggestionDismissalScalarFieldEnum)[keyof typeof RecurringSuggestionDismissalScalarFieldEnum]
 
 
 export const BudgetScalarFieldEnum = {
@@ -1569,16 +1749,16 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
- * Reference to a field of type 'TransactionType'
+ * Reference to a field of type 'Decimal'
  */
-export type EnumTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionType'>
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
     
 
 
 /**
- * Reference to a field of type 'TransactionType[]'
+ * Reference to a field of type 'Decimal[]'
  */
-export type ListEnumTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionType[]'>
+export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
     
 
 
@@ -1590,16 +1770,16 @@ export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
- * Reference to a field of type 'Decimal'
+ * Reference to a field of type 'TransactionType'
  */
-export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+export type EnumTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionType'>
     
 
 
 /**
- * Reference to a field of type 'Decimal[]'
+ * Reference to a field of type 'TransactionType[]'
  */
-export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+export type ListEnumTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionType[]'>
     
 
 
@@ -1783,11 +1963,13 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
+  subscription?: Prisma.SubscriptionOmit
   passwordResetToken?: Prisma.PasswordResetTokenOmit
   bankCategoryRule?: Prisma.BankCategoryRuleOmit
   bank?: Prisma.BankOmit
   category?: Prisma.CategoryOmit
   transaction?: Prisma.TransactionOmit
+  recurringSuggestionDismissal?: Prisma.RecurringSuggestionDismissalOmit
   budget?: Prisma.BudgetOmit
   savingsGoal?: Prisma.SavingsGoalOmit
   savingsMovement?: Prisma.SavingsMovementOmit

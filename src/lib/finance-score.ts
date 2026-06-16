@@ -23,6 +23,8 @@ export type FinancialScoreResult = {
     expenses: number;
     savings: number;
     savingsRate: number;
+    savingsContributions: number;
+    savingsContributionRate: number;
     budgetUsed: number;
     budgetLimit: number;
     paymentsPaid: number;
@@ -61,8 +63,27 @@ function normalizeKey(value: string) {
 }
 
 function getTransactionCategory(tx: Transaction) {
-  const record = tx as unknown as Record<string, string>;
-  return record["Categor\u00c3\u00ada"] ?? record["Categoría"] ?? "";
+  const record = tx as unknown as Record<string, string | undefined>;
+  return record["Categoría"] ?? record["CategorÃ­a"] ?? "";
+}
+
+function getTransactionDescription(tx: Transaction) {
+  return String(tx.DescripcionAdicional ?? "");
+}
+
+function isSavingsTransaction(tx: Transaction) {
+  const text = `${getTransactionCategory(tx)} ${getTransactionDescription(tx)}`
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  const isSavingsWithdrawal =
+    text.includes("toma de ahorro") ||
+    text.includes("retiro de ahorro") ||
+    text.includes("retirar ahorro") ||
+    text.includes("sacar ahorro") ||
+    text.includes("uso de ahorro");
+
+  return text.includes("ahorro") && !isSavingsWithdrawal;
 }
 
 function periodKey(year: number, month: number) {
@@ -116,7 +137,7 @@ export function getScoreRecommendations(
 
   if (breakdown.savingsScore < 80) {
     recommendations.push(
-      "Intenta separar al menos un 10% de tus ingresos antes de cubrir gastos variables."
+      "Intenta registrar aportes de ahorro por al menos un 10% de tus ingresos del mes."
     );
   }
 
@@ -173,7 +194,14 @@ export function calculateFinancialScore({
 
   const savings = income - expenses;
   const savingsRate = income > 0 ? savings / income : 0;
-  const savingsScore = scoreSavings(income, savingsRate);
+  const savingsContributions = periodTransactions
+    .filter((tx) => Number(tx.Importe) > 0)
+    .filter((tx) => normalizeKey(tx.EstadoPago) !== "pendiente")
+    .filter(isSavingsTransaction)
+    .reduce((sum, tx) => sum + (Number(tx.Importe) || 0), 0);
+  const savingsContributionRate =
+    income > 0 ? savingsContributions / income : 0;
+  const savingsScore = scoreSavings(income, savingsContributionRate);
 
   const periodBudgets = budgets.filter(
     (budget) => budget.period === selectedPeriod
@@ -215,6 +243,8 @@ export function calculateFinancialScore({
       expenses,
       savings,
       savingsRate,
+      savingsContributions,
+      savingsContributionRate,
       budgetUsed,
       budgetLimit,
       paymentsPaid,

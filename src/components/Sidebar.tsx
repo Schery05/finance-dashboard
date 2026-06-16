@@ -11,6 +11,7 @@ import {
   Gauge,
   Landmark,
   PiggyBank,
+  Repeat2,
   Tags,
   WalletCards,
   Wrench,
@@ -27,6 +28,7 @@ type ModuleKey =
   | "deudas"
   | "accesibilidad"
   | "ahorros"
+  | "suscripciones"
   | "presupuesto"
   | "mantenimiento";
 type MaintenanceSection = "categorias" | "bancos";
@@ -66,6 +68,11 @@ export function Sidebar({
       key: "ahorros" as const,
       label: "Ahorros",
       Icon: PiggyBank,
+    },
+    {
+      key: "suscripciones" as const,
+      label: "Suscripciones",
+      Icon: Repeat2,
     },
     {
       key: "deudas" as const,

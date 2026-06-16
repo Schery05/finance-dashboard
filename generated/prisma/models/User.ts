@@ -209,6 +209,8 @@ export type UserWhereInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleListRelationFilter
   readNotifications?: Prisma.ReadNotificationListRelationFilter
   passwordResetTokens?: Prisma.PasswordResetTokenListRelationFilter
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalListRelationFilter
+  subscriptions?: Prisma.SubscriptionListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -230,6 +232,8 @@ export type UserOrderByWithRelationInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleOrderByRelationAggregateInput
   readNotifications?: Prisma.ReadNotificationOrderByRelationAggregateInput
   passwordResetTokens?: Prisma.PasswordResetTokenOrderByRelationAggregateInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalOrderByRelationAggregateInput
+  subscriptions?: Prisma.SubscriptionOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -254,6 +258,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   bankCategoryRules?: Prisma.BankCategoryRuleListRelationFilter
   readNotifications?: Prisma.ReadNotificationListRelationFilter
   passwordResetTokens?: Prisma.PasswordResetTokenListRelationFilter
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalListRelationFilter
+  subscriptions?: Prisma.SubscriptionListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -301,6 +307,8 @@ export type UserCreateInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -322,6 +330,8 @@ export type UserUncheckedCreateInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -343,6 +353,8 @@ export type UserUpdateInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -364,6 +376,8 @@ export type UserUncheckedUpdateInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -443,6 +457,20 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type UserCreateNestedOneWithoutSubscriptionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionsInput, Prisma.UserUncheckedCreateWithoutSubscriptionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSubscriptionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSubscriptionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionsInput, Prisma.UserUncheckedCreateWithoutSubscriptionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSubscriptionsInput
+  upsert?: Prisma.UserUpsertWithoutSubscriptionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSubscriptionsInput, Prisma.UserUpdateWithoutSubscriptionsInput>, Prisma.UserUncheckedUpdateWithoutSubscriptionsInput>
+}
+
 export type UserCreateNestedOneWithoutPasswordResetTokensInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutPasswordResetTokensInput
@@ -511,6 +539,20 @@ export type UserUpdateOneRequiredWithoutTransactionsNestedInput = {
   upsert?: Prisma.UserUpsertWithoutTransactionsInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTransactionsInput, Prisma.UserUpdateWithoutTransactionsInput>, Prisma.UserUncheckedUpdateWithoutTransactionsInput>
+}
+
+export type UserCreateNestedOneWithoutRecurringSuggestionDismissalsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRecurringSuggestionDismissalsInput, Prisma.UserUncheckedCreateWithoutRecurringSuggestionDismissalsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRecurringSuggestionDismissalsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutRecurringSuggestionDismissalsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRecurringSuggestionDismissalsInput, Prisma.UserUncheckedCreateWithoutRecurringSuggestionDismissalsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRecurringSuggestionDismissalsInput
+  upsert?: Prisma.UserUpsertWithoutRecurringSuggestionDismissalsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRecurringSuggestionDismissalsInput, Prisma.UserUpdateWithoutRecurringSuggestionDismissalsInput>, Prisma.UserUncheckedUpdateWithoutRecurringSuggestionDismissalsInput>
 }
 
 export type UserCreateNestedOneWithoutBudgetsInput = {
@@ -597,6 +639,110 @@ export type UserUpdateOneRequiredWithoutDebtInstallmentStatusesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDebtInstallmentStatusesInput, Prisma.UserUpdateWithoutDebtInstallmentStatusesInput>, Prisma.UserUncheckedUpdateWithoutDebtInstallmentStatusesInput>
 }
 
+export type UserCreateWithoutSubscriptionsInput = {
+  id?: string
+  email: string
+  passwordHash?: string | null
+  name?: string | null
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutUserInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  savingsMovements?: Prisma.SavingsMovementCreateNestedManyWithoutUserInput
+  debts?: Prisma.DebtCreateNestedManyWithoutUserInput
+  debtInstallmentStatuses?: Prisma.DebtInstallmentStatusCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
+  readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSubscriptionsInput = {
+  id?: string
+  email: string
+  passwordHash?: string | null
+  name?: string | null
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUserInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  savingsMovements?: Prisma.SavingsMovementUncheckedCreateNestedManyWithoutUserInput
+  debts?: Prisma.DebtUncheckedCreateNestedManyWithoutUserInput
+  debtInstallmentStatuses?: Prisma.DebtInstallmentStatusUncheckedCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
+  readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSubscriptionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionsInput, Prisma.UserUncheckedCreateWithoutSubscriptionsInput>
+}
+
+export type UserUpsertWithoutSubscriptionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSubscriptionsInput, Prisma.UserUncheckedUpdateWithoutSubscriptionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionsInput, Prisma.UserUncheckedCreateWithoutSubscriptionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSubscriptionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSubscriptionsInput, Prisma.UserUncheckedUpdateWithoutSubscriptionsInput>
+}
+
+export type UserUpdateWithoutSubscriptionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutUserNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  savingsMovements?: Prisma.SavingsMovementUpdateManyWithoutUserNestedInput
+  debts?: Prisma.DebtUpdateManyWithoutUserNestedInput
+  debtInstallmentStatuses?: Prisma.DebtInstallmentStatusUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
+  readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSubscriptionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutUserNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  savingsMovements?: Prisma.SavingsMovementUncheckedUpdateManyWithoutUserNestedInput
+  debts?: Prisma.DebtUncheckedUpdateManyWithoutUserNestedInput
+  debtInstallmentStatuses?: Prisma.DebtInstallmentStatusUncheckedUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
+  readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedUpdateManyWithoutUserNestedInput
+}
+
 export type UserCreateWithoutPasswordResetTokensInput = {
   id?: string
   email: string
@@ -615,6 +761,8 @@ export type UserCreateWithoutPasswordResetTokensInput = {
   banks?: Prisma.BankCreateNestedManyWithoutUserInput
   bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
@@ -635,6 +783,8 @@ export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
   banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
@@ -671,6 +821,8 @@ export type UserUpdateWithoutPasswordResetTokensInput = {
   banks?: Prisma.BankUpdateManyWithoutUserNestedInput
   bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
@@ -691,6 +843,8 @@ export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
   banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBankCategoryRulesInput = {
@@ -711,6 +865,8 @@ export type UserCreateWithoutBankCategoryRulesInput = {
   banks?: Prisma.BankCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBankCategoryRulesInput = {
@@ -731,6 +887,8 @@ export type UserUncheckedCreateWithoutBankCategoryRulesInput = {
   banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBankCategoryRulesInput = {
@@ -767,6 +925,8 @@ export type UserUpdateWithoutBankCategoryRulesInput = {
   banks?: Prisma.BankUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBankCategoryRulesInput = {
@@ -787,6 +947,8 @@ export type UserUncheckedUpdateWithoutBankCategoryRulesInput = {
   banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBanksInput = {
@@ -807,6 +969,8 @@ export type UserCreateWithoutBanksInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBanksInput = {
@@ -827,6 +991,8 @@ export type UserUncheckedCreateWithoutBanksInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBanksInput = {
@@ -863,6 +1029,8 @@ export type UserUpdateWithoutBanksInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBanksInput = {
@@ -883,6 +1051,8 @@ export type UserUncheckedUpdateWithoutBanksInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCategoriesInput = {
@@ -903,6 +1073,8 @@ export type UserCreateWithoutCategoriesInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCategoriesInput = {
@@ -923,6 +1095,8 @@ export type UserUncheckedCreateWithoutCategoriesInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCategoriesInput = {
@@ -959,6 +1133,8 @@ export type UserUpdateWithoutCategoriesInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCategoriesInput = {
@@ -979,6 +1155,8 @@ export type UserUncheckedUpdateWithoutCategoriesInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTransactionsInput = {
@@ -999,6 +1177,8 @@ export type UserCreateWithoutTransactionsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTransactionsInput = {
@@ -1019,6 +1199,8 @@ export type UserUncheckedCreateWithoutTransactionsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTransactionsInput = {
@@ -1055,6 +1237,8 @@ export type UserUpdateWithoutTransactionsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTransactionsInput = {
@@ -1075,6 +1259,112 @@ export type UserUncheckedUpdateWithoutTransactionsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutRecurringSuggestionDismissalsInput = {
+  id?: string
+  email: string
+  passwordHash?: string | null
+  name?: string | null
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutUserInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalCreateNestedManyWithoutUserInput
+  savingsMovements?: Prisma.SavingsMovementCreateNestedManyWithoutUserInput
+  debts?: Prisma.DebtCreateNestedManyWithoutUserInput
+  debtInstallmentStatuses?: Prisma.DebtInstallmentStatusCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
+  readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutRecurringSuggestionDismissalsInput = {
+  id?: string
+  email: string
+  passwordHash?: string | null
+  name?: string | null
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUserInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedCreateNestedManyWithoutUserInput
+  savingsMovements?: Prisma.SavingsMovementUncheckedCreateNestedManyWithoutUserInput
+  debts?: Prisma.DebtUncheckedCreateNestedManyWithoutUserInput
+  debtInstallmentStatuses?: Prisma.DebtInstallmentStatusUncheckedCreateNestedManyWithoutUserInput
+  banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
+  readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutRecurringSuggestionDismissalsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutRecurringSuggestionDismissalsInput, Prisma.UserUncheckedCreateWithoutRecurringSuggestionDismissalsInput>
+}
+
+export type UserUpsertWithoutRecurringSuggestionDismissalsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutRecurringSuggestionDismissalsInput, Prisma.UserUncheckedUpdateWithoutRecurringSuggestionDismissalsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutRecurringSuggestionDismissalsInput, Prisma.UserUncheckedCreateWithoutRecurringSuggestionDismissalsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutRecurringSuggestionDismissalsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutRecurringSuggestionDismissalsInput, Prisma.UserUncheckedUpdateWithoutRecurringSuggestionDismissalsInput>
+}
+
+export type UserUpdateWithoutRecurringSuggestionDismissalsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutUserNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUpdateManyWithoutUserNestedInput
+  savingsMovements?: Prisma.SavingsMovementUpdateManyWithoutUserNestedInput
+  debts?: Prisma.DebtUpdateManyWithoutUserNestedInput
+  debtInstallmentStatuses?: Prisma.DebtInstallmentStatusUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
+  readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutRecurringSuggestionDismissalsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutUserNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  savingsGoals?: Prisma.SavingsGoalUncheckedUpdateManyWithoutUserNestedInput
+  savingsMovements?: Prisma.SavingsMovementUncheckedUpdateManyWithoutUserNestedInput
+  debts?: Prisma.DebtUncheckedUpdateManyWithoutUserNestedInput
+  debtInstallmentStatuses?: Prisma.DebtInstallmentStatusUncheckedUpdateManyWithoutUserNestedInput
+  banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
+  bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
+  readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBudgetsInput = {
@@ -1095,6 +1385,8 @@ export type UserCreateWithoutBudgetsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBudgetsInput = {
@@ -1115,6 +1407,8 @@ export type UserUncheckedCreateWithoutBudgetsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBudgetsInput = {
@@ -1151,6 +1445,8 @@ export type UserUpdateWithoutBudgetsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBudgetsInput = {
@@ -1171,6 +1467,8 @@ export type UserUncheckedUpdateWithoutBudgetsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSavingsGoalsInput = {
@@ -1191,6 +1489,8 @@ export type UserCreateWithoutSavingsGoalsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSavingsGoalsInput = {
@@ -1211,6 +1511,8 @@ export type UserUncheckedCreateWithoutSavingsGoalsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSavingsGoalsInput = {
@@ -1247,6 +1549,8 @@ export type UserUpdateWithoutSavingsGoalsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavingsGoalsInput = {
@@ -1267,6 +1571,8 @@ export type UserUncheckedUpdateWithoutSavingsGoalsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSavingsMovementsInput = {
@@ -1287,6 +1593,8 @@ export type UserCreateWithoutSavingsMovementsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSavingsMovementsInput = {
@@ -1307,6 +1615,8 @@ export type UserUncheckedCreateWithoutSavingsMovementsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSavingsMovementsInput = {
@@ -1343,6 +1653,8 @@ export type UserUpdateWithoutSavingsMovementsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavingsMovementsInput = {
@@ -1363,6 +1675,8 @@ export type UserUncheckedUpdateWithoutSavingsMovementsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReadNotificationsInput = {
@@ -1383,6 +1697,8 @@ export type UserCreateWithoutReadNotificationsInput = {
   banks?: Prisma.BankCreateNestedManyWithoutUserInput
   bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReadNotificationsInput = {
@@ -1403,6 +1719,8 @@ export type UserUncheckedCreateWithoutReadNotificationsInput = {
   banks?: Prisma.BankUncheckedCreateNestedManyWithoutUserInput
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReadNotificationsInput = {
@@ -1439,6 +1757,8 @@ export type UserUpdateWithoutReadNotificationsInput = {
   banks?: Prisma.BankUpdateManyWithoutUserNestedInput
   bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReadNotificationsInput = {
@@ -1459,6 +1779,8 @@ export type UserUncheckedUpdateWithoutReadNotificationsInput = {
   banks?: Prisma.BankUncheckedUpdateManyWithoutUserNestedInput
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutDebtsInput = {
@@ -1479,6 +1801,8 @@ export type UserCreateWithoutDebtsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDebtsInput = {
@@ -1499,6 +1823,8 @@ export type UserUncheckedCreateWithoutDebtsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDebtsInput = {
@@ -1535,6 +1861,8 @@ export type UserUpdateWithoutDebtsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDebtsInput = {
@@ -1555,6 +1883,8 @@ export type UserUncheckedUpdateWithoutDebtsInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutDebtInstallmentStatusesInput = {
@@ -1575,6 +1905,8 @@ export type UserCreateWithoutDebtInstallmentStatusesInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDebtInstallmentStatusesInput = {
@@ -1595,6 +1927,8 @@ export type UserUncheckedCreateWithoutDebtInstallmentStatusesInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedCreateNestedManyWithoutUserInput
   readNotifications?: Prisma.ReadNotificationUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedCreateNestedManyWithoutUserInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDebtInstallmentStatusesInput = {
@@ -1631,6 +1965,8 @@ export type UserUpdateWithoutDebtInstallmentStatusesInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDebtInstallmentStatusesInput = {
@@ -1651,6 +1987,8 @@ export type UserUncheckedUpdateWithoutDebtInstallmentStatusesInput = {
   bankCategoryRules?: Prisma.BankCategoryRuleUncheckedUpdateManyWithoutUserNestedInput
   readNotifications?: Prisma.ReadNotificationUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  recurringSuggestionDismissals?: Prisma.RecurringSuggestionDismissalUncheckedUpdateManyWithoutUserNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -1670,6 +2008,8 @@ export type UserCountOutputType = {
   bankCategoryRules: number
   readNotifications: number
   passwordResetTokens: number
+  recurringSuggestionDismissals: number
+  subscriptions: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1684,6 +2024,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   bankCategoryRules?: boolean | UserCountOutputTypeCountBankCategoryRulesArgs
   readNotifications?: boolean | UserCountOutputTypeCountReadNotificationsArgs
   passwordResetTokens?: boolean | UserCountOutputTypeCountPasswordResetTokensArgs
+  recurringSuggestionDismissals?: boolean | UserCountOutputTypeCountRecurringSuggestionDismissalsArgs
+  subscriptions?: boolean | UserCountOutputTypeCountSubscriptionsArgs
 }
 
 /**
@@ -1773,6 +2115,20 @@ export type UserCountOutputTypeCountPasswordResetTokensArgs<ExtArgs extends runt
   where?: Prisma.PasswordResetTokenWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountRecurringSuggestionDismissalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RecurringSuggestionDismissalWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSubscriptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SubscriptionWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1793,6 +2149,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   bankCategoryRules?: boolean | Prisma.User$bankCategoryRulesArgs<ExtArgs>
   readNotifications?: boolean | Prisma.User$readNotificationsArgs<ExtArgs>
   passwordResetTokens?: boolean | Prisma.User$passwordResetTokensArgs<ExtArgs>
+  recurringSuggestionDismissals?: boolean | Prisma.User$recurringSuggestionDismissalsArgs<ExtArgs>
+  subscriptions?: boolean | Prisma.User$subscriptionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1839,6 +2197,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   bankCategoryRules?: boolean | Prisma.User$bankCategoryRulesArgs<ExtArgs>
   readNotifications?: boolean | Prisma.User$readNotificationsArgs<ExtArgs>
   passwordResetTokens?: boolean | Prisma.User$passwordResetTokensArgs<ExtArgs>
+  recurringSuggestionDismissals?: boolean | Prisma.User$recurringSuggestionDismissalsArgs<ExtArgs>
+  subscriptions?: boolean | Prisma.User$subscriptionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1858,6 +2218,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     bankCategoryRules: Prisma.$BankCategoryRulePayload<ExtArgs>[]
     readNotifications: Prisma.$ReadNotificationPayload<ExtArgs>[]
     passwordResetTokens: Prisma.$PasswordResetTokenPayload<ExtArgs>[]
+    recurringSuggestionDismissals: Prisma.$RecurringSuggestionDismissalPayload<ExtArgs>[]
+    subscriptions: Prisma.$SubscriptionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2272,6 +2634,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   bankCategoryRules<T extends Prisma.User$bankCategoryRulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$bankCategoryRulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BankCategoryRulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   readNotifications<T extends Prisma.User$readNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$readNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReadNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   passwordResetTokens<T extends Prisma.User$passwordResetTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$passwordResetTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  recurringSuggestionDismissals<T extends Prisma.User$recurringSuggestionDismissalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$recurringSuggestionDismissalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecurringSuggestionDismissalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  subscriptions<T extends Prisma.User$subscriptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2962,6 +3326,54 @@ export type User$passwordResetTokensArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.PasswordResetTokenScalarFieldEnum | Prisma.PasswordResetTokenScalarFieldEnum[]
+}
+
+/**
+ * User.recurringSuggestionDismissals
+ */
+export type User$recurringSuggestionDismissalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RecurringSuggestionDismissal
+   */
+  select?: Prisma.RecurringSuggestionDismissalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RecurringSuggestionDismissal
+   */
+  omit?: Prisma.RecurringSuggestionDismissalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecurringSuggestionDismissalInclude<ExtArgs> | null
+  where?: Prisma.RecurringSuggestionDismissalWhereInput
+  orderBy?: Prisma.RecurringSuggestionDismissalOrderByWithRelationInput | Prisma.RecurringSuggestionDismissalOrderByWithRelationInput[]
+  cursor?: Prisma.RecurringSuggestionDismissalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RecurringSuggestionDismissalScalarFieldEnum | Prisma.RecurringSuggestionDismissalScalarFieldEnum[]
+}
+
+/**
+ * User.subscriptions
+ */
+export type User$subscriptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Subscription
+   */
+  select?: Prisma.SubscriptionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Subscription
+   */
+  omit?: Prisma.SubscriptionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubscriptionInclude<ExtArgs> | null
+  where?: Prisma.SubscriptionWhereInput
+  orderBy?: Prisma.SubscriptionOrderByWithRelationInput | Prisma.SubscriptionOrderByWithRelationInput[]
+  cursor?: Prisma.SubscriptionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SubscriptionScalarFieldEnum | Prisma.SubscriptionScalarFieldEnum[]
 }
 
 /**

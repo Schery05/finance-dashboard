@@ -24,6 +24,12 @@ type ImportSummary = {
   total: number;
 };
 
+type ImportPreviewData = {
+  rows: BankImportPreviewRow[];
+  total: number;
+  duplicateCount?: number;
+};
+
 const money = (value: number) =>
   new Intl.NumberFormat("es-DO", {
     style: "currency",
@@ -49,7 +55,12 @@ async function sendImportFile(
   mode: "preview" | "import",
   overrides: { pattern: string; category: string }[] = [],
   excludedRows: string[] = [],
-  rowEdits: { key: string; type?: "Ingreso" | "Gasto"; category?: string }[] = []
+  rowEdits: {
+    key: string;
+    type?: "Ingreso" | "Gasto";
+    category?: string;
+    description?: string;
+  }[] = []
 ) {
   const body = new FormData();
   body.append("file", file);
@@ -80,12 +91,13 @@ export function BankImportModal({
   const [categoryOverrides, setCategoryOverrides] = useState<Record<string, string>>({});
   const [excludedRows, setExcludedRows] = useState<string[]>([]);
   const [rowEdits, setRowEdits] = useState<
-    Record<string, { type?: "Ingreso" | "Gasto"; category?: string }>
+    Record<string, { type?: "Ingreso" | "Gasto"; category?: string; description?: string }>
   >({});
   const [categories, setCategories] = useState<ManagedCategories>(() =>
     loadManagedCategories()
   );
   const [summary, setSummary] = useState<ImportSummary | null>(null);
+  const [previewDuplicateCount, setPreviewDuplicateCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -134,7 +146,7 @@ export function BankImportModal({
 
   const rememberRowEdit = (
     row: BankImportPreviewRow,
-    edit: { type?: "Ingreso" | "Gasto"; category?: string }
+    edit: { type?: "Ingreso" | "Gasto"; category?: string; description?: string }
   ) => {
     const key = getPreviewRowKey(row);
 
@@ -170,19 +182,13 @@ export function BankImportModal({
     rowIndex: number,
     category: string
   ) => {
-    const pattern = row.sourceRawDescription || `${row.Fecha}-${row.Importe}-${rowIndex}`;
-
     setPreviewRows((prev) =>
       prev.map((item, itemIndex) =>
-        item.sourceRawDescription === row.sourceRawDescription || itemIndex === rowIndex
+        itemIndex === rowIndex
           ? { ...item, Categoría: category }
           : item
       )
     );
-    setCategoryOverrides((prev) => ({
-      ...prev,
-      [pattern]: category,
-    }));
     rememberRowEdit(row, { category });
   };
 
@@ -193,6 +199,19 @@ export function BankImportModal({
     setExcludedRows((prev) => (prev.includes(key) ? prev : [...prev, key]));
   };
 
+  const changePreviewDescription = (
+    row: BankImportPreviewRow,
+    rowIndex: number,
+    description: string
+  ) => {
+    setPreviewRows((prev) =>
+      prev.map((item, itemIndex) =>
+        itemIndex === rowIndex ? { ...item, DescripcionAdicional: description } : item
+      )
+    );
+    rememberRowEdit(row, { description });
+  };
+
   const resetAndClose = () => {
     setFile(null);
     setPreviewRows([]);
@@ -200,6 +219,7 @@ export function BankImportModal({
     setExcludedRows([]);
     setRowEdits({});
     setSummary(null);
+    setPreviewDuplicateCount(0);
     setError(null);
     onClose();
   };
@@ -215,12 +235,14 @@ export function BankImportModal({
     setSummary(null);
     try {
       const data = await sendImportFile(file, "preview");
+      const previewData = data as ImportPreviewData;
       setPreviewRows(
-        (data.rows as BankImportPreviewRow[]).map((row) => ({
+        previewData.rows.map((row) => ({
           ...row,
           sourceImportKey: getPreviewRowKey(row),
         }))
       );
+      setPreviewDuplicateCount(previewData.duplicateCount ?? 0);
       setExcludedRows([]);
       setRowEdits({});
     } catch (err) {
@@ -313,6 +335,7 @@ export function BankImportModal({
                       setExcludedRows([]);
                       setRowEdits({});
                       setSummary(null);
+                      setPreviewDuplicateCount(0);
                       setError(null);
                     }}
                     className="mt-1 w-full rounded-xl bg-white/10 px-3 py-2 text-sm text-white outline-none ring-1 ring-white/15 file:mr-3 file:rounded-lg file:border-0 file:bg-cyan-300 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-slate-950"
@@ -353,6 +376,11 @@ export function BankImportModal({
                     <div className="rounded-2xl bg-white/[0.04] p-4 ring-1 ring-white/10">
                       <p className="text-sm text-white/55">Detectadas</p>
                       <p className="mt-1 text-xl font-semibold">{previewRows.length}</p>
+                      {previewDuplicateCount > 0 && (
+                        <p className="mt-1 text-xs text-amber-200">
+                          {previewDuplicateCount} duplicada(s) omitida(s)
+                        </p>
+                      )}
                     </div>
                     <div className="rounded-2xl bg-white/[0.04] p-4 ring-1 ring-white/10">
                       <p className="text-sm text-white/55">Gastos</p>
@@ -382,7 +410,7 @@ export function BankImportModal({
                       </thead>
                       <tbody>
                         {previewRows.slice(0, 80).map((row, index) => (
-                          <tr key={`${row.Fecha}-${row.Importe}-${index}`} className="border-t border-white/10">
+                          <tr key={getPreviewRowKey(row)} className="border-t border-white/10">
                             <td className="px-4 py-3 text-white/80">{row.Fecha}</td>
                             <td className="min-w-36 px-4 py-3">
                               <CustomSelect
@@ -413,8 +441,16 @@ export function BankImportModal({
                               />
                             </td>
                             <td className="px-4 py-3 text-right font-semibold">{money(row.Importe)}</td>
-                            <td className="max-w-[360px] truncate px-4 py-3 text-white/70">
-                              {row.DescripcionAdicional}
+                            <td className="min-w-[320px] px-4 py-3">
+                              <input
+                                type="text"
+                                value={row.DescripcionAdicional}
+                                onChange={(event) =>
+                                  changePreviewDescription(row, index, event.target.value)
+                                }
+                                className="w-full rounded-lg bg-white/10 px-3 py-2 text-sm text-white outline-none ring-1 ring-white/15 transition placeholder:text-white/35 focus:bg-white/[0.14] focus:ring-cyan-300/50"
+                                aria-label={`Descripcion de transaccion ${index + 1}`}
+                              />
                             </td>
                             <td className="px-4 py-3 text-right">
                               <button

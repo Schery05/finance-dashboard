@@ -9,11 +9,13 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/User'
+export type * from './models/Subscription'
 export type * from './models/PasswordResetToken'
 export type * from './models/BankCategoryRule'
 export type * from './models/Bank'
 export type * from './models/Category'
 export type * from './models/Transaction'
+export type * from './models/RecurringSuggestionDismissal'
 export type * from './models/Budget'
 export type * from './models/SavingsGoal'
 export type * from './models/SavingsMovement'

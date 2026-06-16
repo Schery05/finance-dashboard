@@ -136,7 +136,7 @@ export function FinancialScorePanel() {
 
   const pillars = [
     {
-      label: "Tasa de ahorro",
+      label: "Aportes a ahorro",
       score: result.breakdown.savingsScore,
       weight: "40%",
       Icon: PiggyBank,
@@ -158,8 +158,13 @@ export function FinancialScorePanel() {
   const metrics = [
     { label: "Ingresos", value: money(result.metrics.income) },
     { label: "Gastos", value: money(result.metrics.expenses) },
+    { label: "Aportes ahorro", value: money(result.metrics.savingsContributions) },
+    {
+      label: "Tasa ahorro real",
+      value: percent(result.metrics.savingsContributionRate),
+    },
     { label: "Ahorro neto", value: money(result.metrics.savings) },
-    { label: "Tasa de ahorro", value: percent(result.metrics.savingsRate) },
+    { label: "Tasa neta", value: percent(result.metrics.savingsRate) },
     { label: "Presupuesto usado", value: money(result.metrics.budgetUsed) },
     { label: "Limite presupuesto", value: money(result.metrics.budgetLimit) },
     {
@@ -181,7 +186,7 @@ export function FinancialScorePanel() {
               Score financiero
             </h2>
             <p className="mt-1 max-w-2xl text-sm leading-6 text-white/60">
-              Tu resultado combina ahorro, presupuesto y pagos validados para el periodo seleccionado.
+              Tu resultado combina aportes reales a ahorro, presupuesto y pagos validados para el periodo seleccionado.
             </p>
           </div>
 

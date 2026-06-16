@@ -387,10 +387,6 @@ export type BankUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.BankScalarWhereInput | Prisma.BankScalarWhereInput[]
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type BankCreateWithoutUserInput = {
   id?: string
   name: string

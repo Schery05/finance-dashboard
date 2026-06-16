@@ -23,6 +23,11 @@ export * from './enums';
  */
 export type User = Prisma.UserModel
 /**
+ * Model Subscription
+ * 
+ */
+export type Subscription = Prisma.SubscriptionModel
+/**
  * Model PasswordResetToken
  * 
  */
@@ -47,6 +52,11 @@ export type Category = Prisma.CategoryModel
  * 
  */
 export type Transaction = Prisma.TransactionModel
+/**
+ * Model RecurringSuggestionDismissal
+ * 
+ */
+export type RecurringSuggestionDismissal = Prisma.RecurringSuggestionDismissalModel
 /**
  * Model Budget
  * 

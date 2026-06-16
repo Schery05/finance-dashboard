@@ -26,7 +26,10 @@ function getImportRowKey(row: {
   DescripcionAdicional?: string;
   sourceRawDescription?: string;
   sourceReference?: string;
+  sourceImportKey?: string;
 }) {
+  if (row.sourceImportKey) return row.sourceImportKey;
+
   return [
     row.Fecha,
     row.Tipo,
@@ -36,24 +39,96 @@ function getImportRowKey(row: {
   ].join("|");
 }
 
-function normalizeRowEdits(value: unknown) {
-  if (!Array.isArray(value)) return new Map<string, { type?: "Ingreso" | "Gasto"; category?: string }>();
+function normalizeImportKeyPart(value: string) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .replace(/[^\w\s.-]/g, "")
+    .trim()
+    .toLowerCase();
+}
 
-  const edits = new Map<string, { type?: "Ingreso" | "Gasto"; category?: string }>();
+function getDuplicateRowKey(row: {
+  Fecha: string;
+  Tipo: string;
+  Importe: number;
+  DescripcionAdicional?: string;
+  sourceRawDescription?: string;
+  sourceReference?: string;
+}) {
+  const amount = (Number(row.Importe) || 0).toFixed(2);
+  const reference = normalizeImportKeyPart(row.sourceReference ?? "");
+
+  if (reference) {
+    return [row.Fecha, row.Tipo, amount, reference].join("|");
+  }
+
+  const description = normalizeImportKeyPart(
+    row.sourceRawDescription || row.DescripcionAdicional || ""
+  );
+  return [row.Fecha, row.Tipo, amount, description].join("|");
+}
+
+function dedupeImportRows<T extends {
+  Fecha: string;
+  Tipo: string;
+  Importe: number;
+  DescripcionAdicional?: string;
+  sourceRawDescription?: string;
+  sourceReference?: string;
+}>(rows: T[]) {
+  const seen = new Set<string>();
+  const unique: Array<T & { sourceImportKey: string }> = [];
+  let duplicateCount = 0;
+
+  for (const row of rows) {
+    const sourceImportKey = getDuplicateRowKey(row);
+    if (seen.has(sourceImportKey)) {
+      duplicateCount += 1;
+      continue;
+    }
+
+    seen.add(sourceImportKey);
+    unique.push({ ...row, sourceImportKey });
+  }
+
+  return { rows: unique, duplicateCount };
+}
+
+function normalizeRowEdits(value: unknown) {
+  if (!Array.isArray(value)) {
+    return new Map<
+      string,
+      { type?: "Ingreso" | "Gasto"; category?: string; description?: string }
+    >();
+  }
+
+  const edits = new Map<
+    string,
+    { type?: "Ingreso" | "Gasto"; category?: string; description?: string }
+  >();
 
   for (const item of value) {
     if (!item || typeof item !== "object") continue;
 
-    const row = item as { key?: unknown; type?: unknown; category?: unknown };
+    const row = item as {
+      key?: unknown;
+      type?: unknown;
+      category?: unknown;
+      description?: unknown;
+    };
     if (typeof row.key !== "string" || !row.key.trim()) continue;
 
     const type = row.type === "Ingreso" || row.type === "Gasto" ? row.type : undefined;
     const category = typeof row.category === "string" && row.category.trim()
       ? row.category.trim()
       : undefined;
+    const description =
+      typeof row.description === "string" ? row.description.trim() : undefined;
 
-    if (!type && !category) continue;
-    edits.set(row.key, { type, category });
+    if (!type && !category && description === undefined) continue;
+    edits.set(row.key, { type, category, description });
   }
 
   return edits;
@@ -158,7 +233,12 @@ export async function POST(req: Request) {
       ),
       overrides
     );
-    const parsedRows = categorizedRows
+    const keyedRows = categorizedRows.map((row) => ({
+      ...row,
+      sourceImportKey: getDuplicateRowKey(row),
+    }));
+    const { rows: dedupedRows, duplicateCount } = dedupeImportRows(keyedRows);
+    const parsedRows = dedupedRows
       .filter((row) => !excludedRowKeys.has(getImportRowKey(row)))
       .map((row) => {
         const edit = rowEdits.get(getImportRowKey(row));
@@ -168,6 +248,8 @@ export async function POST(req: Request) {
           ...row,
           Tipo: edit.type ?? row.Tipo,
           Categoría: edit.category ?? row.Categoría,
+          DescripcionAdicional:
+            edit.description !== undefined ? edit.description : row.DescripcionAdicional,
         };
       })
       .map((row) => ({
@@ -181,16 +263,20 @@ export async function POST(req: Request) {
         data: {
           rows: parsedRows,
           total: parsedRows.length,
+          duplicateCount,
         },
       });
     }
 
-    const mappedRows = parsedRows.map(mapUIToDB);
+    const mappedRows = parsedRows.map((row) => ({
+      row,
+      mapped: mapUIToDB(row),
+    }));
     const categoryByKey = new Map<string, { id: string }>();
     let created = 0;
-    let skipped = 0;
+    let skipped = duplicateCount;
 
-    for (const mapped of mappedRows) {
+    for (const { mapped } of mappedRows) {
       const key = `${mapped.type}:${mapped.categoryName}`;
       if (categoryByKey.has(key)) continue;
 
@@ -217,14 +303,17 @@ export async function POST(req: Request) {
       categoryByKey.set(key, category);
     }
 
-    for (const mapped of mappedRows) {
+    for (const { row, mapped } of mappedRows) {
+      const sourceReference = String(row.sourceReference ?? "").trim();
       const existing = await prisma.transaction.findFirst({
         where: {
           userId: user.id,
           date: mapped.date,
           type: mapped.type,
           amount: mapped.amount,
-          additionalDescription: mapped.additionalDescription,
+          ...(sourceReference
+            ? { additionalDescription: { contains: sourceReference } }
+            : { additionalDescription: mapped.additionalDescription }),
         },
         select: {
           id: true,

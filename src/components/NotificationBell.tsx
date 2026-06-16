@@ -32,12 +32,12 @@ function notificationTone(type: PaymentNotification["type"]) {
     };
   }
 
-  if (type === "budget-overrun") {
+  if (type === "budget-overrun" || type === "cashflow-overrun") {
     return {
       card: "notification-card-overdue border-rose-300/30 bg-rose-500/10",
       icon: "bg-rose-400/15 text-rose-100 ring-rose-300/20",
       badge: "bg-rose-400/15 text-rose-100 ring-rose-300/20",
-      label: "Presupuesto",
+      label: type === "cashflow-overrun" ? "Flujo" : "Presupuesto",
       Icon: AlertTriangle,
       style: {
         "--notification-card-bg": "rgba(244, 63, 94, 0.12)",
@@ -111,7 +111,9 @@ export function NotificationBell({ notifications }: NotificationBellProps) {
   const summary = useMemo(() => {
     const overdue = pendingNotifications.filter((item) => item.type === "overdue").length;
     const upcoming = pendingNotifications.filter((item) => item.type === "upcoming").length;
-    const budget = pendingNotifications.filter((item) => item.type === "budget-overrun").length;
+    const budget = pendingNotifications.filter(
+      (item) => item.type === "budget-overrun" || item.type === "cashflow-overrun"
+    ).length;
     return { overdue, upcoming, budget };
   }, [pendingNotifications]);
 

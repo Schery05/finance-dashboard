@@ -12,13 +12,17 @@ import { ExpenseCalendarPanel } from "@/components/ExpenseCalendarPanel";
 import { FinancialAssistantPanel } from "@/components/FinancialAssistantPanel";
 import { FinancialScorePanel } from "@/components/FinancialScorePanel";
 import { SavingsGoalsPanel } from "@/components/SavingsGoalsPanel";
+import { SubscriptionsCenterPanel } from "@/components/SubscriptionsCenterPanel";
 import { Sidebar } from "@/components/Sidebar";
 import { NotificationBell } from "@/components/NotificationBell";
 import type { Budget } from "@/lib/budgets";
 import {
   getBudgetNotifications,
+  getCashflowNotifications,
   getPaymentNotifications,
+  getSubscriptionNotifications,
 } from "@/lib/notifications";
+import type { Subscription } from "@/lib/subscriptions";
 import { useFinanceStore } from "@/store/financeStore";
 import { UserMenu } from "@/components/UserMenu";
 
@@ -32,6 +36,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     | "deudas"
     | "accesibilidad"
     | "ahorros"
+    | "suscripciones"
     | "presupuesto"
     | "mantenimiento"
   >("finanzas");
@@ -42,6 +47,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     "gestion" | "listado"
   >("gestion");
   const isSavingsModule = activeModule === "ahorros";
+  const isSubscriptionsModule = activeModule === "suscripciones";
   const isCalendarModule = activeModule === "calendar";
   const isScoreModule = activeModule === "score";
   const isAssistantModule = activeModule === "asistente";
@@ -51,9 +57,12 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const isMaintenanceModule = activeModule === "mantenimiento";
   const { transactions } = useFinanceStore();
   const [budgets, setBudgets] = useState<Budget[]>([]);
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const notifications = [
     ...getPaymentNotifications(transactions),
+    ...getCashflowNotifications(transactions),
     ...getBudgetNotifications({ budgets, transactions }),
+    ...getSubscriptionNotifications(subscriptions),
   ];
   const userName = session?.user?.name?.trim() || "Usuario";
   const firstName = userName.split(/\s+/)[0] || userName;
@@ -70,9 +79,22 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         if (mounted) setBudgets([]);
       }
     };
+    const fetchSubscriptions = async () => {
+      try {
+        const res = await fetch("/api/subscriptions", { cache: "no-store" });
+        const json = await res.json();
+        if (mounted && json.ok) setSubscriptions(json.data as Subscription[]);
+      } catch {
+        if (mounted) setSubscriptions([]);
+      }
+    };
 
     fetchBudgets();
-    const id = window.setInterval(fetchBudgets, 60000);
+    fetchSubscriptions();
+    const id = window.setInterval(() => {
+      fetchBudgets();
+      fetchSubscriptions();
+    }, 60000);
 
     return () => {
       mounted = false;
@@ -81,7 +103,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className="relative flex min-h-screen overflow-hidden">
+    <div className="relative flex min-h-screen w-full overflow-x-hidden">
       {/* Background gradients */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-40 -left-40 h-[520px] w-[520px] rounded-full bg-gradient-to-br from-fuchsia-500/30 to-cyan-400/20 blur-3xl" />
@@ -99,18 +121,20 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       />
 
 
-          <main className="relative mx-auto w-full max-w-[92rem] px-4 py-8 md:px-8">
+          <main className="relative w-full min-w-0 flex-1 px-3 py-6 sm:px-4 md:px-8 md:py-8 2xl:px-10">
            
           <motion.header
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: "easeOut" }}
-          className="mb-6 flex items-start justify-between gap-4"
+          className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row"
         >
-          <div>
+          <div className="min-w-0">
             <h1 className="text-2xl md:text-3xl font-semibold text-glow">
               {isSavingsModule
                 ? "Metas de ahorro"
+                : isSubscriptionsModule
+                ? "Centro de Suscripciones"
                 : isCalendarModule
                 ? "Calendar Trxn"
                 : isScoreModule
@@ -131,6 +155,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             <p className="max-w-2xl text-sm md:text-base leading-7 text-slate-300">
               {isSavingsModule
                 ? "Asocia tus transacciones de ahorro y mide el avance de cada meta."
+                : isSubscriptionsModule
+                ? "Administra servicios recurrentes, costos y proximos cobros."
                 : isCalendarModule
                 ? "Vista mensual para identificar tus dias de mayor gasto."
                 : isScoreModule
@@ -156,7 +182,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex w-full items-center justify-end gap-3 sm:w-auto">
             <NotificationBell notifications={notifications} />
 
             <div className="h-8 w-px bg-white/10" />
@@ -167,6 +193,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
         {isSavingsModule ? (
           <SavingsGoalsPanel />
+        ) : isSubscriptionsModule ? (
+          <SubscriptionsCenterPanel />
         ) : isCalendarModule ? (
           <ExpenseCalendarPanel txs={transactions} />
         ) : isScoreModule ? (

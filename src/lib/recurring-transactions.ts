@@ -17,6 +17,24 @@ type SourceTransaction = {
   };
 };
 
+type RecurringSuggestionDismissalReader = {
+  recurringSuggestionDismissal?: {
+    findUnique: (args: {
+      where: {
+        userId_recurrenceKey_date: {
+          userId: string;
+          recurrenceKey: string;
+          date: Date;
+        };
+      };
+      select: {
+        id: true;
+      };
+    }) => Promise<{ id: string } | null>;
+  };
+  $queryRawUnsafe: <T = unknown>(query: string, ...values: unknown[]) => Promise<T>;
+};
+
 const MIN_RECURRING_OCCURRENCES = 2;
 const MAX_DAY_VARIANCE = 4;
 const MIN_MONTHLY_INTERVAL_DAYS = 24;
@@ -122,6 +140,45 @@ function isRecurringMonthlyPattern(transactions: SourceTransaction[]) {
   );
 }
 
+async function isRecurringSuggestionDismissed(
+  userId: string,
+  recurrenceKey: string,
+  date: Date
+) {
+  const client = prisma as unknown as RecurringSuggestionDismissalReader;
+
+  if (client.recurringSuggestionDismissal) {
+    const dismissal = await client.recurringSuggestionDismissal.findUnique({
+      where: {
+        userId_recurrenceKey_date: {
+          userId,
+          recurrenceKey,
+          date,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    return Boolean(dismissal);
+  }
+
+  const rows = await client.$queryRawUnsafe<Array<{ id: string }>>(
+    `SELECT "id"
+     FROM "RecurringSuggestionDismissal"
+     WHERE "userId" = $1
+       AND "recurrenceKey" = $2
+       AND "date" = $3
+     LIMIT 1`,
+    userId,
+    recurrenceKey,
+    date
+  );
+
+  return rows.length > 0;
+}
+
 export async function ensureRecurringTransactionSuggestions(userId: string) {
   const sourceTransactions = await prisma.transaction.findMany({
     where: {
@@ -190,6 +247,10 @@ export async function ensureRecurringTransactionSuggestions(userId: string) {
     });
 
     if (existingSuggestion) continue;
+
+    if (await isRecurringSuggestionDismissed(userId, recurrenceKey, date)) {
+      continue;
+    }
 
     const existingManualTransaction = await prisma.transaction.findFirst({
       where: {

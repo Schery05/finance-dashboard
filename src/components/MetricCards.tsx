@@ -36,15 +36,15 @@ export function MetricCards({ txs }: { txs: Transaction[] }) {
           animate={{ opacity: 1, y: 0 }}
           whileHover={{ y: -6 }}
           transition={{ delay: idx * 0.05, duration: 0.45, ease: "easeOut" }}
-          className="glass relative overflow-hidden p-5 transition-transform duration-300 hover:-translate-y-1"
+          className="glass relative min-w-0 overflow-hidden p-4 transition-transform duration-300 hover:-translate-y-1 sm:p-5"
         >
           <div className={`absolute inset-0 bg-gradient-to-br ${c.ring}`} />
-          <div className="relative flex items-center justify-between">
-            <div>
+          <div className="relative flex min-w-0 items-center justify-between gap-3">
+            <div className="min-w-0">
               <p className="text-sm text-white/60">{c.title}</p>
-              <p className="mt-2 text-2xl font-semibold">{c.value}</p>
+              <p className="mt-2 break-words text-xl font-semibold sm:text-2xl">{c.value}</p>
             </div>
-            <div className="rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
+            <div className="shrink-0 rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
               <c.Icon className={`h-6 w-6 ${c.accent}`} />
             </div>
           </div>

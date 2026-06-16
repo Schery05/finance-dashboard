@@ -57,6 +57,29 @@ model User {
   bankCategoryRules   BankCategoryRule[]
   readNotifications   ReadNotification[]
   passwordResetTokens PasswordResetToken[]
+  recurringSuggestionDismissals RecurringSuggestionDismissal[]
+  subscriptions       Subscription[]
+}
+
+model Subscription {
+  id            String   @id @default(cuid())
+  name          String
+  category      String
+  amount        Decimal  @db.Decimal(12, 2)
+  currency      String   @default("DOP")
+  frequency     String
+  nextChargeDate DateTime
+  autoRenew     Boolean  @default(true)
+  status        String   @default("ACTIVA")
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([userId, nextChargeDate])
 }
 
 model PasswordResetToken {
@@ -149,6 +172,19 @@ model Transaction {
   @@index([userId, type])
   @@index([userId, recurrenceKey])
   @@unique([userId, recurrenceKey, date])
+}
+
+model RecurringSuggestionDismissal {
+  id            String   @id @default(cuid())
+  recurrenceKey String
+  date          DateTime
+  createdAt     DateTime @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, recurrenceKey, date])
+  @@index([userId, recurrenceKey])
 }
 
 model Budget {

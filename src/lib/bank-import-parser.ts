@@ -118,6 +118,10 @@ export function inferBankTransactionCategory(
     return { type: "Ingreso" as const, category: "Bonos" };
   }
 
+  if (/prestamo|pr\s*stamo/.test(text)) {
+    return { type: "Gasto" as const, category: "Pago prestamos" };
+  }
+
   if (/pago via app|pago/.test(text)) {
     return { type: "Gasto" as const, category: "Pago tarjeta" };
   }
@@ -165,8 +169,9 @@ export function inferBankTransactionCategory(
   return { type: "Gasto" as const, category: "Pendiente de categorizar" };
 }
 
-function shouldIgnoreCategory(category: string) {
-  return normalize(category) === "pago tarjeta";
+function shouldIgnoreCategory(_category: string) {
+  void _category;
+  return false;
 }
 
 export function parseBankTransactionsCSV(

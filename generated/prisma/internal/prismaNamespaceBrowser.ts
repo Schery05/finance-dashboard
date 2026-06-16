@@ -52,11 +52,13 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  Subscription: 'Subscription',
   PasswordResetToken: 'PasswordResetToken',
   BankCategoryRule: 'BankCategoryRule',
   Bank: 'Bank',
   Category: 'Category',
   Transaction: 'Transaction',
+  RecurringSuggestionDismissal: 'RecurringSuggestionDismissal',
   Budget: 'Budget',
   SavingsGoal: 'SavingsGoal',
   SavingsMovement: 'SavingsMovement',
@@ -92,6 +94,25 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const SubscriptionScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  category: 'category',
+  amount: 'amount',
+  currency: 'currency',
+  frequency: 'frequency',
+  nextChargeDate: 'nextChargeDate',
+  autoRenew: 'autoRenew',
+  status: 'status',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum]
 
 
 export const PasswordResetTokenScalarFieldEnum = {
@@ -162,6 +183,17 @@ export const TransactionScalarFieldEnum = {
 } as const
 
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
+
+
+export const RecurringSuggestionDismissalScalarFieldEnum = {
+  id: 'id',
+  recurrenceKey: 'recurrenceKey',
+  date: 'date',
+  createdAt: 'createdAt',
+  userId: 'userId'
+} as const
+
+export type RecurringSuggestionDismissalScalarFieldEnum = (typeof RecurringSuggestionDismissalScalarFieldEnum)[keyof typeof RecurringSuggestionDismissalScalarFieldEnum]
 
 
 export const BudgetScalarFieldEnum = {

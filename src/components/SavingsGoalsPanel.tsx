@@ -5,10 +5,13 @@ import {
   CalendarDays,
   CheckCircle2,
   Clock3,
+  History,
   Loader2,
+  Pencil,
   Plus,
   Target,
   Trash2,
+  X,
 } from "lucide-react";
 import type { SavingsGoal, Transaction } from "@/lib/types";
 import { useFinanceStore } from "@/store/financeStore";
@@ -135,7 +138,17 @@ const deadlineStatus = (goal: SavingsGoal, percent: number) => {
 const isSavingsTransaction = (t: Transaction) => {
   const category = String(t.Categoría ?? "").toLowerCase();
   const description = String(t.DescripcionAdicional ?? "").toLowerCase();
-  return category.includes("ahorro") || description.includes("ahorro");
+  const text = `${category} ${description}`
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  const isSavingsWithdrawal =
+    text.includes("toma de ahorro") ||
+    text.includes("retiro de ahorro") ||
+    text.includes("retirar ahorro") ||
+    text.includes("sacar ahorro") ||
+    text.includes("uso de ahorro");
+
+  return text.includes("ahorro") && !isSavingsWithdrawal;
 };
 
 const getTransactionLabel = (t: Transaction) => {
@@ -154,6 +167,7 @@ export function SavingsGoalsPanel() {
   const [activeGoalId, setActiveGoalId] = useState<string | null>(null);
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
   const [goalToDelete, setGoalToDelete] = useState<SavingsGoal | null>(null);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -225,8 +239,6 @@ export function SavingsGoalsPanel() {
     return map;
   }, [goals]);
 
-  const activeGoal = goals.find((goal) => goal.ID === activeGoalId) ?? goals[0];
-
   const goalProgress = useCallback((goal: SavingsGoal) => {
     const transactionTotal = goal.TransaccionesAsociadas.reduce((sum, id) => {
       const tx = txById.get(id);
@@ -267,6 +279,23 @@ export function SavingsGoalsPanel() {
       return a.Nombre.localeCompare(b.Nombre);
     });
   }, [goals, goalProgress]);
+
+  const completedGoals = useMemo(() => {
+    return prioritizedGoals
+      .map((goal) => ({
+        goal,
+        progress: goalProgress(goal),
+      }))
+      .filter((item) => item.progress.percent >= 100)
+      .sort((a, b) => String(b.goal.FechaLimite).localeCompare(String(a.goal.FechaLimite)));
+  }, [prioritizedGoals, goalProgress]);
+
+  const activeGoals = useMemo(() => {
+    return prioritizedGoals.filter((goal) => goalProgress(goal).percent < 100);
+  }, [prioritizedGoals, goalProgress]);
+
+  const activeGoal =
+    activeGoals.find((goal) => goal.ID === activeGoalId) ?? activeGoals[0];
 
   const createGoal = async () => {
     const amount = parseAmountInput(targetAmount);
@@ -350,7 +379,6 @@ export function SavingsGoalsPanel() {
   };
 
   const applySuggestion = (suggestion: GoalSuggestion) => {
-    setEditingGoalId(null);
     setName(suggestion.name);
     setTargetAmount(formatAmountInput(String(suggestion.targetAmount)));
   };
@@ -381,8 +409,9 @@ export function SavingsGoalsPanel() {
       if (!json.ok) throw new Error(json.error ?? "No se pudo eliminar la meta");
 
       const next = goals.filter((goal) => goal.ID !== id);
+      const nextActive = next.find((goal) => goalProgress(goal).percent < 100);
       setGoals(next);
-      setActiveGoalId(next[0]?.ID ?? null);
+      setActiveGoalId(nextActive?.ID ?? null);
       setGoalToDelete(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error eliminando meta");
@@ -434,6 +463,14 @@ export function SavingsGoalsPanel() {
               <p className="mt-1 text-sm text-white/60">
                 Crea una meta y asocia transacciones de ahorro.
               </p>
+              <button
+                type="button"
+                onClick={() => setShowHistoryModal(true)}
+                className="mt-3 inline-flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-xs font-semibold text-white/75 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white"
+              >
+                <History className="h-4 w-4" />
+                Historico de Metas
+              </button>
             </div>
             <div className="rounded-2xl bg-emerald-400/10 p-3 text-emerald-300 ring-1 ring-emerald-300/20">
               <Target className="h-5 w-5" />
@@ -495,12 +532,12 @@ export function SavingsGoalsPanel() {
             </div>
             <div className="flex flex-col gap-2 sm:flex-row">
                 <button
-                  onClick={saveGoal}
+                  onClick={createGoal}
                   disabled={saving}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                  {editingGoalId ? "Actualizar meta" : "Agregar meta"}
+                  Agregar meta
                 </button>
                 {editingGoalId && (
                   <button
@@ -538,23 +575,31 @@ export function SavingsGoalsPanel() {
               <Loader2 className="h-4 w-4 animate-spin" />
               Cargando metas...
             </div>
-          ) : goals.length === 0 ? (
+          ) : activeGoals.length === 0 ? (
             <div className="glass flex min-h-[260px] items-center justify-center p-6 text-center text-sm text-white/55 lg:col-span-2">
-              Aun no tienes metas. Elige una sugerencia o crea tu primera meta.
+              No tienes metas activas. Crea una nueva meta o revisa el historico.
             </div>
           ) : (
-            prioritizedGoals.map((goal) => {
+            activeGoals.map((goal) => {
               const progress = goalProgress(goal);
               const status = deadlineStatus(goal, progress.percent);
               const selected = activeGoal?.ID === goal.ID;
 
               return (
-                <button
+                <div
                   key={goal.ID}
                   onClick={() => setActiveGoalId(goal.ID)}
-                  className={`glass p-5 text-left transition ${
+                  className={`glass cursor-pointer p-5 text-left transition ${
                     selected ? "ring-2 ring-emerald-300/50" : "hover:bg-white/[0.07]"
                   }`}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      setActiveGoalId(goal.ID);
+                    }
+                  }}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -572,9 +617,37 @@ export function SavingsGoalsPanel() {
                         {status.label}
                       </span>
                     </div>
-                    <span className="rounded-full bg-white/10 px-2 py-1 text-xs text-white/70">
-                      {progress.percent.toFixed(0)}%
-                    </span>
+                    <div className="flex flex-none items-start gap-2">
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          populateFormForGoal(goal);
+                        }}
+                        disabled={saving}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10 text-blue-100 ring-1 ring-blue-300/20 transition hover:bg-blue-500/15 disabled:cursor-not-allowed disabled:opacity-60"
+                        aria-label={`Editar meta ${goal.Nombre}`}
+                        title="Editar meta"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setGoalToDelete(goal);
+                        }}
+                        disabled={saving}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-rose-500/10 text-rose-200 ring-1 ring-rose-300/20 transition hover:bg-rose-500/15 disabled:cursor-not-allowed disabled:opacity-60"
+                        aria-label={`Eliminar meta ${goal.Nombre}`}
+                        title="Eliminar meta"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                      <span className="rounded-full bg-white/10 px-2 py-1 text-xs text-white/70">
+                        {progress.percent.toFixed(0)}%
+                      </span>
+                    </div>
                   </div>
 
                   <div className="mt-4 h-2 rounded-full bg-white/10">
@@ -603,7 +676,7 @@ export function SavingsGoalsPanel() {
                       </p>
                     </div>
                   </div>
-                </button>
+                </div>
               );
             })
           )}
@@ -620,24 +693,6 @@ export function SavingsGoalsPanel() {
               <p className="mt-1 text-sm text-white/60">
                 Marca las transacciones de ahorro que aportan a esta meta.
               </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={() => activeGoal && populateFormForGoal(activeGoal)}
-                disabled={saving}
-                className="inline-flex items-center gap-2 rounded-xl bg-blue-500/10 px-3 py-2 text-sm text-blue-100 ring-1 ring-blue-300/20 transition hover:bg-blue-500/15 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <Plus className="h-4 w-4 rotate-45" />
-                Editar meta
-              </button>
-              <button
-                onClick={() => setGoalToDelete(activeGoal)}
-                disabled={saving}
-                className="inline-flex items-center gap-2 rounded-xl bg-rose-500/10 px-3 py-2 text-sm text-rose-200 ring-1 ring-rose-300/20 transition hover:bg-rose-500/15 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <Trash2 className="h-4 w-4" />
-                Eliminar meta
-              </button>
             </div>
           </div>
 
@@ -701,6 +756,106 @@ export function SavingsGoalsPanel() {
         </div>
       )}
 
+      {editingGoalId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-6 backdrop-blur-sm">
+          <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-slate-950 p-5 text-white shadow-2xl shadow-black/50">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-base font-semibold">Editar meta</h3>
+                <p className="mt-1 text-sm text-white/60">
+                  Ajusta el nombre, monto, saldo inicial o fecha objetivo.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={cancelEdit}
+                disabled={saving}
+                className="rounded-xl bg-white/5 p-2 text-white/70 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+                aria-label="Cerrar edicion de meta"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="mt-5 space-y-3">
+              <label className="block space-y-1.5">
+                <span className="text-xs font-medium text-white/65">
+                  Nombre de la meta
+                </span>
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Ej. Inicial de vivienda"
+                  className="w-full rounded-xl bg-white/10 px-3 py-2.5 text-sm font-medium text-white outline-none ring-1 ring-white/15 placeholder:text-white/45 focus:ring-2 focus:ring-emerald-300/60"
+                />
+              </label>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <label className="block space-y-1.5">
+                  <span className="text-xs font-medium text-white/65">
+                    Monto objetivo
+                  </span>
+                  <input
+                    value={targetAmount}
+                    onChange={(e) =>
+                      setTargetAmount(formatAmountInput(e.target.value))
+                    }
+                    placeholder="0"
+                    inputMode="decimal"
+                    className="w-full rounded-xl bg-white/10 px-3 py-2.5 text-sm font-medium text-white outline-none ring-1 ring-white/15 placeholder:text-white/45 focus:ring-2 focus:ring-emerald-300/60"
+                  />
+                </label>
+                <label className="block space-y-1.5">
+                  <span className="text-xs font-medium text-white/65">
+                    Ya ahorrado
+                  </span>
+                  <input
+                    value={initialBalance}
+                    onChange={(e) =>
+                      setInitialBalance(formatAmountInput(e.target.value))
+                    }
+                    placeholder="0"
+                    inputMode="decimal"
+                    className="w-full rounded-xl bg-white/10 px-3 py-2.5 text-sm font-medium text-white outline-none ring-1 ring-white/15 placeholder:text-white/45 focus:ring-2 focus:ring-emerald-300/60"
+                  />
+                </label>
+                <label className="block space-y-1.5 sm:col-span-2">
+                  <span className="text-xs font-medium text-white/65">
+                    Fecha objetivo
+                  </span>
+                  <input
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    type="date"
+                    className="w-full rounded-xl bg-white/10 px-3 py-2.5 text-sm font-medium text-white outline-none ring-1 ring-white/15 focus:ring-2 focus:ring-emerald-300/60"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={cancelEdit}
+                disabled={saving}
+                className="rounded-xl bg-white/10 px-4 py-2 text-sm font-medium text-white ring-1 ring-white/15 transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={saveGoal}
+                disabled={saving}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+                Guardar cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {goalToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-2xl border border-white/10 bg-slate-950 p-5 text-white shadow-2xl shadow-black/50">
@@ -737,6 +892,90 @@ export function SavingsGoalsPanel() {
                 Si
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showHistoryModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-3xl rounded-2xl border border-white/10 bg-slate-950 p-5 text-white shadow-2xl shadow-black/50">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-base font-semibold">Historico de Metas</h3>
+                <p className="mt-1 text-sm text-white/60">
+                  Metas que ya alcanzaron el 100% de avance.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowHistoryModal(false)}
+                className="rounded-xl bg-white/5 p-2 text-white/70 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white"
+                aria-label="Cerrar historico de metas"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {completedGoals.length === 0 ? (
+              <div className="mt-5 rounded-2xl bg-white/5 p-5 text-sm text-white/55 ring-1 ring-white/10">
+                Todavia no hay metas completadas.
+              </div>
+            ) : (
+              <div className="mt-5 max-h-[60vh] space-y-3 overflow-auto pr-1">
+                {completedGoals.map(({ goal, progress }) => (
+                  <div
+                    key={goal.ID}
+                    className="rounded-2xl bg-white/[0.04] p-4 ring-1 ring-white/10"
+                  >
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h4 className="break-words text-sm font-semibold text-white">
+                            {goal.Nombre}
+                          </h4>
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 px-2.5 py-1 text-xs font-medium text-emerald-200 ring-1 ring-emerald-300/20">
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            Completada
+                          </span>
+                        </div>
+                        <p className="mt-2 flex items-center gap-1.5 text-xs text-white/45">
+                          <CalendarDays className="h-3.5 w-3.5" />
+                          Fecha objetivo: {dateLabel(goal.FechaLimite)}
+                        </p>
+                      </div>
+                      <span className="rounded-full bg-white/10 px-2 py-1 text-xs text-white/70">
+                        {progress.percent.toFixed(0)}%
+                      </span>
+                    </div>
+
+                    <div className="mt-4 h-2 rounded-full bg-white/10">
+                      <div className="h-full rounded-full bg-emerald-300" />
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
+                      <div>
+                        <p className="text-white/45">Objetivo</p>
+                        <p className="mt-1 font-semibold text-white">
+                          {money(goal.MontoObjetivo)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-white/45">Ahorrado</p>
+                        <p className="mt-1 font-semibold text-emerald-200">
+                          {money(progress.current)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-white/45">Transacciones</p>
+                        <p className="mt-1 font-semibold text-white">
+                          {goal.TransaccionesAsociadas.length}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

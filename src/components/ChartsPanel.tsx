@@ -146,7 +146,7 @@ function CategoryPieCard({
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: "easeOut", delay }}
-      className="glass min-w-0 p-5"
+      className="glass min-w-0 p-4 sm:p-5"
     >
       <div className="mb-3">
         <h3 className="text-base font-semibold">{title}</h3>
@@ -158,10 +158,10 @@ function CategoryPieCard({
           No hay datos disponibles para mostrar.
         </div>
       ) : (
-        <div className="flex min-h-[360px] w-full min-w-0 flex-col gap-5 xl:flex-row xl:items-center">
-          <div className="mx-auto h-[280px] w-[280px] flex-none xl:h-[260px] xl:w-[260px] 2xl:h-[280px] 2xl:w-[280px]">
+        <div className="flex min-h-[320px] w-full min-w-0 flex-col gap-5 xl:flex-row xl:items-center">
+          <div className="mx-auto h-[220px] w-full max-w-[220px] flex-none sm:h-[260px] sm:max-w-[260px] 2xl:h-[280px] 2xl:max-w-[280px]">
             {mounted && (
-              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={260}>
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={220}>
                 <PieChart>
                   <Pie
                     data={data}
@@ -196,12 +196,12 @@ function CategoryPieCard({
             )}
           </div>
 
-          <div className="min-w-0 flex-1 pr-1">
+          <div className="min-w-0 flex-1 pr-0 xl:pr-1">
             <div className="space-y-2.5">
               {data.map((item, i) => (
                 <div
                   key={item.name}
-                  className="grid grid-cols-[10px_minmax(140px,1fr)_auto] items-start gap-2 text-xs"
+                  className="grid grid-cols-[10px_minmax(0,1fr)] items-start gap-2 text-xs sm:grid-cols-[10px_minmax(120px,1fr)_auto]"
                 >
                   <span
                     className="mt-1 h-2.5 w-2.5 rounded-sm"
@@ -224,7 +224,7 @@ function CategoryPieCard({
                     </p>
                   </div>
                   <p
-                    className="whitespace-nowrap text-right font-medium"
+                    className="col-start-2 break-words font-medium sm:col-auto sm:whitespace-nowrap sm:text-right"
                     style={{ color: "var(--chart-legend-value)" }}
                   >
                     {money(item.value)}
@@ -243,7 +243,8 @@ export function ChartsPanel({ txs }: { txs: Transaction[] }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const id = window.requestAnimationFrame(() => setMounted(true));
+    return () => window.cancelAnimationFrame(id);
   }, []);
 
   const grouped = new Map<
@@ -301,24 +302,24 @@ export function ChartsPanel({ txs }: { txs: Transaction[] }) {
   const totalIngresos = incomePieData.reduce((sum, item) => sum + item.value, 0);
 
   return (
-    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-3">
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: "easeOut" }}
-        className="glass min-w-0 p-5"
+        className="glass min-w-0 p-4 sm:p-5"
       >
         <div className="mb-3">
           <h3 className="text-base font-semibold">Evolucion (Neto mensual)</h3>
           <p className="text-sm text-white/60">Ingresos - Gastos</p>
         </div>
 
-        <div className="h-[340px]">
+        <div className="h-[280px] sm:h-[340px]">
           {mounted && (
-            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={340}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={280}>
               <LineChart
                 data={lineData}
-                margin={{ top: 14, right: 24, bottom: 14, left: 12 }}
+                margin={{ top: 14, right: 12, bottom: 14, left: 0 }}
               >
                 <CartesianGrid stroke="var(--chart-grid)" />
                 <XAxis
@@ -332,7 +333,7 @@ export function ChartsPanel({ txs }: { txs: Transaction[] }) {
                   tick={{ fill: "var(--chart-axis)", fontSize: 14 }}
                   tickFormatter={(value) => formatNumber(Number(value))}
                   tickMargin={8}
-                  width={90}
+                  width={68}
                 />
                 <Tooltip
                   formatter={(value) => [money(Number(value)), "Neto"]}

@@ -1,5 +1,6 @@
 import type { Budget } from "@/lib/budgets";
 import type { Debt, Transaction } from "@/lib/types";
+import type { Subscription } from "@/lib/subscriptions";
 import {
   getDebtAlerts,
   getDebtControlSummary,
@@ -16,6 +17,8 @@ export type PaymentNotification = {
     | "overdue"
     | "upcoming"
     | "budget-overrun"
+    | "cashflow-overrun"
+    | "subscription-renewal"
     | "debt-interest"
     | "debt-low-payment"
     | "debt-priority";
@@ -46,6 +49,10 @@ function getTransactionCategory(tx: Transaction) {
   );
 
   return String(entry?.[1] ?? "");
+}
+
+function isPaid(tx: Transaction) {
+  return normalizeKey(tx.EstadoPago) === "pagado";
 }
 
 function normalizeDate(dateValue: string) {
@@ -152,6 +159,7 @@ export function getBudgetNotifications({
 
   for (const tx of transactions) {
     if (normalizeKey(tx.Tipo) !== "gasto") continue;
+    if (!isPaid(tx)) continue;
 
     const period = periodKey(tx.Fecha);
     const category = normalizeKey(getTransactionCategory(tx));
@@ -182,6 +190,70 @@ export function getBudgetNotifications({
         title: "Presupuesto superado",
         message: `${budget.category} supero el presupuesto de ${budget.period}: gastado ${money(spent)} de ${money(limit)} (${money(excess)} por encima).`,
         type: "budget-overrun" as const,
+      };
+    })
+    .filter(Boolean) as PaymentNotification[];
+}
+
+export function getCashflowNotifications(
+  transactions: Transaction[],
+  period = new Date().toISOString().slice(0, 7)
+): PaymentNotification[] {
+  let income = 0;
+  let expenses = 0;
+
+  for (const tx of transactions) {
+    if (periodKey(tx.Fecha) !== period) continue;
+
+    if (normalizeKey(tx.Tipo) === "ingreso") {
+      income += Number(tx.Importe) || 0;
+    }
+
+    if (normalizeKey(tx.Tipo) === "gasto" && isPaid(tx)) {
+      expenses += Number(tx.Importe) || 0;
+    }
+  }
+
+  if (expenses <= income || expenses <= 0) return [];
+
+  return [
+    {
+      id: `cashflow-overrun-${period}`,
+      title: "Gastos superan ingresos previstos",
+      message:
+        income > 0
+          ? `En ${period}, tus gastos pagados (${money(expenses)}) superan tus ingresos previstos (${money(income)}) por ${money(expenses - income)}.`
+          : `En ${period}, tienes gastos pagados por ${money(expenses)} y aun no hay ingresos previstos registrados.`,
+      type: "cashflow-overrun",
+      period,
+    },
+  ];
+}
+
+export function getSubscriptionNotifications(
+  subscriptions: Subscription[]
+): PaymentNotification[] {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return subscriptions
+    .filter((subscription) => subscription.status === "Activa")
+    .map((subscription) => {
+      const date = new Date(`${subscription.nextChargeDate}T00:00:00`);
+      if (Number.isNaN(date.getTime())) return null;
+
+      const diffDays = Math.ceil((date.getTime() - today.getTime()) / 86400000);
+      if (![1, 3, 7].includes(diffDays)) return null;
+
+      return {
+        id: `subscription-renewal-${subscription.id}-${subscription.nextChargeDate}`,
+        title: "Suscripcion por renovar",
+        message:
+          diffDays === 1
+            ? `${subscription.name} se renovara mañana por ${money(subscription.amount)}.`
+            : `${subscription.name} se renovara en ${diffDays} dias por ${money(subscription.amount)}.`,
+        type: "subscription-renewal" as const,
+        daysDifference: diffDays,
       };
     })
     .filter(Boolean) as PaymentNotification[];

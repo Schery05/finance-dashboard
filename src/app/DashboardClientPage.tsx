@@ -12,7 +12,14 @@ import { useFinanceStore } from "@/store/financeStore";
 import type { Transaction } from "@/lib/types";
 
 export default function DashboardClientPage() {
-  const { transactions, fetchTransactions, deleteTransaction, loading, error } =
+  const {
+    transactions,
+    fetchTransactions,
+    deleteTransaction,
+    deleteTransactions,
+    loading,
+    error,
+  } =
     useFinanceStore();
 
   const [open, setOpen] = useState(false);
@@ -67,7 +74,7 @@ export default function DashboardClientPage() {
 
   return (
     <DashboardShell>
-      <div className="space-y-4">
+      <div className="min-w-0 space-y-4">
         {error && (
           <div className="glass p-4 text-sm text-rose-200 ring-1 ring-rose-500/20">
             Error: {error}
@@ -85,7 +92,7 @@ export default function DashboardClientPage() {
         <div className="flex justify-end">
           <button
             onClick={() => setImportOpen(true)}
-            className="rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/15 transition hover:bg-white/15"
+            className="w-full rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/15 transition hover:bg-white/15 sm:w-auto"
           >
             Importar CSV bancario
           </button>
@@ -105,6 +112,9 @@ export default function DashboardClientPage() {
           }}
           onDelete={async (t) => {
             await deleteTransaction(t.ID);
+          }}
+          onBulkDelete={async (ids) => {
+            await deleteTransactions(ids);
           }}
         />
       </div>

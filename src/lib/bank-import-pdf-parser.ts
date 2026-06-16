@@ -121,12 +121,10 @@ function cleanPdfText(value: string) {
     .trim();
 }
 
-function shouldIgnorePdfRow(description: string, category: string) {
-  const text = normalizeBankImportText(description);
-  return (
-    normalizeBankImportText(category) === "pago tarjeta" ||
-    /^pago\s+via\s+app|^pago\s+via\s+cel/.test(text)
-  );
+function shouldIgnorePdfRow(_description: string, _category: string) {
+  void _description;
+  void _category;
+  return false;
 }
 
 function isFullDateLine(value: string) {
@@ -498,7 +496,7 @@ function parseTextRows(text: string, sourceBank: string) {
       continue;
     }
 
-    const type = signedAmount < 0 && inferred.category !== "Pago tarjeta" ? "Ingreso" : inferred.type;
+    const type = signedAmount < 0 ? "Ingreso" : inferred.type;
     const category =
       type === inferred.type ? inferred.category : type === "Ingreso" ? "Reembolsos" : inferred.category;
 
@@ -537,8 +535,6 @@ function mapOcrRows(rows: OcrTransaction[], sourceBank: string) {
       const type = row.type === "Ingreso" || row.type === "Gasto" ? row.type : inferred.type;
       const category =
         type === inferred.type ? inferred.category : type === "Ingreso" ? "Bonos" : inferred.category;
-
-      if (normalizeBankImportText(category) === "pago tarjeta") return null;
 
       return {
         Fecha: date,

@@ -118,36 +118,18 @@ function matchesTransactionQuery(query: string, text: string, amount: number) {
   );
 }
 
-function matchesMainQuery(query: string, description: string, amount: number) {
-  const normalizedQuery = normalizeQueryText(query);
-  if (!normalizedQuery) return true;
-
-  const amountText = [
-    String(amount),
-    amount.toFixed(2),
-    money(amount),
-    money(amount).replace(/[^\d.,]/g, ""),
-  ].join(" ");
-
-  return (
-    normalizeQueryText(description).includes(normalizedQuery) ||
-    compactQueryText(description).includes(compactQueryText(normalizedQuery)) ||
-    normalizeQueryText(amountText).includes(normalizedQuery) ||
-    compactQueryText(amountText).includes(compactQueryText(normalizedQuery)) ||
-    matchesAmountQuery(normalizedQuery, amount)
-  );
-}
-
 export function TransactionsTable({
   txs,
   onEdit,
   onClone,
   onDelete,
+  onBulkDelete,
 }: {
   txs: Transaction[];
   onClone: (t: Transaction) => void;
   onEdit: (t: Transaction) => void;
   onDelete: (t: Transaction) => Promise<void>;
+  onBulkDelete: (ids: string[]) => Promise<void>;
 }) {
   const {
     search,
@@ -166,7 +148,9 @@ export function TransactionsTable({
   const [excludeMonth, setExcludeMonth] = useState("Ninguno");
   const [excludeDate, setExcludeDate] = useState("");
   const [hideRecurringSuggestions, setHideRecurringSuggestions] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
@@ -234,7 +218,7 @@ export function TransactionsTable({
       t.EsSugerenciaRecurrente ? "recurrente sugerido" : "",
     ].join(" ");
 
-    const matchesSearch = matchesMainQuery(s, desc, importe);
+    const matchesSearch = matchesTransactionQuery(s, searchableText, importe);
     const matchesMonth = month === "Todos" ? true : m === month;
     const matchesCategory =
       categoryFilter === "Todas" ? true : categoria === categoryFilter;
@@ -294,17 +278,34 @@ export function TransactionsTable({
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+  const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
+  const selectedTransactions = useMemo(
+    () => txs.filter((transaction) => selectedIdSet.has(transaction.ID)),
+    [selectedIdSet, txs]
+  );
+  const visibleSelectedCount = paginated.filter((transaction) =>
+    selectedIdSet.has(transaction.ID)
+  ).length;
+  const allVisibleSelected =
+    paginated.length > 0 && visibleSelectedCount === paginated.length;
+  const someVisibleSelected = visibleSelectedCount > 0 && !allVisibleSelected;
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
   }, [page, totalPages]);
+
+  useEffect(() => {
+    const availableIds = new Set(txs.map((transaction) => transaction.ID));
+    setSelectedIds((current) =>
+      current.filter((id) => availableIds.has(id))
+    );
+  }, [txs]);
 
   const controlBase =
     "rounded-xl px-3 py-2 text-sm outline-none backdrop-blur-xl transition " +
     "bg-white/10 text-white ring-1 ring-white/20 hover:bg-white/15 focus:ring-2 focus:ring-cyan-400/60";
 
   const selectClass = "native-filter-select";
-  const optionClass = "native-filter-option";
 
   const confirmDelete = async () => {
     if (!deleteTarget || deleting) return;
@@ -326,16 +327,57 @@ export function TransactionsTable({
     }
   };
 
+  const toggleSelected = (id: string) => {
+    setSelectedIds((current) =>
+      current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id]
+    );
+  };
+
+  const toggleVisibleSelected = () => {
+    const visibleIds = paginated.map((transaction) => transaction.ID);
+
+    setSelectedIds((current) => {
+      if (allVisibleSelected) {
+        return current.filter((id) => !visibleIds.includes(id));
+      }
+
+      return Array.from(new Set([...current, ...visibleIds]));
+    });
+  };
+
+  const confirmBulkDelete = async () => {
+    if (selectedIds.length === 0 || deleting) return;
+
+    setDeleting(true);
+    setDeleteError("");
+
+    try {
+      await onBulkDelete(selectedIds);
+      setSelectedIds([]);
+      setBulkDeleteOpen(false);
+    } catch (error) {
+      setDeleteError(
+        error instanceof Error
+          ? error.message
+          : "No se pudieron eliminar las transacciones."
+      );
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: "easeOut" }}
-      className="glass p-5"
+      className="glass min-w-0 p-3 sm:p-5"
     >
       {/* Header */}
       <div className="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-        <div className="shrink-0">
+        <div className="min-w-0 shrink-0">
           <h3 className="text-base font-semibold">Transacciones</h3>
           <p className="text-sm text-white/60">
             {filtered.length} registro(s) encontrados
@@ -343,11 +385,11 @@ export function TransactionsTable({
         </div>
 
         {/* Filtros */}
-        <div className="grid w-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1.35fr)_minmax(140px,0.85fr)_minmax(170px,1fr)_minmax(120px,0.7fr)_minmax(140px,0.85fr)] xl:max-w-[980px] xl:items-center">
+        <div className="grid w-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1.35fr)_minmax(140px,0.85fr)_minmax(170px,1fr)_minmax(120px,0.7fr)_minmax(140px,0.85fr)] xl:items-center">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por descripcion o importe"
+            placeholder="Buscar por categoria, descripcion o importe"
             className={
               controlBase +
               " native-filter-input w-full min-w-0 placeholder-white/50 sm:col-span-2 lg:col-span-1"
@@ -451,9 +493,41 @@ export function TransactionsTable({
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl ring-1 ring-white/10">
-        <table className="w-full table-fixed text-sm">
+      {selectedIds.length > 0 && (
+        <div className="mb-4 flex flex-col gap-3 rounded-2xl bg-cyan-400/10 p-3 text-sm ring-1 ring-cyan-300/20 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-cyan-100">
+            <span className="font-semibold">{selectedIds.length}</span>{" "}
+            transaccion(es) seleccionada(s)
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setSelectedIds([])}
+              disabled={deleting}
+              className="rounded-xl bg-white/5 px-3 py-2 text-xs font-semibold text-white/75 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Limpiar seleccion
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setDeleteError("");
+                setBulkDeleteOpen(true);
+              }}
+              disabled={deleting}
+              className="inline-flex items-center gap-2 rounded-xl bg-rose-500 px-3 py-2 text-xs font-semibold text-white shadow-lg shadow-rose-500/20 transition hover:bg-rose-400 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <Trash2 className="h-4 w-4" />
+              Eliminar seleccionadas
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="overflow-x-auto rounded-2xl ring-1 ring-white/10">
+        <table className="min-w-[980px] w-full table-fixed text-sm">
           <colgroup>
+            <col className="w-[44px]" />
             <col className="w-[9%]" />
             <col className="w-[7%]" />
             <col className="w-[17%]" />
@@ -464,6 +538,19 @@ export function TransactionsTable({
           </colgroup>
           <thead className="bg-white/5 text-white/70">
             <tr>
+              <th className="px-3 py-3 text-left font-medium">
+                <input
+                  type="checkbox"
+                  checked={allVisibleSelected}
+                  ref={(input) => {
+                    if (input) input.indeterminate = someVisibleSelected;
+                  }}
+                  onChange={toggleVisibleSelected}
+                  disabled={paginated.length === 0}
+                  className="h-4 w-4 rounded accent-cyan-400"
+                  aria-label="Seleccionar transacciones visibles"
+                />
+              </th>
               <th className="px-3 py-3 text-left font-medium">Fecha</th>
               <th className="px-3 py-3 text-left font-medium">Tipo</th>
               <th className="px-3 py-3 text-left font-medium">Categoría</th>
@@ -482,6 +569,15 @@ export function TransactionsTable({
 
               return (
                 <tr key={t.ID} className="border-t border-white/10 hover:bg-white/[0.03]">
+                  <td className="px-3 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedIdSet.has(t.ID)}
+                      onChange={() => toggleSelected(t.ID)}
+                      className="h-4 w-4 rounded accent-cyan-400"
+                      aria-label={`Seleccionar transaccion ${t.Fecha} ${t.Categoría}`}
+                    />
+                  </td>
                   <td className="px-3 py-3 whitespace-nowrap text-white/80">{t.Fecha}</td>
 
                   <td className="px-3 py-3">
@@ -566,7 +662,7 @@ export function TransactionsTable({
 
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-10 text-center text-white/50">
+                <td colSpan={8} className="px-4 py-10 text-center text-white/50">
                   No hay resultados con los filtros actuales.
                 </td>
               </tr>
@@ -683,6 +779,70 @@ export function TransactionsTable({
               <button
                 type="button"
                 onClick={confirmDelete}
+                disabled={deleting}
+                className="rounded-xl bg-rose-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-rose-500/20 transition hover:bg-rose-400 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {deleting ? "Eliminando..." : "Si, eliminar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {bulkDeleteOpen && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl border border-white/10 bg-slate-950 p-5 text-white shadow-2xl shadow-black/40">
+            <div className="mb-4 flex items-start gap-3">
+              <div className="rounded-2xl bg-rose-500/10 p-3 text-rose-200 ring-1 ring-rose-300/20">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold">Eliminar seleccionadas</h3>
+                <p className="mt-1 text-sm leading-6 text-white/60">
+                  Se eliminaran {selectedIds.length} transaccion(es). Esta accion no se puede deshacer.
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-white/[0.04] p-3 text-sm ring-1 ring-white/10">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-white/55">Seleccionadas</span>
+                <span className="font-medium">{selectedIds.length}</span>
+              </div>
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <span className="text-white/55">Importe total</span>
+                <span className="font-semibold">
+                  {money(
+                    selectedTransactions.reduce(
+                      (total, transaction) => total + (Number(transaction.Importe) || 0),
+                      0
+                    )
+                  )}
+                </span>
+              </div>
+            </div>
+
+            {deleteError && (
+              <div className="mt-4 rounded-2xl bg-rose-500/10 p-3 text-sm text-rose-100 ring-1 ring-rose-300/20">
+                {deleteError}
+              </div>
+            )}
+
+            <div className="mt-5 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  if (deleting) return;
+                  setBulkDeleteOpen(false);
+                  setDeleteError("");
+                }}
+                className="rounded-xl bg-white/5 px-4 py-2 text-sm font-semibold text-white/75 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={confirmBulkDelete}
                 disabled={deleting}
                 className="rounded-xl bg-rose-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-rose-500/20 transition hover:bg-rose-400 disabled:cursor-not-allowed disabled:opacity-60"
               >
